@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RAMLP Portal | Role-Based Access &amp; Registration</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#98e9ab",
+            "inverse-surface": "#2a322a",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#a3f5b6",
+            "tertiary-fixed": "#ffdea7",
+            "secondary": "#306b19",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "error": "#ba1a1a",
+            "outline": "#707a6f",
+            "primary-container": "#176b3a",
+            "surface": "#f3fcef",
+            "secondary-container": "#b0f491",
+            "tertiary-container": "#7b5700",
+            "surface-dim": "#d4ddd0",
+            "on-surface-variant": "#404940",
+            "surface-container": "#e8f0e4",
+            "on-secondary-fixed": "#052100",
+            "on-tertiary": "#ffffff",
+            "primary": "#005128",
+            "surface-container-low": "#edf6e9",
+            "surface-container-highest": "#dce5d9",
+            "on-tertiary-fixed": "#271900",
+            "background": "#f3fcef",
+            "surface-tint": "#196c3b",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#95d878",
+            "on-background": "#161d16",
+            "surface-bright": "#f3fcef",
+            "tertiary": "#5d4100",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "outline-variant": "#bfc9bd",
+            "secondary-fixed": "#b0f491",
+            "on-primary-fixed": "#00210d",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#175200",
+            "inverse-on-surface": "#eaf3e7",
+            "on-surface": "#161d16",
+            "surface-container-high": "#e2ebde",
+            "on-primary-fixed-variant": "#005228",
+            "surface-variant": "#dce5d9",
+            "tertiary-fixed-dim": "#f8bd45",
+            "inverse-primary": "#88d89c",
+            "on-secondary-container": "#36721f",
+            "on-tertiary-container": "#ffd07c",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#88d89c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "label-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "currency-display": ["Manrope"],
+            "label-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "headline-md": ["Manrope"]
+          },
+          "fontSize": {
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5ee;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #bfc9bd;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #707a6f;
+    }
+  </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Mobile Top Utility Brand Header (Visible only on mobile) -->
+<header class="lg:hidden bg-surface-container-lowest px-4 py-3 border-b border-outline-variant flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[22px]">agriculture</span>
+</div>
+<div>
+<span class="font-headline-sm text-headline-sm font-bold text-primary block leading-tight">AgroLink RAMLP</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant block uppercase tracking-wider">CBN Regulated Ecosystem</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 text-[11px] font-label-sm font-medium bg-surface-container px-2.5 py-1 rounded-full text-primary border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+      v2.4 Live
+    </span>
+</header>
+<!-- Main Canvas Container: Split-screen Architectural View -->
+<main class="flex-grow flex flex-col lg:flex-row w-full max-w-[1536px] mx-auto min-h-[calc(100vh-64px)]">
+<!-- LEFT COLUMN: Institutional Trust, Economic Impact & Ecosystem Showcase -->
+<section class="lg:w-5/12 xl:w-1/2 bg-surface-container-low p-6 sm:p-10 lg:p-12 xl:p-16 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-outline-variant relative overflow-hidden">
+<!-- Background Subtle Pattern Grid Accent -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#005128 1px, transparent 1px); background-size: 20px 20px;"></div>
+<div class="relative z-10 space-y-8">
+<!-- Logo & Institutional Identifier Badge -->
+<div class="space-y-3">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-lowest border border-outline-variant shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-container ring-4 ring-primary/20 animate-pulse"></span>
+<span class="font-label-sm text-label-sm font-semibold text-primary uppercase tracking-wide">Nigeria Unified Rural Agricultural Trade Gateway</span>
+</div>
+<div class="flex items-center gap-3 pt-2">
+<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">token</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">AgroLink RAMLP</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Rural Agricultural Market Liquidity &amp; Escrow Portal</p>
+</div>
+</div>
+</div>
+<!-- Value Proposition Headlines -->
+<div class="space-y-4">
+<h2 class="font-headline-lg lg:text-[2.2rem] lg:leading-[2.6rem] font-bold text-on-surface tracking-tight">
+            Institutional Escrow &amp; Guaranteed Delivery for Nigeria's Agro Value Chain.
+          </h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Join over <strong class="text-on-surface font-semibold">4,000+ verified farming clusters</strong>, industrial food millers, institutional grain aggregators, and certified haulage carriers across Nigeria operating under regulated financial integrity.
+          </p>
+</div>
+<!-- Security & Compliance Triple Assurance Stack -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+<div class="bg-surface-container-lowest p-3.5 rounded-xl border border-outline-variant flex flex-col justify-between shadow-sm">
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<span class="font-label-sm text-[11px] font-bold uppercase tracking-wider">Settlement</span>
+</div>
+<p class="font-label-sm text-xs text-on-surface font-semibold leading-tight">NIBSS e-BillsPay Direct Settlement</p>
+</div>
+<div class="bg-surface-container-lowest p-3.5 rounded-xl border border-outline-variant flex flex-col justify-between shadow-sm">
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-sm text-[11px] font-bold uppercase tracking-wider">Custody</span>
+</div>
+<p class="font-label-sm text-xs text-on-surface font-semibold leading-tight">CBN-Regulated Commercial Escrow</p>
+</div>
+<div class="bg-surface-container-lowest p-3.5 rounded-xl border border-outline-variant flex flex-col justify-between shadow-sm">
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">biotech</span>
+<span class="font-label-sm text-[11px] font-bold uppercase tracking-wider">Audit</span>
+</div>
+<p class="font-label-sm text-xs text-on-surface font-semibold leading-tight">Automated Lab Inspection Protocols</p>
+</div>
+</div>
+<!-- Interactive Trade Credential Preview Card -->
+<div class="pt-2">
+<div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-sm relative overflow-hidden group">
+<div class="flex items-start justify-between gap-4 mb-4">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-lg bg-surface-container flex items-center justify-center text-primary font-bold">
+<span class="material-symbols-outlined text-[26px]">verified</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-sm font-bold text-on-surface">Bodija Grain Aggregator Union</span>
+<span class="bg-[#E8F4EC] text-primary text-[10px] font-bold px-2 py-0.5 rounded-full border border-primary/20">TIER-1 CO-OP</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant">LGA: Ibadan North, Oyo State • ID: RAMLP-NG-77492</p>
+</div>
+</div>
+<span class="font-label-sm text-xs bg-secondary-fixed text-on-secondary-fixed px-2.5 py-1 rounded-md font-semibold">Active Ledger</span>
+</div>
+<div class="grid grid-cols-3 gap-2 py-3 px-3.5 bg-surface-container-low rounded-lg border border-outline-variant/60 text-center">
+<div>
+<span class="block text-[11px] font-label-sm text-on-surface-variant">Escrow Settled</span>
+<span class="block font-headline-sm text-sm font-bold text-primary">₦284.5M</span>
+</div>
+<div class="border-x border-outline-variant/60 px-2">
+<span class="block text-[11px] font-label-sm text-on-surface-variant">Moisture Pass Rate</span>
+<span class="block font-headline-sm text-sm font-bold text-secondary">99.4%</span>
+</div>
+<div>
+<span class="block text-[11px] font-label-sm text-on-surface-variant">Waybills Closed</span>
+<span class="block font-headline-sm text-sm font-bold text-on-surface">412 Trucks</span>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between text-xs text-on-surface-variant">
+<span class="inline-flex items-center gap-1 font-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">encrypted</span>
+                End-to-End Cryptographic Chain of Custody
+              </span>
+<span class="text-[11px] text-outline font-medium">Synced NIBSS 14:02 UTC</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Left Column Footer Testimonial / Help Note -->
+<div class="pt-8 mt-6 border-t border-outline-variant/60 flex items-center justify-between text-xs text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-tertiary">support_agent</span>
+<span>RAMLP Desk 24/7 Field Support Available</span>
+</div>
+<span class="font-label-sm font-semibold text-primary">CBN/RAMLP/DIR/2024/09</span>
+</div>
+</section>
+<!-- RIGHT COLUMN: Role-Based Authentication & Registration Panel -->
+<section class="lg:w-7/12 xl:w-1/2 bg-surface-container-lowest p-6 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-start custom-scrollbar overflow-y-auto">
+<!-- Top Action Navigation Pill: Account Mode Toggle -->
+<div class="w-full max-w-xl mx-auto space-y-6">
+<!-- Segmented Tab Switcher (Registration vs Sign In) -->
+<div class="bg-surface-container-low p-1.5 rounded-xl border border-outline-variant flex items-center shadow-inner">
+<button class="flex-1 py-2.5 px-4 rounded-lg font-headline-sm text-sm font-bold transition-all duration-150 bg-primary-container text-on-primary shadow-sm flex items-center justify-center gap-2" id="tabRegisterBtn" onclick="switchAuthMode('register')" type="button">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+            Create New Account
+          </button>
+<button class="flex-1 py-2.5 px-4 rounded-lg font-headline-sm text-sm font-medium transition-all duration-150 text-on-surface-variant hover:text-primary flex items-center justify-center gap-2" id="tabLoginBtn" onclick="switchAuthMode('login')" type="button">
+<span class="material-symbols-outlined text-[18px]">login</span>
+            Sign In to Portal
+          </button>
+</div>
+<!-- ======================= SECTION 1: REGISTRATION FLOW ======================= -->
+<div class="space-y-6" id="registerPanel">
+<!-- Header and Instructions -->
+<div class="space-y-1">
+<h3 class="font-headline-md text-xl font-bold text-on-surface">Select Value Chain Participation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Every profile undergoes automated KYC verification with CBN/NIBSS and the Federal Ministry of Agriculture.
+            </p>
+</div>
+<!-- 4-ROLE SELECTOR CARDS -->
+<div class="space-y-2.5">
+<label class="block font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">
+              1. Choose Ecosystem Persona:
+            </label>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="roleGrid">
+<!-- Role 1: Farmer / Agricultural Cooperative (Default Selected) -->
+<div class="role-card cursor-pointer p-3.5 rounded-xl border-2 border-primary-container bg-surface-container-low/70 transition-all duration-150 relative" onclick="selectRole('farmer', this)">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">agriculture</span>
+</div>
+<div class="pr-5">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline-sm text-xs font-bold text-on-surface leading-snug">Farmer / Agricultural Co-op</h4>
+</div>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mt-1">
+                      Sell harvest lots, benchmark local spot rates, and receive instant escrow disbursements.
+                    </p>
+</div>
+</div>
+<div class="check-indicator absolute top-3 right-3 text-primary-container">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Role 2: Industrial Buyer / Food Processor -->
+<div class="role-card cursor-pointer p-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest hover:border-primary-container/60 transition-all duration-150 relative" onclick="selectRole('buyer', this)">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">factory</span>
+</div>
+<div class="pr-5">
+<h4 class="font-headline-sm text-xs font-bold text-on-surface leading-snug">Industrial Buyer / Processor</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mt-1">
+                      Procure standardized bulk grains, roots &amp; tubers with moisture &amp; grade guarantees.
+                    </p>
+</div>
+</div>
+<div class="check-indicator absolute top-3 right-3 text-outline-variant hidden">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Role 3: Logistics & Haulage Carrier -->
+<div class="role-card cursor-pointer p-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest hover:border-primary-container/60 transition-all duration-150 relative" onclick="selectRole('logistics', this)">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">local_shipping</span>
+</div>
+<div class="pr-5">
+<h4 class="font-headline-sm text-xs font-bold text-on-surface leading-snug">Logistics &amp; Haulage Carrier</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mt-1">
+                      Accept verified dispatch manifests, track GPS waybills, and receive automated diesel advances.
+                    </p>
+</div>
+</div>
+<div class="check-indicator absolute top-3 right-3 text-outline-variant hidden">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Role 4: Certified Quality Lab / Inspector -->
+<div class="role-card cursor-pointer p-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest hover:border-primary-container/60 transition-all duration-150 relative" onclick="selectRole('lab', this)">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">science</span>
+</div>
+<div class="pr-5">
+<h4 class="font-headline-sm text-xs font-bold text-on-surface leading-snug">Certified Lab / Inspector</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mt-1">
+                      Issue spectrometry moisture certificates, aflatoxin audits, and weighbridge telemetry slips.
+                    </p>
+</div>
+</div>
+<div class="check-indicator absolute top-3 right-3 text-outline-variant hidden">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Dynamic Registration Form Elements -->
+<form class="space-y-4 pt-1" onsubmit="event.preventDefault();">
+<div class="space-y-1">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="regEntityName" id="lblEntityName">
+                Cooperative Legal Name / Farmer Enterprise Name *
+              </label>
+<div class="relative">
+<input class="w-full h-12 bg-surface-container-lowest border border-outline-variant rounded-lg px-4 font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-0 transition-colors" id="regEntityName" placeholder="e.g. Saki Grain Producers Union Limited" type="text"/>
+</div>
+</div>
+<!-- Contact Numbers with Affix and OTP Verification Trigger -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="regPhone">
+                  Official Phone Number *
+                </label>
+<div class="flex rounded-lg border border-outline-variant focus-within:border-primary-container bg-surface-container-lowest overflow-hidden h-12 transition-colors">
+<span class="inline-flex items-center px-3 bg-surface-container-low border-r border-outline-variant text-on-surface-variant font-label-md text-xs font-bold">
+                    +234
+                  </span>
+<input class="w-full h-full border-0 bg-transparent px-3 font-body-md text-body-md text-on-surface focus:ring-0 placeholder:text-outline" id="regPhone" placeholder="803 123 4567" type="tel"/>
+</div>
+</div>
+<div class="space-y-1">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="regEmail">
+                  Official Email Address *
+                </label>
+<div class="relative">
+<input class="w-full h-12 bg-surface-container-lowest border border-outline-variant rounded-lg px-4 font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-0 transition-colors" id="regEmail" placeholder="ops@cooperative.ng" type="email"/>
+</div>
+</div>
+</div>
+<!-- Operating Hub & Region Selection -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="regHub">
+                  Primary Agro Logistics Hub *
+                </label>
+<div class="relative">
+<select class="w-full h-12 bg-surface-container-lowest border border-outline-variant rounded-lg px-3.5 font-body-sm text-body-sm text-on-surface focus:border-primary-container focus:ring-0 appearance-none transition-colors" id="regHub">
+<option disabled="" selected="" value="">Select Trade Hub Cluster</option>
+<option value="kano">Kano — Dawanau International Grains Hub</option>
+<option value="oyo">Oyo — Bodija / Iseyin Agricultural Center</option>
+<option value="benue">Benue — Gboko / Makurdi Tuber Hub</option>
+<option value="kaduna">Kaduna — Zaria / Giwa Depot</option>
+<option value="lagos">Lagos — Mile 12 / Ikeja Terminal</option>
+<option value="ogun">Ogun — Abeokuta / Sagamu Agro Hub</option>
+</select>
+<span class="material-symbols-outlined text-[20px] text-outline absolute right-3 top-3.5 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Compliance Identifiers: CAC / Co-op Reg or BVN / NIN -->
+<div class="space-y-1">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="regIdentifier" id="lblIdentifier">
+                  Cooperative Reg. / CAC RC Number *
+                </label>
+<div class="relative">
+<input class="w-full h-12 bg-surface-container-lowest border border-outline-variant rounded-lg px-4 font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-0 transition-colors" id="regIdentifier" placeholder="RC-1298492 or COOP/OYO/44" type="text"/>
+<span class="material-symbols-outlined text-[18px] text-outline absolute right-3.5 top-3.5" title="Required for AML/CBN compliance">policy</span>
+</div>
+</div>
+</div>
+<!-- Password Generation -->
+<div class="space-y-1">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="regPassword">
+                Create Security Keyphrase *
+              </label>
+<div class="relative">
+<input class="w-full h-12 bg-surface-container-lowest border border-outline-variant rounded-lg px-4 pr-11 font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-0 transition-colors" id="regPassword" placeholder="Minimum 8 characters with digits &amp; symbols" type="password"/>
+<button class="absolute right-3.5 top-3.5 text-outline hover:text-on-surface" onclick="togglePasswordVisibility('regPassword', this)" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</div>
+<!-- Checkbox Terms of Agreement -->
+<div class="pt-2">
+<label class="flex items-start gap-3 cursor-pointer select-none">
+<input class="w-5 h-5 rounded border-outline-variant text-primary-container focus:ring-0 focus:ring-offset-0 mt-0.5" required="" type="checkbox"/>
+<span class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+                  I agree to the <strong class="text-primary font-semibold hover:underline">RAMLP SafeTrade™ Escrow Framework</strong>, automated dispute arbitration rules, and Central Bank of Nigeria Agricultural Market guidelines.
+                </span>
+</label>
+</div>
+<!-- Primary Creation CTA -->
+<button class="w-full h-13 py-3.5 px-6 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-headline-sm text-base font-bold shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 group active:scale-[0.99]" type="submit">
+<span class="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span>Create Verified Account</span>
+</button>
+<!-- Verification Helper Info -->
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/60 flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-tertiary">info</span>
+<p class="font-label-sm text-[11px] text-on-surface-variant">
+                Instant SMS One-Time Passcode (OTP) will be dispatched to your phone number upon submission for terminal authorization.
+              </p>
+</div>
+</form>
+</div>
+<!-- ======================= SECTION 2: SIGN IN FLOW (HIDDEN BY DEFAULT) ======================= -->
+<div class="space-y-6 hidden" id="loginPanel">
+<div class="space-y-1">
+<h3 class="font-headline-md text-xl font-bold text-on-surface">Access RAMLP Trade Terminal</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Enter your registered credentials to access your escrow vaults, dispatch orders, and lab certificates.
+            </p>
+</div>
+<form class="space-y-4 pt-1" onsubmit="event.preventDefault();">
+<div class="space-y-1">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="loginIdentifier">
+                Registered Email or Phone (+234)
+              </label>
+<div class="relative">
+<input class="w-full h-12 bg-surface-container-lowest border border-outline-variant rounded-lg px-4 pr-10 font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-0 transition-colors" id="loginIdentifier" placeholder="e.g. kano-depot@agrolink.ng or 08031234567" type="text"/>
+<span class="material-symbols-outlined text-[20px] text-outline absolute right-3.5 top-3.5">badge</span>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<label class="block font-label-md text-label-md font-semibold text-on-surface" for="loginPassword">
+                  Account Password / Passcode
+                </label>
+<a class="font-label-sm text-xs font-semibold text-primary hover:underline" href="#reset">Forgot Password?</a>
+</div>
+<div class="relative">
+<input class="w-full h-12 bg-surface-container-lowest border border-outline-variant rounded-lg px-4 pr-11 font-body-md text-body-md text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-0 transition-colors" id="loginPassword" placeholder="••••••••••••" type="password"/>
+<button class="absolute right-3.5 top-3.5 text-outline hover:text-on-surface" onclick="togglePasswordVisibility('loginPassword', this)" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input class="w-4 h-4 rounded border-outline-variant text-primary-container focus:ring-0" type="checkbox"/>
+<span class="font-body-sm text-xs text-on-surface-variant">Remember this terminal for 30 days</span>
+</label>
+<span class="inline-flex items-center gap-1 text-[11px] font-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded border border-outline-variant">
+<span class="material-symbols-outlined text-[13px] text-secondary">shield</span> TLS 1.3
+              </span>
+</div>
+<!-- Login Primary Action -->
+<button class="w-full h-13 py-3.5 px-6 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-headline-sm text-base font-bold shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 group active:scale-[0.99]" type="submit">
+<span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-0.5">login</span>
+<span>Sign In to RAMLP Portal</span>
+</button>
+<!-- Hardware Security Token / CAC Quick Switch option -->
+<div class="pt-4 border-t border-outline-variant/60">
+<button class="w-full py-2.5 px-4 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-xs font-semibold flex items-center justify-center gap-2 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">key</span>
+                Sign In with Bank Identity (BVN / NIBSS ID)
+              </button>
+</div>
+</form>
+</div>
+<!-- Hotlines & Institutional Assistance Footer -->
+<div class="pt-6 border-t border-outline-variant/70 text-center space-y-2">
+<p class="font-body-sm text-xs text-on-surface-variant">
+            Need onboarding assistance? Call RAMLP Desk: 
+            <a class="font-label-md font-bold text-primary hover:underline ml-1" href="tel:+234018882476">+234 (01) 888-AGRO</a>
+</p>
+<div class="flex items-center justify-center gap-4 text-[11px] font-label-sm text-outline">
+<span class="hover:text-primary cursor-pointer">CBN Guidelines</span>
+<span>•</span>
+<span class="hover:text-primary cursor-pointer">Weighbridge Directory</span>
+<span>•</span>
+<span class="hover:text-primary cursor-pointer">Quality Lab Standards</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Docked Institutional Mini Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant py-3 px-4 sm:px-8 text-center text-xs text-on-surface-variant">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+<p class="font-body-sm text-[11px]">
+        © 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus &amp; NIBSS Settlement Secured.
+      </p>
+<div class="flex items-center gap-3 text-[11px] font-label-sm">
+<span class="inline-flex items-center gap-1 text-primary font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> All Gateways Operational
+        </span>
+<span class="text-outline">|</span>
+<span class="text-on-surface-variant">Server ID: LOS-AGRO-04</span>
+</div>
+</div>
+</footer>
+<!-- Micro-Interactions Script for Dynamic Role & Auth Modes -->
+<script>
+    function switchAuthMode(mode) {
+      const regPanel = document.getElementById('registerPanel');
+      const loginPanel = document.getElementById('loginPanel');
+      const regBtn = document.getElementById('tabRegisterBtn');
+      const loginBtn = document.getElementById('tabLoginBtn');
+
+      if (mode === 'register') {
+        regPanel.classList.remove('hidden');
+        loginPanel.classList.add('hidden');
+        regBtn.className = "flex-1 py-2.5 px-4 rounded-lg font-headline-sm text-sm font-bold transition-all duration-150 bg-primary-container text-on-primary shadow-sm flex items-center justify-center gap-2";
+        loginBtn.className = "flex-1 py-2.5 px-4 rounded-lg font-headline-sm text-sm font-medium transition-all duration-150 text-on-surface-variant hover:text-primary flex items-center justify-center gap-2";
+      } else {
+        loginPanel.classList.remove('hidden');
+        regPanel.classList.add('hidden');
+        loginBtn.className = "flex-1 py-2.5 px-4 rounded-lg font-headline-sm text-sm font-bold transition-all duration-150 bg-primary-container text-on-primary shadow-sm flex items-center justify-center gap-2";
+        regBtn.className = "flex-1 py-2.5 px-4 rounded-lg font-headline-sm text-sm font-medium transition-all duration-150 text-on-surface-variant hover:text-primary flex items-center justify-center gap-2";
+      }
+    }
+
+    function selectRole(role, element) {
+      // Clear previous active states
+      const cards = document.querySelectorAll('.role-card');
+      cards.forEach(card => {
+        card.classList.remove('border-2', 'border-primary-container', 'bg-surface-container-low/70');
+        card.classList.add('border', 'border-outline-variant', 'bg-surface-container-lowest');
+        const iconDiv = card.querySelector('.w-10');
+        if (iconDiv) {
+          iconDiv.classList.remove('bg-primary-container', 'text-on-primary');
+          iconDiv.classList.add('bg-surface-container', 'text-primary');
+        }
+        const check = card.querySelector('.check-indicator');
+        if (check) check.classList.add('hidden');
+      });
+
+      // Highlight clicked card
+      element.classList.remove('border', 'border-outline-variant', 'bg-surface-container-lowest');
+      element.classList.add('border-2', 'border-primary-container', 'bg-surface-container-low/70');
+      const activeIcon = element.querySelector('.w-10');
+      if (activeIcon) {
+        activeIcon.classList.remove('bg-surface-container', 'text-primary');
+        activeIcon.classList.add('bg-primary-container', 'text-on-primary');
+      }
+      const activeCheck = element.querySelector('.check-indicator');
+      if (activeCheck) activeCheck.classList.remove('hidden');
+
+      // Adjust dynamic labels according to role
+      const lblEntity = document.getElementById('lblEntityName');
+      const inputEntity = document.getElementById('regEntityName');
+      const lblId = document.getElementById('lblIdentifier');
+      const inputId = document.getElementById('regIdentifier');
+
+      if (role === 'farmer') {
+        lblEntity.textContent = 'Cooperative Legal Name / Farmer Enterprise Name *';
+        inputEntity.placeholder = 'e.g. Saki Grain Producers Union Limited';
+        lblId.textContent = 'Cooperative Reg. / CAC RC / NIN *';
+        inputId.placeholder = 'RC-1298492 or COOP/OYO/44';
+      } else if (role === 'buyer') {
+        lblEntity.textContent = 'Industrial Company / Milling Enterprise Name *';
+        inputEntity.placeholder = 'e.g. Flour Mills Agro Processing Ltd';
+        lblId.textContent = 'Corporate CAC Registration (RC Number) *';
+        inputId.placeholder = 'RC-8849219';
+      } else if (role === 'logistics') {
+        lblEntity.textContent = 'Transport Fleet / Logistics Operator Legal Name *';
+        inputEntity.placeholder = 'e.g. Northern Haulage & Freight Ltd';
+        lblId.textContent = 'FRSC Carrier Permit / CAC RC Number *';
+        inputId.placeholder = 'FLEET-NG-2041';
+      } else if (role === 'lab') {
+        lblEntity.textContent = 'Accredited Inspection Agency / Testing Lab *';
+        inputEntity.placeholder = 'e.g. Standard Agro-Spectrometry Services';
+        lblId.textContent = 'SON / NAFDAC / ISO Certification No. *';
+        inputId.placeholder = 'ISO/IEC-17025-NG';
+      }
+    }
+
+    function togglePasswordVisibility(fieldId, btn) {
+      const input = document.getElementById(fieldId);
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+  </script>
+</body></html>

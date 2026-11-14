@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroLink - NIBSS Electronic Settlement Clearance</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter & Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#d4ddd0",
+            "on-primary-fixed": "#00210d",
+            "surface": "#f3fcef",
+            "on-error": "#ffffff",
+            "on-surface": "#161d16",
+            "secondary": "#306b19",
+            "surface-container-low": "#edf6e9",
+            "primary-fixed": "#a3f5b6",
+            "on-primary-fixed-variant": "#005228",
+            "surface-tint": "#196c3b",
+            "outline-variant": "#bfc9bd",
+            "on-surface-variant": "#404940",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "tertiary": "#5d4100",
+            "surface-container-high": "#e2ebde",
+            "inverse-surface": "#2a322a",
+            "on-secondary-fixed-variant": "#175200",
+            "primary-fixed-dim": "#88d89c",
+            "secondary-fixed": "#b0f491",
+            "on-secondary-fixed": "#052100",
+            "secondary-container": "#b0f491",
+            "primary": "#005128",
+            "inverse-on-surface": "#eaf3e7",
+            "surface-container": "#e8f0e4",
+            "tertiary-fixed-dim": "#f8bd45",
+            "on-primary-container": "#98e9ab",
+            "surface-container-lowest": "#ffffff",
+            "surface-bright": "#f3fcef",
+            "on-tertiary-container": "#ffd07c",
+            "secondary-fixed-dim": "#95d878",
+            "on-primary": "#ffffff",
+            "surface-variant": "#dce5d9",
+            "on-tertiary-fixed": "#271900",
+            "tertiary-fixed": "#ffdea7",
+            "surface-container-highest": "#dce5d9",
+            "outline": "#707a6f",
+            "on-error-container": "#93000a",
+            "inverse-primary": "#88d89c",
+            "primary-container": "#176b3a",
+            "tertiary-container": "#7b5700",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "background": "#f3fcef",
+            "on-secondary-container": "#36721f",
+            "on-background": "#161d16",
+            "on-secondary": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin": "1rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "margin-desktop": "2.5rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Inter"],
+            "display-lg": ["Manrope"],
+            "label-lg": ["Inter"],
+            "headline-md": ["Manrope"],
+            "body-sm": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "currency-display": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "body-lg": ["Inter"]
+          },
+          "fontSize": {
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .security-guilloche {
+      background-image: radial-gradient(#176b3a 0.6px, transparent 0.6px), radial-gradient(#176b3a 0.6px, #ffffff 0.6px);
+      background-size: 16px 16px;
+      background-position: 0 0, 8px 8px;
+      opacity: 0.035;
+    }
+    .watermark-stamp {
+      transform: rotate(-18deg);
+      border: 3px dashed rgba(23, 107, 58, 0.28);
+    }
+    .jagged-receipt-bottom {
+      background: linear-gradient(135deg, transparent 5px, #ffffff 5px) top left,
+                  linear-gradient(225deg, transparent 5px, #ffffff 5px) top right;
+      background-size: 12px 10px;
+      background-repeat: repeat-x;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased font-body-md min-h-screen overflow-x-hidden">
+<!-- ==================== BACKGROUND SCREEN (FARMER SALES & PAYOUTS CANVAS) ==================== -->
+<div class="relative w-full max-w-lg mx-auto bg-surface-bright min-h-screen pb-24 filter blur-[2px] opacity-70 pointer-events-none select-none transition-all duration-300">
+<!-- Top Bar Component from JSON Anchor -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none fixed top-0 left-0 w-full z-10 flex items-center justify-between px-4 h-16 max-w-lg mx-auto right-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary" data-icon="agriculture">agriculture</span>
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary tracking-tight">AgroLink</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-on-surface-variant">Kano Escrow Hub</span>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="swap_horiz">swap_horiz</span>
+</div>
+</header>
+<!-- Subheader Profile -->
+<div class="pt-20 px-4">
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/60 shadow-sm flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary font-bold flex items-center justify-center font-headline-sm text-headline-sm">
+          IM
+        </div>
+<div class="flex-1">
+<div class="flex items-center gap-1.5">
+<h1 class="font-headline-sm text-headline-sm text-on-surface font-bold">Mallam Ibrahim Musa</h1>
+<span class="material-symbols-outlined text-primary text-sm" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Musa Agro Farms Ltd • Dawanau Grain Market, Kano</p>
+</div>
+</div>
+</div>
+<!-- Payout Ledger Overview -->
+<div class="px-4 mt-4 space-y-3">
+<div class="bg-primary text-on-primary p-4 rounded-xl shadow-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider">Total Disbursed (Oct 2025)</span>
+<span class="bg-primary-container text-on-primary-container text-xs px-2 py-0.5 rounded-full font-label-sm">T+0 Instant</span>
+</div>
+<div class="mt-2 font-currency-display text-currency-display tracking-tight text-white">₦18,440,000.00</div>
+<div class="mt-1 text-xs text-primary-fixed-dim">All disbursements authenticated via NIBSS &amp; CBN Escrow</div>
+</div>
+<!-- Past Deals List (Muted) -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-4 space-y-3">
+<h2 class="font-label-lg text-label-lg font-bold text-on-surface">Recent Commodity Liquidations</h2>
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/40 flex justify-between items-center">
+<div>
+<div class="font-label-md text-label-md font-bold text-on-surface">45 MT Clean Yellow Maize</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Flour Mills Nig. • Providus NIBSS</div>
+</div>
+<div class="text-right">
+<div class="font-label-md text-label-md font-bold text-primary">₦6,216,000.00</div>
+<span class="inline-flex items-center gap-1 text-[11px] font-label-sm text-primary">
+<span class="material-symbols-outlined text-xs" data-icon="verified">verified</span> Cleared
+            </span>
+</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/40 flex justify-between items-center opacity-70">
+<div>
+<div class="font-label-md text-label-md font-bold text-on-surface">30 MT Sorghum Grade 1</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Guinness Nigeria • Providus Escrow</div>
+</div>
+<div class="text-right">
+<div class="font-label-md text-label-md font-bold text-on-surface">₦4,120,000.00</div>
+<span class="inline-flex items-center gap-1 text-[11px] font-label-sm text-on-surface-variant">11 Oct 2025</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ==================== MODAL OVERLAY WRAPPER ==================== -->
+<div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4 overflow-y-auto animate-fadeIn" id="receiptModalOverlay">
+<!-- Modal Card Container (Tactile Field-Utility Banking Sheet) -->
+<div class="relative w-full max-w-md bg-surface-container-lowest rounded-t-2xl sm:rounded-2xl border border-outline-variant shadow-2xl overflow-hidden flex flex-col my-auto max-h-[830px]">
+<!-- CBN & NIBSS Official Security Ribbon Header -->
+<div class="bg-primary text-on-primary px-3.5 py-2.5 flex items-center justify-between shadow-sm relative z-20">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-white p-0.5 flex items-center justify-center shrink-0">
+<!-- Simulated Coat of Arms / CBN Star emblem -->
+<span class="material-symbols-outlined text-primary text-base" data-icon="account_balance" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold tracking-tight text-primary-fixed leading-tight uppercase">Central Bank of Nigeria &amp; NIBSS</span>
+<span class="text-[9px] font-medium text-white/90 leading-tight">Verified Electronic Settlement Receipt</span>
+</div>
+</div>
+<div class="flex items-center gap-1 bg-primary-container px-2 py-0.5 rounded text-[10px] font-mono font-bold text-white border border-primary-fixed-dim/40">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed animate-pulse"></span>
+          NODE #0841
+        </div>
+</div>
+<!-- Inner Modal Scrollable Body -->
+<div class="relative px-4 pt-3 pb-4 overflow-y-auto space-y-4">
+<!-- Guilloche Fine Pattern Overlay Background -->
+<div class="security-guilloche absolute inset-0 pointer-events-none"></div>
+<!-- Clearance Watermark Stamp Effect -->
+<div class="absolute right-4 top-28 pointer-events-none z-10 opacity-30 select-none">
+<div class="watermark-stamp px-3 py-1 text-center font-bold text-primary border-primary">
+<div class="text-[10px] tracking-widest font-mono">NIBSS SETTLED</div>
+<div class="text-[8px] font-sans font-semibold">T+0 RTGS ARCHIVED</div>
+</div>
+</div>
+<!-- Top Receipt Identification & Bank Partners -->
+<div class="flex items-center justify-between border-b border-outline-variant/60 pb-3 relative z-10">
+<div class="space-y-0.5">
+<div class="text-[10px] font-bold uppercase tracking-wider text-outline">Clearing Gateway</div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm font-bold text-primary tracking-tight">Providus</span>
+<span class="text-xs font-semibold text-on-surface-variant font-label-sm">Custody Bank</span>
+</div>
+<div class="text-[11px] text-on-surface-variant font-mono">e-BillsPay Direct Settlement</div>
+</div>
+<div class="text-right space-y-0.5">
+<div class="text-[10px] font-bold uppercase tracking-wider text-outline">Date &amp; Timestamp</div>
+<div class="font-label-sm text-label-sm font-bold text-on-surface">14 Oct 2025, 11:42:19 WAT</div>
+<div class="text-[10px] font-mono text-on-surface-variant">Switch Ref: PRV-NIP-99214</div>
+</div>
+</div>
+<!-- Reference Bar -->
+<div class="bg-surface-container-low p-2 rounded-lg border border-outline-variant/50 flex items-center justify-between text-xs relative z-10">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-base" data-icon="terminal">terminal</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tx Reference:</span>
+</div>
+<span class="font-mono font-bold text-on-surface text-[11px] select-all">NIBSS/PRV/RAMLP-99214-0841</span>
+</div>
+<!-- Settled Amount Banner -->
+<div class="text-center py-2 px-3 bg-surface-container-high/40 rounded-xl border border-outline-variant/70 relative z-10">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-label-sm font-bold bg-[#E8F4EC] text-[#176B3A] mb-1">
+<span class="material-symbols-outlined text-xs" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            CLEARED &amp; LIQUIDATED (T+0 INSTANT)
+          </span>
+<div class="font-currency-display text-headline-lg-mobile sm:text-currency-display text-primary tracking-tight">
+            ₦6,216,000.00
+          </div>
+<p class="font-body-sm text-xs text-on-surface-variant italic font-medium">
+            "Six Million, Two Hundred &amp; Sixteen Thousand Naira Only"
+          </p>
+</div>
+<!-- QR Code & Cryptographic Fingerprint Dual Card -->
+<div class="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/80 shadow-sm relative z-10 flex flex-col sm:flex-row items-center gap-3">
+<!-- Live Verifiable QR Box -->
+<div class="relative bg-white p-2 rounded-lg border-2 border-primary/30 shrink-0 shadow-inner group">
+<div class="w-24 h-24 bg-white flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Custom Designed Authentic SVG QR Pattern with Agro Centerpiece -->
+<svg class="w-full h-full text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<!-- QR Position Detection Patterns -->
+<path d="M0,0 h30 v30 h-30 z M6,6 h18 v18 h-18 z M10,10 h10 v10 h-10 z"></path>
+<path d="M70,0 h30 v30 h-30 z M76,6 h18 v18 h-18 z M80,10 h10 v10 h-10 z"></path>
+<path d="M0,70 h30 v30 h-30 z M6,76 h18 v18 h-18 z M10,80 h10 v10 h-10 z"></path>
+<!-- QR Dense Data Matrix Simulation -->
+<rect height="6" width="6" x="36" y="4"></rect>
+<rect height="6" width="6" x="46" y="4"></rect>
+<rect height="6" width="6" x="58" y="4"></rect>
+<rect height="6" width="6" x="36" y="14"></rect>
+<rect height="6" width="10" x="50" y="14"></rect>
+<rect height="6" width="6" x="4" y="36"></rect>
+<rect height="6" width="10" x="14" y="36"></rect>
+<rect height="12" width="6" x="28" y="36"></rect>
+<rect fill="#176b3a" height="8" width="8" x="38" y="28"></rect>
+<rect height="6" width="6" x="54" y="28"></rect>
+<rect height="6" width="8" x="4" y="48"></rect>
+<rect height="14" width="6" x="18" y="48"></rect>
+<!-- Center Verified Badge Motif -->
+<rect fill="#176b3a" height="20" rx="3" width="20" x="40" y="40"></rect>
+<circle cx="50" cy="50" fill="#ffffff" r="5"></circle>
+<!-- Bottom Half Matrix -->
+<rect height="6" width="8" x="70" y="36"></rect>
+<rect height="6" width="10" x="84" y="36"></rect>
+<rect height="6" width="14" x="68" y="48"></rect>
+<rect height="14" width="6" x="88" y="48"></rect>
+<rect height="8" width="6" x="36" y="70"></rect>
+<rect height="6" width="12" x="48" y="68"></rect>
+<rect height="12" width="6" x="66" y="70"></rect>
+<rect height="6" width="16" x="78" y="70"></rect>
+<rect height="6" width="14" x="36" y="84"></rect>
+<rect height="12" width="6" x="56" y="82"></rect>
+<rect height="6" width="14" x="68" y="88"></rect>
+<rect height="10" width="6" x="88" y="84"></rect>
+</svg>
+</div>
+<div class="text-[8px] font-bold text-center text-primary mt-1 font-mono tracking-tighter">SECURE QR-NIBSS</div>
+</div>
+<!-- Cryptographic Fingerprint Details -->
+<div class="flex-1 space-y-1.5 w-full">
+<div class="flex items-center gap-1 text-[11px] font-label-sm font-bold text-primary">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="shield">shield</span>
+              Cryptographic SHA-256 Ledger Seal
+            </div>
+<div class="font-mono text-[9px] text-on-surface-variant bg-surface-container-low p-1.5 rounded border border-outline-variant/60 break-all leading-tight">
+              b8e4f1a09d6c773a4e9b2512f458ce32483d91cf9aa054b1f481093c8374fa09
+            </div>
+<p class="font-body-sm text-[10px] text-on-surface-variant leading-snug">
+              Scan to verify authenticity directly on the NIBSS Regulated Banking Node &amp; CBN Commercial Produce Registry.
+            </p>
+</div>
+</div>
+<!-- Structured Settlement Ledger Breakdown -->
+<div class="border border-outline-variant/80 rounded-xl overflow-hidden text-xs relative z-10">
+<div class="bg-surface-container-high/60 px-3 py-1.5 font-label-sm font-bold text-on-surface border-b border-outline-variant/70 flex justify-between items-center">
+<span>Settlement Parameters &amp; Audit Log</span>
+<span class="text-[10px] font-mono text-outline">LOT AGL-TX-2025-0841</span>
+</div>
+<div class="p-3 space-y-2.5 bg-surface-container-lowest">
+<!-- Row: Consignment -->
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-body-sm">Consignment:</span>
+<span class="font-label-md text-label-md font-bold text-on-surface text-right">
+                45 MT Clean Yellow Feed Maize
+              </span>
+</div>
+<!-- Row: Milestone -->
+<div class="flex justify-between items-start border-t border-outline-variant/40 pt-2">
+<span class="text-on-surface-variant font-body-sm">Settled Milestone:</span>
+<span class="font-label-md text-label-md font-bold text-primary text-right max-w-[65%]">
+                Milestone 2 (Destination Lab Passed 11.8% Moisture &amp; Weighbridge Inward)
+              </span>
+</div>
+<!-- Row: Off-taker (Payer) -->
+<div class="flex justify-between items-start border-t border-outline-variant/40 pt-2">
+<div>
+<span class="text-on-surface-variant font-body-sm block">Payer / Off-taker:</span>
+<span class="text-[10px] text-outline font-mono">Corporate NUBAN: 0128940192</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-on-surface text-right">
+                Flour Mills Nigeria PLC<br/>
+<span class="text-[10px] text-outline font-normal">Providus Corporate Escrow Vault</span>
+</span>
+</div>
+<!-- Row: Beneficiary -->
+<div class="flex justify-between items-start border-t border-outline-variant/40 pt-2">
+<div>
+<span class="text-on-surface-variant font-body-sm block">Beneficiary Farmer:</span>
+<span class="text-[10px] text-outline font-mono">Providus ••••• 4192</span>
+</div>
+<span class="font-label-sm text-label-sm font-bold text-on-surface text-right">
+                Musa Agro Enterprises<br/>
+<span class="text-[10px] text-on-surface-variant font-normal">Mallam Ibrahim Musa</span>
+</span>
+</div>
+<!-- Row: Weighbridge Tolerance -->
+<div class="flex justify-between items-center border-t border-outline-variant/40 pt-2">
+<span class="text-on-surface-variant font-body-sm">Weighbridge Net Variance:</span>
+<span class="font-label-sm text-label-sm font-bold text-[#176B3A] bg-[#E8F4EC] px-2 py-0.5 rounded">
+                0.0% matched (45.00 MT)
+              </span>
+</div>
+<!-- Row: Statutory Exemptions -->
+<div class="flex justify-between items-center border-t border-outline-variant/40 pt-2">
+<div>
+<span class="text-on-surface-variant font-body-sm block">Statutory WHT &amp; Fees:</span>
+<span class="text-[9px] text-primary font-medium">Sec. 23 CITA / NAPIS Exempt</span>
+</div>
+<span class="font-mono font-bold text-on-surface">₦0.00</span>
+</div>
+</div>
+</div>
+<!-- Official Signatures & Electronic Custodian Stamps -->
+<div class="grid grid-cols-2 gap-2 pt-1 relative z-10">
+<div class="p-2 bg-surface-container-low rounded-lg border border-outline-variant/70 text-center">
+<div class="flex justify-center mb-1 text-primary">
+<span class="material-symbols-outlined text-lg" data-icon="policy" style="font-variation-settings: 'FILL' 1;">policy</span>
+</div>
+<div class="text-[10px] font-bold text-on-surface uppercase font-label-sm">CBN Authorized</div>
+<div class="text-[8px] font-mono text-on-surface-variant">Custodian Escrow Registry</div>
+<div class="mt-1 text-[8px] font-bold text-primary">VALIDATED #CBN-AGR-401</div>
+</div>
+<div class="p-2 bg-surface-container-low rounded-lg border border-outline-variant/70 text-center">
+<div class="flex justify-center mb-1 text-primary">
+<span class="material-symbols-outlined text-lg" data-icon="token" style="font-variation-settings: 'FILL' 1;">token</span>
+</div>
+<div class="text-[10px] font-bold text-on-surface uppercase font-label-sm">Providus Gateway</div>
+<div class="text-[8px] font-mono text-on-surface-variant">Real-Time Gross Liquidation</div>
+<div class="mt-1 text-[8px] font-bold text-primary">BATCH #PRV-LIQ-9908</div>
+</div>
+</div>
+<!-- Audit Notice Notice Footnote -->
+<div class="text-center pt-1 pb-1 relative z-10">
+<p class="text-[9px] text-outline-variant leading-tight">
+            This electronic slip certifies irrevocable T+0 fund settlement into the farmer beneficiary account under the AgroLink Continental Escrow Protocol.
+          </p>
+</div>
+</div>
+<!-- Action Buttons Footer (Anchored & High Touch Legibility) -->
+<div class="bg-surface-container-lowest border-t border-outline-variant px-4 py-3 space-y-2 relative z-20">
+<!-- Primary Action: Download PDF -->
+<button class="w-full h-12 bg-primary hover:bg-[#11522C] active:scale-[0.98] transition-all rounded-xl text-white font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 shadow-sm" id="btnDownloadReceipt" onclick="triggerDownload()">
+<span class="material-symbols-outlined text-xl" data-icon="download">download</span>
+<span>Download Official PDF Receipt</span>
+</button>
+<!-- Secondary Actions Row: WhatsApp Link & Close -->
+<div class="grid grid-cols-2 gap-2">
+<button class="h-11 bg-white hover:bg-[#E8F4EC] border-[1.5px] border-primary active:scale-[0.98] transition-all rounded-xl text-primary font-label-sm text-label-sm font-bold flex items-center justify-center gap-1.5" id="btnShareWhatsApp" onclick="triggerWhatsAppShare()">
+<span class="material-symbols-outlined text-lg" data-icon="share">share</span>
+<span>Share WhatsApp</span>
+</button>
+<button class="h-11 bg-surface-container-high hover:bg-surface-variant active:scale-[0.98] transition-all rounded-xl text-on-surface font-label-sm text-label-sm font-semibold flex items-center justify-center gap-1" id="btnCloseReceipt" onclick="closeModal()">
+<span class="material-symbols-outlined text-lg" data-icon="close">close</span>
+<span>Close Receipt</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro-Interactions & Modal Logic Script -->
+<script>
+    function closeModal() {
+      const modal = document.getElementById('receiptModalOverlay');
+      if (modal) {
+        modal.classList.add('opacity-0');
+        modal.classList.remove('flex');
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 200);
+      }
+    }
+
+    function triggerDownload() {
+      const btn = document.getElementById('btnDownloadReceipt');
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-xl" data-icon="progress_activity">progress_activity</span> Generating NIBSS PDF...`;
+      setTimeout(() => {
+        btn.innerHTML = `<span class="material-symbols-outlined text-xl" data-icon="check_circle">check_circle</span> Downloaded (Receipt-99214.pdf)`;
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+        }, 2200);
+      }, 1200);
+    }
+
+    function triggerWhatsAppShare() {
+      const shareUrl = "https://nibss-plc.com.ng/verify?ref=NIBSS-PRV-RAMLP-99214-0841";
+      const text = encodeURIComponent("AgroLink verified NIBSS Payout Clearance: ₦6,216,000.00 for Mallam Ibrahim Musa (Musa Agro Farms). Ref: NIBSS/PRV/RAMLP-99214-0841");
+      window.open(`https://api.whatsapp.com/send?text=${text}%20${shareUrl}`, '_blank');
+    }
+  </script>
+</body></html>

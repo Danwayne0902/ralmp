@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-[15px] leading-6 text-ink antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-ink;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    @apply bg-forest-100 text-forest-700;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-sprout-400 ring-offset-2 ring-offset-canvas;
+  }
+
+  input, select, textarea, button {
+    font: inherit;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full border-[3px] border-solid border-transparent bg-sage-400 bg-clip-content;
+  }
+}
+
+@layer components {
+  .page-wrap {
+    @apply mx-auto w-full max-w-shell px-4 sm:px-6 lg:px-10;
+  }
+
+  .page-pad {
+    @apply pb-20 pt-7 sm:pt-9;
+  }
+
+  .panel {
+    @apply rounded-card border border-line bg-surface shadow-card;
+  }
+
+  .panel-head {
+    @apply flex items-center justify-between gap-3 border-b border-line px-5 py-4;
+  }
+
+  .label-caps {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-muted;
+  }
+
+  .label-caps-gold {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-harvest-600;
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  .input {
+    @apply h-12 w-full rounded-btn border border-line bg-surface px-4 text-sm text-ink shadow-none outline-none transition placeholder:text-muted/60 hover:border-sage-400 focus:border-forest-500 focus:ring-0;
+  }
+
+  .select {
+    @apply h-12 w-full appearance-none rounded-btn border border-line bg-surface bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2352634F%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[right_14px_center] bg-no-repeat px-4 pr-10 text-sm text-ink outline-none transition hover:border-sage-400 focus:border-forest-500;
+  }
+
+  .textarea {
+    @apply w-full rounded-btn border border-line bg-surface px-4 py-3 text-sm text-ink outline-none transition placeholder:text-muted/60 hover:border-sage-400 focus:border-forest-500;
+  }
+
+  .chip {
+    @apply inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-surface px-4 text-[13px] font-medium text-ink-soft transition hover:border-sage-400 hover:bg-sage-50;
+  }
+
+  .chip-active {
+    @apply border-forest-500 bg-forest-500 text-white hover:border-forest-600 hover:bg-forest-600;
+  }
+
+  .divider {
+    @apply border-t border-line;
+  }
+
+  .kbd {
+    @apply rounded-[5px] border border-line bg-sage-50 px-1.5 py-0.5 font-mono text-[11px] text-muted;
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgba(23, 107, 58, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23, 107, 58, 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(rgba(23, 107, 58, 0.14) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-sage-200;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent;
+    animation: shimmer 1.6s infinite;
+  }
+
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #C3D2C0 transparent;
+  }
+
+  .link-underline {
+    @apply underline decoration-forest-200 decoration-2 underline-offset-4 transition hover:decoration-forest-500;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

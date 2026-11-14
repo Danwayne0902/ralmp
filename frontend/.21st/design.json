@@ -1,0 +1,51 @@
+{
+  "name": "RALMP — Rural Agricultural Linkage Management Program",
+  "schemaVersion": 1,
+  "direction": {
+    "title": "Agri Precision",
+    "summary": "A modern, editorial agri-tech system: high-contrast type, generous whitespace, hairline structure and a restrained emerald + lime + amber signal palette. Marketing surfaces feel editorial; product surfaces feel engineered — dense, calm and operational.",
+    "keywords": ["editorial", "engineered", "high-contrast", "calm", "trustworthy", "Nigerian agri-tech"],
+    "avoid": ["neon gradients everywhere", "glassmorphism as default", "oversized display copy on product screens", "emoji as primary iconography"]
+  },
+  "palette": {
+    "brand": { "500": "#16A363", "600": "#0B8050", "700": "#096841", "900": "#0A452E", "950": "#04281A" },
+    "accent": { "300": "#C6F24E", "400": "#B4E626", "600": "#77A006" },
+    "signal": { "amber400": "#FBBF24", "amber600": "#D97706", "red600": "#DC2626" },
+    "ink": "#07160F",
+    "canvas": "#FAFAF7",
+    "surface": "#FFFFFF"
+  },
+  "typography": {
+    "display": "Sora",
+    "body": "Inter",
+    "mono": "JetBrains Mono",
+    "notes": "Display 700/800 with -0.02em tracking for editorial headings. Body Inter 400/500/600. Numbers use tabular-nums in tables and metrics."
+  },
+  "radii": { "sm": "8px", "md": "10px", "lg": "14px", "xl": "18px", "2xl": "24px" },
+  "structure": {
+    "publicShell": "Sticky translucent top nav + 3-column editorial footer.",
+    "productShell": "Role-aware left sidebar + sticky top bar with search, notifications and user menu; content in a max-w container.",
+    "density": "Product surfaces use a 4px spacing grid, hairline 1px borders (rgba(7,22,15,.08)) and shadow-sm cards."
+  },
+  "components": [
+    "Button (primary/accent/outline/ghost/dark/danger + sm/lg/icon)",
+    "Input, Textarea, Select, Checkbox, Radio, Switch, Field/Help/Error",
+    "Card & Panel, StatCard, SectionHeading, Badge/Chip, Tag",
+    "Avatar & AvatarGroup, Tabs, SegmentedControl, Modal, Drawer/Sheet",
+    "Table (sticky header, zebra-free, hairline rows), Pagination, Breadcrumbs",
+    "EmptyState, Skeleton, Spinner, ProgressBar, Timeline, Toaster (sonner)"
+  ],
+  "states": ["loading", "empty", "error", "success", "disabled", "focus-visible", "reduced-motion"],
+  "accessibility": {
+    "contrast": "Body text >= 4.5:1 on canvas; interactive focus uses a 4px brand ring.",
+    "motion": "All animations respect prefers-reduced-motion; durations 140-240ms.",
+    "semantics": "Landmarks (header/nav/main/footer), labelled icon buttons, visible focus."
+  },
+  "decisions": [
+    {
+      "date": "2026-11-11",
+      "decision": "Full visual redesign of the React frontend using the 21st.dev build workflow; introduce a role-aware sidebar product shell distinct from the public marketing shell.",
+      "by": "user request"
+    }
+  ]
+}

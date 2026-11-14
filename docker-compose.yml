@@ -1,0 +1,115 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ramlp_mysql
+    environment:
+      MYSQL_DATABASE: ramlp
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${DB_PASSWORD:-password}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - ramlp-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ramlp_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - ramlp-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ramlp_backend
+    environment:
+      APP_NAME: RAMLP
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: http://localhost:8000
+      APP_KEY: ${APP_KEY:-}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ramlp
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      CACHE_DRIVER: ${CACHE_DRIVER:-file}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      # No Pusher/Soketi container is included in this stack, so broadcasting
+      # to the log driver keeps realtime events from failing the request.
+      BROADCAST_DRIVER: ${BROADCAST_DRIVER:-log}
+      MAIL_MAILER: ${MAIL_MAILER:-log}
+      PAYSTACK_PUBLIC_KEY: ${PAYSTACK_PUBLIC_KEY:-}
+      PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY:-}
+      RAMLP_DELIVERY_FEE: ${RAMLP_DELIVERY_FEE:-2500}
+      RAMLP_DEFAULT_DELIVERY_DAYS: ${RAMLP_DEFAULT_DELIVERY_DAYS:-3}
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ramlp-network
+    restart: unless-stopped
+
+  # AgroLink Continental client (current frontend)
+  frontend:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+      args:
+        # Baked into the static bundle at build time (Vite requires VITE_*).
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
+        VITE_PAYSTACK_PUBLIC_KEY: ${VITE_PAYSTACK_PUBLIC_KEY:-}
+    container_name: ramlp_frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - ramlp-network
+    restart: unless-stopped
+
+  # Pre-redesign client, kept as a rollback reference.
+  # Start it explicitly: docker compose --profile legacy up frontend-legacy
+  frontend-legacy:
+    profiles: ["legacy"]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
+        VITE_PAYSTACK_PUBLIC_KEY: ${VITE_PAYSTACK_PUBLIC_KEY:-}
+    container_name: ramlp_frontend_legacy
+    ports:
+      - "8082:80"
+    depends_on:
+      - backend
+    networks:
+      - ramlp-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  ramlp-network:
+    driver: bridge

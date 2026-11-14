@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Batch Procurement &amp; Commercial Price Negotiation - AgroLink RAMLP</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed-variant": "#5e4200",
+            "on-surface": "#161d16",
+            "surface-container-highest": "#dce5d9",
+            "inverse-on-surface": "#eaf3e7",
+            "on-surface-variant": "#404940",
+            "outline-variant": "#bfc9bd",
+            "surface-dim": "#d4ddd0",
+            "tertiary-fixed": "#ffdea7",
+            "inverse-primary": "#88d89c",
+            "on-secondary-fixed": "#052100",
+            "error": "#ba1a1a",
+            "on-background": "#161d16",
+            "on-tertiary-fixed": "#271900",
+            "on-error": "#ffffff",
+            "secondary-container": "#b0f491",
+            "on-primary-fixed": "#00210d",
+            "on-tertiary-container": "#ffd07c",
+            "surface-variant": "#dce5d9",
+            "outline": "#707a6f",
+            "secondary-fixed": "#b0f491",
+            "surface-container": "#e8f0e4",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed-variant": "#005228",
+            "background": "#f3fcef",
+            "on-secondary-fixed-variant": "#175200",
+            "on-tertiary": "#ffffff",
+            "secondary": "#306b19",
+            "inverse-surface": "#2a322a",
+            "primary-fixed": "#a3f5b6",
+            "primary": "#005128",
+            "tertiary": "#5d4100",
+            "error-container": "#ffdad6",
+            "surface-container-lowest": "#ffffff",
+            "surface-bright": "#f3fcef",
+            "tertiary-container": "#7b5700",
+            "on-error-container": "#93000a",
+            "on-primary": "#ffffff",
+            "surface-container-high": "#e2ebde",
+            "primary-container": "#176b3a",
+            "surface": "#f3fcef",
+            "surface-tint": "#196c3b",
+            "secondary-fixed-dim": "#95d878",
+            "on-primary-container": "#98e9ab",
+            "primary-fixed-dim": "#88d89c",
+            "tertiary-fixed-dim": "#f8bd45",
+            "surface-container-low": "#edf6e9",
+            "on-secondary-container": "#36721f"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-desktop": "2.5rem",
+            "space-md": "1rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline-sm": [
+              "Manrope"
+            ],
+            "body-lg": [
+              "Inter"
+            ],
+            "body-sm": [
+              "Inter"
+            ],
+            "label-md": [
+              "Inter"
+            ],
+            "headline-md": [
+              "Manrope"
+            ],
+            "headline-lg": [
+              "Manrope"
+            ],
+            "display-lg": [
+              "Manrope"
+            ],
+            "currency-display": [
+              "Manrope"
+            ],
+            "body-md": [
+              "Inter"
+            ],
+            "display-lg-mobile": [
+              "Manrope"
+            ],
+            "headline-lg-mobile": [
+              "Manrope"
+            ],
+            "label-sm": [
+              "Inter"
+            ],
+            "label-lg": [
+              "Inter"
+            ]
+          },
+          "fontSize": {
+            "headline-sm": [
+              "1.25rem",
+              {
+                "lineHeight": "1.75rem",
+                "fontWeight": "600"
+              }
+            ],
+            "body-lg": [
+              "1.125rem",
+              {
+                "lineHeight": "1.75rem",
+                "fontWeight": "400"
+              }
+            ],
+            "body-sm": [
+              "0.875rem",
+              {
+                "lineHeight": "1.25rem",
+                "fontWeight": "400"
+              }
+            ],
+            "label-md": [
+              "0.875rem",
+              {
+                "lineHeight": "1.25rem",
+                "fontWeight": "500"
+              }
+            ],
+            "headline-md": [
+              "1.75rem",
+              {
+                "lineHeight": "2.25rem",
+                "fontWeight": "600"
+              }
+            ],
+            "headline-lg": [
+              "2.25rem",
+              {
+                "lineHeight": "2.75rem",
+                "letterSpacing": "-0.015em",
+                "fontWeight": "700"
+              }
+            ],
+            "display-lg": [
+              "3rem",
+              {
+                "lineHeight": "3.5rem",
+                "letterSpacing": "-0.02em",
+                "fontWeight": "700"
+              }
+            ],
+            "currency-display": [
+              "2rem",
+              {
+                "lineHeight": "2.25rem",
+                "letterSpacing": "-0.02em",
+                "fontWeight": "800"
+              }
+            ],
+            "body-md": [
+              "1rem",
+              {
+                "lineHeight": "1.5rem",
+                "fontWeight": "400"
+              }
+            ],
+            "display-lg-mobile": [
+              "2rem",
+              {
+                "lineHeight": "2.5rem",
+                "letterSpacing": "-0.01em",
+                "fontWeight": "700"
+              }
+            ],
+            "headline-lg-mobile": [
+              "1.625rem",
+              {
+                "lineHeight": "2rem",
+                "letterSpacing": "-0.01em",
+                "fontWeight": "700"
+              }
+            ],
+            "label-sm": [
+              "0.75rem",
+              {
+                "lineHeight": "1rem",
+                "letterSpacing": "0.02em",
+                "fontWeight": "600"
+              }
+            ],
+            "label-lg": [
+              "1rem",
+              {
+                "lineHeight": "1.5rem",
+                "letterSpacing": "0.01em",
+                "fontWeight": "600"
+              }
+            ]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #005128;
+      cursor: pointer;
+      border: 3px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- ========================================== -->
+<!-- TopNavBar (Shared Component)               -->
+<!-- ========================================== -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-7xl mx-auto h-16">
+<!-- Brand & Regulatory Shield -->
+<div class="flex items-center gap-6">
+<a class="flex items-center gap-3" href="#">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[24px]">energy_savings_leaf</span>
+</div>
+<div>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed tracking-tight">AgroLink RAMLP</span>
+<span class="hidden lg:inline-block ml-2 text-[10px] font-label-sm uppercase tracking-wider bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-semibold">CBN / NIBSS Licensed</span>
+</div>
+</a>
+<!-- Global Navigation Items -->
+<nav class="hidden xl:flex items-center gap-6 ml-4">
+<a class="border-b-2 border-primary dark:border-primary-fixed text-primary dark:text-primary-fixed font-label-md text-label-md pb-1 font-semibold" href="#">Marketplace</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150" href="#">Waybill &amp; Haulage</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150" href="#">Quality Lab</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150" href="#">Disputes &amp; Escrow</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150" href="#">Settlements</a>
+</nav>
+</div>
+<!-- Trailing Profile & Actions -->
+<div class="flex items-center gap-4">
+<!-- Status Verification Badge -->
+<button class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low border border-outline-variant text-primary hover:bg-surface-container transition-colors text-label-sm font-label-sm font-medium">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span>CBN Verification: Level 3 Enterprise</span>
+</button>
+<!-- Utility Action Icons -->
+<div class="flex items-center gap-1 border-x border-outline-variant px-2">
+<button class="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container transition duration-150 relative" title="Notifications">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="w-2 h-2 rounded-full bg-error absolute top-2 right-2 ring-2 ring-surface-container-lowest"></span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container transition duration-150" title="RAMLP Support Desk">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+</button>
+</div>
+<!-- Tier 1 Offtaker Buyer Profile -->
+<div class="flex items-center gap-3 pl-1">
+<div class="text-right hidden sm:block">
+<div class="font-label-md text-label-md font-bold text-on-surface tracking-tight leading-tight">Grand Cereals &amp; Feeds PLC</div>
+<div class="text-[11px] font-label-sm text-outline flex items-center justify-end gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span> Tier 1 Industrial Off-taker
+            </div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-primary font-headline-sm overflow-hidden">
+            GC
+          </div>
+</div>
+</div>
+</div>
+</header>
+<!-- ========================================== -->
+<!-- Contextual Sub-Header & Breadcrumb Bar     -->
+<!-- ========================================== -->
+<section class="bg-surface-container-lowest border-b border-outline-variant">
+<div class="max-w-7xl mx-auto px-margin-desktop py-4">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<!-- Breadcrumb -->
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-outline mb-1">
+<a class="hover:text-primary transition-colors" href="#">Marketplace</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Procurement Orders</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-medium">Batch Negotiation</span>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">
+              Batch Procurement &amp; Commercial Price Negotiation
+            </h1>
+<span class="px-2.5 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold tracking-wide">
+              #BATCH-PROC-2025-089
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            Aggregated Target: <span class="font-semibold text-on-surface">250 Metric Tonnes</span> Yellow Feed Maize (Cleaned &amp; Calibrated) • Destination: <span class="font-semibold text-on-surface">Ikeja Central Mill Silos, Lagos</span>
+</p>
+</div>
+<!-- Top Right Micro Actions -->
+<div class="flex items-center gap-3 self-start md:self-center">
+<div class="bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant flex items-center gap-3">
+<div class="text-right">
+<div class="text-[11px] font-label-sm text-outline">Providus Vault Bonded Limit</div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary">₦225,000,000</div>
+</div>
+<span class="material-symbols-outlined text-primary text-[28px]">account_balance_wallet</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- Main Dual-Column Canvas Layout             -->
+<!-- ========================================== -->
+<main class="flex-grow max-w-7xl mx-auto px-margin-desktop py-6 w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- ======================================== -->
+<!-- Left Column / Main Area (65% -> 8 cols)  -->
+<!-- ======================================== -->
+<div class="lg:col-span-8 space-y-6">
+<!-- 1. Multi-Lot Batch Aggregation Table -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="p-5 border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">inventory_2</span>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Consolidated Lot Aggregation Deck</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">3 regional cooperative supplier lots bundled into single settlement milestone</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm font-semibold px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant">
+                Target: 250 MT (100% Allocated)
+              </span>
+</div>
+</div>
+<!-- Table Container -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm border-b border-outline-variant">
+<th class="py-3 px-4 font-semibold">Lot ID &amp; Supplier</th>
+<th class="py-3 px-4 font-semibold text-center">Volume</th>
+<th class="py-3 px-4 font-semibold">Asking / MT</th>
+<th class="py-3 px-4 font-semibold">Negotiated / MT</th>
+<th class="py-3 px-4 font-semibold">Status &amp; Escrow Gate</th>
+<th class="py-3 px-4 font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant text-body-sm font-body-sm">
+<!-- Lot #841: Musa Agro Farms (Agreed & Locked) -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-3.5 px-4">
+<div class="font-bold text-on-surface">Lot #841</div>
+<div class="text-[12px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">location_on</span>
+                      Musa Agro Farms (Oyo State)
+                    </div>
+</td>
+<td class="py-3.5 px-4 text-center font-bold text-on-surface">
+                    45 MT
+                  </td>
+<td class="py-3.5 px-4 text-on-surface-variant line-through text-[12px]">
+                    ₦775,000
+                  </td>
+<td class="py-3.5 px-4 font-bold text-primary">
+                    ₦760,000
+                  </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-[#E8F4EC] text-[#176B3A] font-semibold">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                      Agreed &amp; In Escrow Lock
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="text-label-sm font-label-sm text-outline hover:text-primary font-medium p-1">View Cert</button>
+</td>
+</tr>
+<!-- Lot #844: Gboko Maize Farmers Union (Selected for Active Negotiation) -->
+<tr class="bg-primary/5 border-l-4 border-l-primary hover:bg-primary/10 transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<span class="font-bold text-on-surface">Lot #844</span>
+<span class="text-[10px] bg-primary text-on-primary font-bold px-1.5 py-0.2 rounded uppercase">Active Focus</span>
+</div>
+<div class="text-[12px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">location_on</span>
+                      Gboko Maize Farmers Union (Benue)
+                    </div>
+</td>
+<td class="py-3.5 px-4 text-center font-bold text-on-surface">
+                    120 MT
+                  </td>
+<td class="py-3.5 px-4 font-bold text-on-surface">
+                    ₦780,000
+                  </td>
+<td class="py-3.5 px-4 font-bold text-[#9A6700]">
+                    ₦755,000 <span class="text-[11px] font-normal text-on-surface-variant block">(Counter-Offer)</span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-[#FEF6E7] text-[#9A6700] font-semibold">
+<span class="material-symbols-outlined text-[14px]">history_toggle_off</span>
+                      Counter-Offer Pending
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<span class="text-label-sm font-label-sm text-primary font-bold underline cursor-pointer">Negotiating</span>
+</td>
+</tr>
+<!-- Lot #849: Dawanau Grain Aggregators (Price Accepted, Escrow Pending) -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-3.5 px-4">
+<div class="font-bold text-on-surface">Lot #849</div>
+<div class="text-[12px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">location_on</span>
+                      Dawanau Grain Aggregators (Kano)
+                    </div>
+</td>
+<td class="py-3.5 px-4 text-center font-bold text-on-surface">
+                    85 MT
+                  </td>
+<td class="py-3.5 px-4 text-on-surface-variant line-through text-[12px]">
+                    ₦770,000
+                  </td>
+<td class="py-3.5 px-4 font-bold text-primary">
+                    ₦765,000
+                  </td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container-high text-on-surface-variant font-semibold">
+<span class="material-symbols-outlined text-[14px]">done_all</span>
+                      Price Accepted, Escrow Pending
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="text-label-sm font-label-sm text-outline hover:text-primary font-medium p-1">Review</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Bottom Aggregate Bar -->
+<div class="bg-surface-container-low px-4 py-3 border-t border-outline-variant flex flex-wrap items-center justify-between text-label-sm font-label-sm">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span>Total Volume: <strong class="text-on-surface font-semibold">250 MT</strong></span>
+<span>Weighted Avg Price: <strong class="text-primary font-semibold">₦762,500 / MT</strong></span>
+<span>Moisture Lab Standard: <strong class="text-on-surface font-semibold">Grade A (≤12.5%)</strong></span>
+</div>
+<div class="text-outline">
+              Regulated via RAMLP Escrow Clause 4.2
+            </div>
+</div>
+</div>
+<!-- 2. Interactive Negotiation & Bidding Thread Console -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-5 border-b border-outline-variant bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">forum</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">
+                  Commercial Negotiation Console — Lot #844
+                </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Counter-offering Gboko Maize Farmers Union (Benue) • Lot Volume: 120 Metric Tonnes
+                </p>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded bg-[#FEF6E7] text-[#9A6700] text-label-sm font-label-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 04h : 22m Response Window Left
+            </span>
+</div>
+<!-- Negotiation History Timeline -->
+<div class="p-5 bg-surface-container/40 border-b border-outline-variant space-y-4 max-h-[300px] overflow-y-auto">
+<!-- Message 1: Cooperative Initial Offer -->
+<div class="flex gap-3 items-start">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex-shrink-0 flex items-center justify-center font-bold text-[12px] text-on-surface">
+                GU
+              </div>
+<div class="flex-grow bg-surface-container-lowest p-3.5 rounded-xl border border-outline-variant max-w-xl">
+<div class="flex items-center justify-between gap-2 mb-1">
+<span class="font-label-md text-label-md font-bold text-on-surface">Gboko Farmers Union (Cooperative Secretary)</span>
+<span class="text-[11px] font-label-sm text-outline">Today, 08:30 WAT</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+                  We have published 120 MT dried yellow kernel maize stored in Makurdi Grain Hub. Tested at 12.1% moisture with SGS initial report. Our opening off-take rate is fixed at <strong class="text-on-surface">₦780,000/MT</strong> with immediate truck loading access.
+                </p>
+<div class="mt-2 text-[12px] font-label-sm inline-block px-2 py-0.5 rounded bg-surface-container font-semibold text-on-surface">
+                  Initial Listing: ₦780,000 / MT (Total: ₦93,600,000)
+                </div>
+</div>
+</div>
+<!-- Message 2: Buyer Counter Offer (Grand Cereals) -->
+<div class="flex gap-3 items-start justify-end">
+<div class="flex-grow bg-primary-container text-on-primary p-3.5 rounded-xl border border-primary/20 max-w-xl text-left">
+<div class="flex items-center justify-between gap-2 mb-1">
+<span class="font-label-md text-label-md font-bold text-white">Grand Cereals &amp; Feeds PLC (Buyer Procurement)</span>
+<span class="text-[11px] font-label-sm text-on-primary-container">Today, 10:14 WAT</span>
+</div>
+<p class="text-body-sm font-body-sm text-white/90">
+                  We are aggregating 250 MT batch under RAMLP Escrow. Given haulage logistics from Benue corridor to Lagos, our institutional ceiling for this lot is <strong class="text-white">₦755,000/MT</strong>. Full upfront escrow will be locked with NIBSS disbursement within 6 hours of weighbridge acceptance in Ikeja.
+                </p>
+<div class="mt-2 text-[12px] font-label-sm inline-block px-2 py-0.5 rounded bg-white/20 font-semibold text-white">
+                  Active Buyer Counter: ₦755,000 / MT (Diff: -₦25,000/MT)
+                </div>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex-shrink-0 flex items-center justify-center font-bold text-[12px] text-white">
+                GC
+              </div>
+</div>
+<!-- Message 3: Cooperative Note -->
+<div class="flex gap-3 items-start">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex-shrink-0 flex items-center justify-center font-bold text-[12px] text-on-surface">
+                GU
+              </div>
+<div class="flex-grow bg-surface-container-lowest p-3 rounded-xl border border-outline-variant max-w-xl">
+<div class="flex items-center justify-between gap-2 mb-1">
+<span class="font-label-md text-label-md font-bold text-on-surface">Gboko Farmers Union Executive</span>
+<span class="text-[11px] font-label-sm text-outline">Today, 11:05 WAT</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+                  We are reviewing the ₦755k proposal with our aggregating farmers. Would Grand Cereals consider meeting at ₦765,000/MT or taking the entire lot without bagging deductions?
+                </p>
+</div>
+</div>
+</div>
+<!-- Interactive Bidding & Adjustment Controls -->
+<div class="p-5 space-y-5">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<!-- Left Control: Price Per MT Bid Adjustment -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-semibold text-on-surface">
+                    Adjust Counter-Bid Price (Per MT)
+                  </label>
+<span class="text-label-sm font-label-sm font-bold text-primary" id="bidPriceDisplay">₦755,000 / MT</span>
+</div>
+<!-- Slider -->
+<div class="py-2">
+<input class="w-full h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary" id="priceSlider" max="780000" min="740000" oninput="document.getElementById('bidPriceDisplay').innerText = '₦' + Number(this.value).toLocaleString() + ' / MT'; document.getElementById('btnSubmitCounter').innerText = 'Submit Counter-Offer (₦' + Number(this.value).toLocaleString() + '/MT)';" step="1000" type="range" value="755000"/>
+<div class="flex justify-between text-[11px] font-label-sm text-outline mt-1">
+<span>Min Cap: ₦740,000</span>
+<span>Floor Target: ₦755,000</span>
+<span>Asking: ₦780,000</span>
+</div>
+</div>
+<!-- Increment buttons -->
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 py-1.5 px-2 rounded border border-outline-variant bg-surface-container-lowest text-label-sm font-label-sm font-semibold hover:bg-surface-container text-on-surface transition-colors" onclick="adjustPrice(-5000)" type="button">
+                    - ₦5,000
+                  </button>
+<button class="flex-1 py-1.5 px-2 rounded border border-outline-variant bg-surface-container-lowest text-label-sm font-label-sm font-semibold hover:bg-surface-container text-on-surface transition-colors" onclick="adjustPrice(-1000)" type="button">
+                    - ₦1,000
+                  </button>
+<button class="flex-1 py-1.5 px-2 rounded border border-outline-variant bg-surface-container-lowest text-label-sm font-label-sm font-semibold hover:bg-surface-container text-on-surface transition-colors" onclick="adjustPrice(1000)" type="button">
+                    + ₦1,000
+                  </button>
+<button class="flex-1 py-1.5 px-2 rounded border border-outline-variant bg-surface-container-lowest text-label-sm font-label-sm font-semibold hover:bg-surface-container text-on-surface transition-colors" onclick="adjustPrice(5000)" type="button">
+                    + ₦5,000
+                  </button>
+</div>
+</div>
+<!-- Right Control: Volume Commitment Toggle & Notes -->
+<div class="space-y-3">
+<label class="font-label-md text-label-md font-semibold text-on-surface">
+                  Volume Offtake Commitment
+                </label>
+<div class="grid grid-cols-2 gap-2">
+<label class="flex items-center justify-between p-2.5 rounded-lg border-2 border-primary bg-primary/5 cursor-pointer">
+<div class="flex items-center gap-2">
+<input checked="" class="text-primary focus:ring-primary h-4 w-4" name="volumeCommitment" type="radio"/>
+<div>
+<div class="font-bold text-on-surface text-label-md font-label-md">Full Lot (120 MT)</div>
+<div class="text-[11px] text-on-surface-variant">Recommended for batch target</div>
+</div>
+</div>
+</label>
+<label class="flex items-center justify-between p-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest cursor-pointer hover:bg-surface-container">
+<div class="flex items-center gap-2">
+<input class="text-primary focus:ring-primary h-4 w-4" name="volumeCommitment" type="radio"/>
+<div>
+<div class="font-bold text-on-surface text-label-md font-label-md">Split Lot (60 MT)</div>
+<div class="text-[11px] text-on-surface-variant">Requires aggregator split fee</div>
+</div>
+</div>
+</label>
+</div>
+<!-- Custom counter note -->
+<div class="relative">
+<input class="w-full text-body-sm font-body-sm py-2 px-3 border border-outline-variant rounded-lg focus:border-primary focus:ring-0 bg-surface-container-lowest" placeholder="Add specific commercial term (e.g. Weighbridge moisture cap tolerance 12.3%)" type="text"/>
+</div>
+</div>
+</div>
+<!-- Escrow terms compliance confirmation -->
+<div class="pt-2">
+<label class="flex items-start gap-3 cursor-pointer">
+<input checked="" class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+                  Enforce <strong class="text-on-surface font-semibold">RAMLP SafeTrade Escrow Protection</strong>: Funds will be held in Providus Bank Custody Trust Account. Funds are only liquidated to cooperative account after automatic Weighbridge &amp; Moisture Lab verification at Lagos Mill Gate.
+                </span>
+</label>
+</div>
+<!-- Action Buttons Deck -->
+<div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-outline-variant">
+<button class="py-2.5 px-4 rounded-lg border border-error text-error hover:bg-error-container hover:text-on-error-container font-label-md text-label-md font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">close</span>
+                Withdraw from Negotiation
+              </button>
+<div class="flex items-center gap-3">
+<button class="py-2.5 px-4 rounded-lg border border-primary text-primary bg-surface-container-lowest hover:bg-surface-container font-label-md text-label-md font-semibold transition-colors">
+                  Accept Cooperative Offer (₦780,000/MT)
+                </button>
+<button class="py-2.5 px-5 rounded-lg bg-primary hover:bg-[#11522C] text-on-primary font-label-md text-label-md font-bold shadow-sm transition-all active:scale-[0.99] flex items-center gap-2" id="btnSubmitCounter">
+<span class="material-symbols-outlined text-[18px]">send</span>
+                  Submit Counter-Offer (₦755,000/MT)
+                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ======================================== -->
+<!-- Right Column / Summary Rail (35% -> 4 cols) -->
+<!-- ======================================== -->
+<div class="lg:col-span-4 space-y-6">
+<!-- 1. Batch Procurement Financial & Escrow Calculator -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-5 border-b border-outline-variant bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">calculate</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Escrow Breakdown</h3>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]" title="Calculated live with dynamic haulage distance matrix">info</span>
+</div>
+<div class="p-5 space-y-4">
+<!-- produce total -->
+<div class="space-y-1.5 pb-3 border-b border-outline-variant">
+<div class="flex justify-between items-center text-body-sm font-body-sm text-on-surface-variant">
+<span>Consolidated Produce (250 MT)</span>
+<span class="font-semibold text-on-surface">₦190,625,000</span>
+</div>
+<div class="flex justify-between text-[11px] font-label-sm text-outline pl-2">
+<span>• Oyo Lot (45 MT @ ₦760k)</span>
+<span>₦34,200,000</span>
+</div>
+<div class="flex justify-between text-[11px] font-label-sm text-outline pl-2">
+<span>• Benue Lot (120 MT @ ₦755k proposed)</span>
+<span>₦90,600,000</span>
+</div>
+<div class="flex justify-between text-[11px] font-label-sm text-outline pl-2">
+<span>• Kano Lot (85 MT @ ₦765k)</span>
+<span>₦65,025,000</span>
+</div>
+</div>
+<!-- logistics and testing line items -->
+<div class="space-y-2 pb-3 border-b border-outline-variant text-body-sm font-body-sm">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">local_shipping</span>
+                  Multi-corridor Haulage (3 routes)
+                </span>
+<span class="font-semibold text-on-surface">₦8,450,000</span>
+</div>
+<div class="flex justify-between text-[11px] font-label-sm text-outline pl-5">
+<span>Transit Insurance (GIT &amp; Hijack Cover)</span>
+<span class="text-secondary font-medium">Included (100%)</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">science</span>
+                  Moisture Lab Spectrometry
+                </span>
+<span class="font-semibold text-[#176B3A] uppercase text-[12px] bg-[#E8F4EC] px-1.5 py-0.5 rounded">Free (RAMLP Pilot)</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">scale</span>
+                  Weighbridge Telematics Link
+                </span>
+<span class="font-semibold text-[#176B3A] uppercase text-[12px] bg-[#E8F4EC] px-1.5 py-0.5 rounded">Free (RAMLP Pilot)</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">security</span>
+                  RAMLP Custody Trustee Escrow Fee
+                </span>
+<span class="font-semibold text-on-surface">₦0 <span class="text-[10px] text-outline">(Subsidized)</span></span>
+</div>
+</div>
+<!-- Total Escrow Required Box -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant space-y-1">
+<div class="text-[12px] font-label-sm font-bold uppercase tracking-wider text-outline">
+                Total Escrow Commitment Required
+              </div>
+<div class="font-currency-display text-currency-display font-extrabold text-primary">
+                ₦199,075,000
+              </div>
+<div class="flex items-center justify-between text-[11px] font-label-sm text-on-surface-variant pt-1 border-t border-outline-variant">
+<span>Providus Bonded Vault Balance:</span>
+<span class="font-bold text-on-surface">₦225,000,000</span>
+</div>
+<div class="text-[11px] font-label-sm text-[#176B3A] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                Sufficient liquid funds pre-authorized for locking
+              </div>
+</div>
+<!-- Action CTAs -->
+<div class="space-y-2 pt-2">
+<button class="w-full h-12 bg-primary hover:bg-[#11522C] text-white rounded-lg font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+                Commit &amp; Lock Batch Escrow (₦199.07M)
+              </button>
+<button class="w-full h-10 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                Export Proforma Commercial Invoice
+              </button>
+</div>
+</div>
+</div>
+<!-- 2. Procurement Quality & Moisture Enforcement Matrix -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Mandatory Lab Matrix</h3>
+</div>
+<span class="text-[11px] font-label-sm font-semibold bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant">SON / AFEX Calibrated</span>
+</div>
+<div class="p-4 space-y-4">
+<!-- Quality Metric Badges -->
+<div class="grid grid-cols-2 gap-3">
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="text-[11px] font-label-sm text-outline">Moisture Ceiling</div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary">≤ 12.5% max</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">Automated sensor rejection at gate</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="text-[11px] font-label-sm text-outline">Aflatoxin Limit</div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary">&lt; 10 ppb</div>
+<div class="text-[10px] text-on-surface-variant mt-0.5">Feed grade safety guaranteed</div>
+</div>
+</div>
+<!-- Milestone Payout Timeline Breakdown -->
+<div class="space-y-2 pt-1">
+<div class="font-label-sm text-label-sm font-bold text-on-surface uppercase tracking-wider text-[11px]">
+                Milestone Payout Tranches (Smart Escrow)
+              </div>
+<!-- Tranche 1 -->
+<div class="flex items-center gap-3 p-2.5 rounded-lg border border-outline-variant bg-surface-container-low">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[12px] flex-shrink-0">
+                  10%
+                </div>
+<div class="flex-grow">
+<div class="flex justify-between font-label-md text-label-md font-bold text-on-surface">
+<span>Loading &amp; Waybill Issuance</span>
+<span>₦19.9M</span>
+</div>
+<div class="text-[11px] font-body-sm text-outline">Disbursed on verified truck dispatch at origin</div>
+</div>
+</div>
+<!-- Tranche 2 -->
+<div class="flex items-center gap-3 p-2.5 rounded-lg border border-outline-variant bg-surface-container-low">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[12px] flex-shrink-0">
+                  60%
+                </div>
+<div class="flex-grow">
+<div class="flex justify-between font-label-md text-label-md font-bold text-on-surface">
+<span>Weighbridge Gate-In</span>
+<span>₦119.4M</span>
+</div>
+<div class="text-[11px] font-body-sm text-outline">Disbursed upon Gross - Tare automated weighbridge sync</div>
+</div>
+</div>
+<!-- Tranche 3 -->
+<div class="flex items-center gap-3 p-2.5 rounded-lg border border-outline-variant bg-surface-container-low">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[12px] flex-shrink-0">
+                  30%
+                </div>
+<div class="flex-grow">
+<div class="flex justify-between font-label-md text-label-md font-bold text-on-surface">
+<span>Final Lab QA Clearance</span>
+<span>₦59.7M</span>
+</div>
+<div class="text-[11px] font-body-sm text-outline">Released within 24h of spectrometer aflatoxin pass</div>
+</div>
+</div>
+</div>
+<!-- Compliance Footnote -->
+<div class="bg-surface-container p-2.5 rounded border border-outline-variant text-[11px] font-body-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+<span>All payment dispatches route via direct NIBSS instant settlement APIs. Zero counterparty default risk.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- ========================================== -->
+<!-- Footer (Shared Component)                  -->
+<!-- ========================================== -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface border-t border-outline-variant dark:border-outline flat no shadows mt-12">
+<div class="w-full py-8 px-margin-desktop max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">energy_savings_leaf</span>
+</div>
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">AgroLink RAMLP</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant max-w-xl">
+          © 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus &amp; NIBSS Settlement Secured.
+        </p>
+</div>
+<nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">CBN Compliance</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Dispute Framework</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Weighbridge Protocol</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Moisture Standards</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Developer APIs</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Privacy Notice</a>
+</nav>
+</div>
+</footer>
+<!-- Inline Helper Scripts for Interactive Console -->
+<script>
+    function adjustPrice(delta) {
+      const slider = document.getElementById('priceSlider');
+      let val = parseInt(slider.value, 10) + delta;
+      if (val < 740000) val = 740000;
+      if (val > 780000) val = 780000;
+      slider.value = val;
+      
+      const formatted = '₦' + val.toLocaleString() + ' / MT';
+      document.getElementById('bidPriceDisplay').innerText = formatted;
+      document.getElementById('btnSubmitCounter').innerText = 'Submit Counter-Offer (₦' + val.toLocaleString() + '/MT)';
+    }
+  </script>
+</body></html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroLink | Farmer Orders &amp; Waybill Tracking</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#d4ddd0",
+            "on-primary-fixed": "#00210d",
+            "surface": "#f3fcef",
+            "on-error": "#ffffff",
+            "on-surface": "#161d16",
+            "secondary": "#306b19",
+            "surface-container-low": "#edf6e9",
+            "primary-fixed": "#a3f5b6",
+            "on-primary-fixed-variant": "#005228",
+            "surface-tint": "#196c3b",
+            "outline-variant": "#bfc9bd",
+            "on-surface-variant": "#404940",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "tertiary": "#5d4100",
+            "surface-container-high": "#e2ebde",
+            "inverse-surface": "#2a322a",
+            "on-secondary-fixed-variant": "#175200",
+            "primary-fixed-dim": "#88d89c",
+            "secondary-fixed": "#b0f491",
+            "on-secondary-fixed": "#052100",
+            "secondary-container": "#b0f491",
+            "primary": "#005128",
+            "inverse-on-surface": "#eaf3e7",
+            "surface-container": "#e8f0e4",
+            "tertiary-fixed-dim": "#f8bd45",
+            "on-primary-container": "#98e9ab",
+            "surface-container-lowest": "#ffffff",
+            "surface-bright": "#f3fcef",
+            "on-tertiary-container": "#ffd07c",
+            "secondary-fixed-dim": "#95d878",
+            "on-primary": "#ffffff",
+            "surface-variant": "#dce5d9",
+            "on-tertiary-fixed": "#271900",
+            "tertiary-fixed": "#ffdea7",
+            "surface-container-highest": "#dce5d9",
+            "outline": "#707a6f",
+            "on-error-container": "#93000a",
+            "inverse-primary": "#88d89c",
+            "primary-container": "#176b3a",
+            "tertiary-container": "#7b5700",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "background": "#f3fcef",
+            "on-secondary-container": "#36721f",
+            "on-background": "#161d16",
+            "on-secondary": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin": "1rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "margin-desktop": "2.5rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Inter"],
+            "display-lg": ["Manrope"],
+            "label-lg": ["Inter"],
+            "headline-md": ["Manrope"],
+            "body-sm": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "currency-display": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "body-lg": ["Inter"]
+          },
+          "fontSize": {
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.35); opacity: 0.2; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring {
+      animation: pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased font-body-md min-h-screen pb-24 selection:bg-primary selection:text-white">
+<!-- Top Navigation Anchor (Shared Component: TopAppBar Mobile Implementation) -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 h-16 max-w-7xl mx-auto bg-surface border-b border-outline-variant shadow-sm">
+<div class="flex items-center space-x-2.5">
+<div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white" data-icon="agriculture" style="font-variation-settings: 'FILL' 1;">agriculture</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm font-bold text-primary tracking-tight">AgroLink</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-tertiary-fixed text-on-tertiary-fixed">RAMLP Hub</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary inline-block animate-ping"></span>
+          SW Logistics Node • Lagos-Ibadan
+        </p>
+</div>
+</div>
+<!-- Node Switch & Alert Tray -->
+<div class="flex items-center space-x-2">
+<button aria-label="Switch logistics node" class="p-2 rounded-lg border border-outline-variant hover:bg-surface-container active:scale-95 transition-transform flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" data-icon="swap_horiz">swap_horiz</span>
+</button>
+<div class="relative">
+<button aria-label="Notifications" class="p-2 rounded-lg border border-outline-variant hover:bg-surface-container active:scale-95 transition-transform flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error rounded-full ring-2 ring-surface"></span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-20 px-4 max-w-xl mx-auto space-y-4">
+<!-- Profile & Verification Banner -->
+<section class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant shadow-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-3">
+<div class="relative">
+<img class="w-13 h-13 rounded-full object-cover ring-2 ring-primary border border-surface-container-lowest" data-alt="Dignified portrait of Mallam Ibrahim Musa, a seasoned Nigerian commercial farmer in northern attired cap, standing proudly beside lush irrigated farmland under clean morning sunlight. Modern documentary photorealistic style with warm green and earthy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsR2EWvzvegr1HS9TB0PvlSYySCFOX9nks8f5fAeRQCgzDcWmeWRD_LZFJHAmJT494W5j_y2Ym5YHLO44S9x6IWRpck6cQMniE6QLJSZDnY3hZAnyGn27YVLBpnT20FI1yHsg9RMAsAud2wXqUMnVaNJ6yJrrx9pKtGAZiYuKWKOteXvb-_uO3fT5-x1hcgr-717YYCebDnvQfWj4aqxkysUU4r9AhP4NnWAOQnS4"/>
+<span class="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5 shadow-sm" title="Tier-1 Biometric Verified">
+<span class="material-symbols-outlined text-xs block" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight">Mallam Ibrahim Musa</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Musa Agro Farms Ltd • Saki, Oyo State</p>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-container text-white">
+<span class="material-symbols-outlined text-xs mr-1" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                RAMLP V-Tier 1
+              </span>
+<span class="text-xs font-medium text-outline">ID: AF-OY-8821</span>
+</div>
+</div>
+</div>
+<button class="bg-surface-container hover:bg-surface-container-high text-primary px-3 py-1.5 rounded-lg font-label-sm text-label-sm flex items-center gap-1 border border-outline-variant active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="qr_code_scanner">qr_code_scanner</span>
+<span>Pass</span>
+</button>
+</div>
+<!-- Quick Metrics Ribbon -->
+<div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-outline-variant">
+<div class="bg-surface-container-low rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Active Escrow</span>
+<span class="font-headline-sm text-headline-sm font-bold text-primary block mt-0.5">₦1.75M</span>
+<span class="text-[10px] text-secondary flex items-center font-medium">
+<span class="material-symbols-outlined text-xs" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span> Secured
+          </span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">In Transit</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface block mt-0.5">2 Lots</span>
+<span class="text-[10px] text-on-surface-variant flex items-center font-medium">Mack 30T &amp; Man</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Settled (MTD)</span>
+<span class="font-headline-sm text-headline-sm font-bold text-primary block mt-0.5">₦4.82M</span>
+<span class="text-[10px] text-secondary flex items-center font-medium">
+<span class="material-symbols-outlined text-xs" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span> 100% NIBSS
+          </span>
+</div>
+</div>
+</section>
+<!-- Quick Filter Tabs -->
+<nav aria-label="Waybill Status Filters" class="flex space-x-2 overflow-x-auto pb-1 custom-scrollbar">
+<button class="shrink-0 h-9 px-4 rounded-lg bg-primary-container text-white font-label-md text-label-md font-semibold shadow-sm flex items-center gap-1.5">
+<span>All Orders</span>
+<span class="w-5 h-5 rounded-full bg-white text-primary text-xs flex items-center justify-center font-bold">5</span>
+</button>
+<button class="shrink-0 h-9 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>En-Route Haulage</span>
+<span class="text-xs text-on-surface-variant font-semibold">(2)</span>
+</button>
+<button class="shrink-0 h-9 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span>At Destination Lab</span>
+<span class="text-xs text-on-surface-variant font-semibold">(1)</span>
+</button>
+<button class="shrink-0 h-9 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span>Delivered &amp; Settled</span>
+<span class="text-xs text-on-surface-variant font-semibold">(2)</span>
+</button>
+</nav>
+<!-- Section Heading -->
+<div class="flex items-center justify-between pt-1">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="near_me">near_me</span>
+        Live Corridor Tracking
+      </h2>
+<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant">Realtime Telematics</span>
+</div>
+<!-- Active Waybill Corridor Highlight Card (Bento Style) -->
+<article class="bg-surface-container-lowest rounded-xl border-2 border-primary shadow-sm overflow-hidden">
+<!-- Card Header Banner -->
+<div class="bg-surface-container-low px-4 py-3 border-b border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary inline-block animate-ping"></span>
+            En-Route Haulage
+          </span>
+<span class="font-mono text-xs font-bold text-on-surface">#EWB-2025-0982</span>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">Dispatched 06:30 AM</span>
+</div>
+<div class="p-4 space-y-4">
+<!-- Crop & Off-Taker Specification -->
+<div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface leading-tight">500 Tubers Premium Export Yam</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="domain">domain</span>
+                Off-Taker: <strong class="text-on-surface">Grand Cereals &amp; Feeds PLC</strong>
+</p>
+<p class="text-xs text-outline flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-xs" data-icon="location_on">location_on</span>
+                Destination: Ikeja Logistics Terminal, Lagos State
+              </p>
+</div>
+<div class="text-right">
+<span class="text-xs font-medium text-outline uppercase block">Vault Total</span>
+<span class="font-currency-display text-lg font-extrabold text-primary">₦1,750,000</span>
+</div>
+</div>
+</div>
+<!-- Live GNSS Map Snippet -->
+<div class="relative w-full h-44 rounded-xl overflow-hidden border border-outline-variant shadow-inner group">
+<img class="w-full h-full object-cover" data-alt="Satellite GIS route corridor tracking view on the Lagos Ibadan expressway at sunrise. Detailed logistical route vector overlay showing coordinate waypoints, green destination marker at Ikeja, live telematics telemetry markers with high visual precision in modern logistics GIS design style." data-location="Ibadan to Lagos Expressway Nigeria" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAHS0A_BLddrN6IYG0f5jjVkWz23RSSp7egBt3Oin3w5k5H25cibR4fym5rnIgM5C9XBd_cEc3GlZ4FqJbu8ohZKAyLWmpcWbyyJ8okru5Z06gDO7YbTPcPmrAoZVA9kYCo__9QtKG9wQeslQqY-pMFVoLSXfDZBZhbQ8rCuA3nbMicu4ZiaMVZ6ZYzD720Dd_LR-vmxrx9eA0-r5Zp56DDDwc5Vq_p1xj2SHVONE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>
+<!-- Pulsing Truck Coordinates -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+<div class="w-10 h-10 rounded-full bg-primary/40 pulse-ring absolute"></div>
+<div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-lg border-2 border-white z-10">
+<span class="material-symbols-outlined text-sm" data-icon="local_shipping" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+</div>
+<!-- Live Telemetry Overlays -->
+<div class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-md text-white rounded-lg px-2.5 py-1 flex items-center gap-2 border border-white/20 text-xs">
+<span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+<span class="font-mono font-bold">54 km/h</span>
+<span class="text-gray-300">|</span>
+<span class="font-medium text-green-300">Corridor A1</span>
+</div>
+<div class="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur-md text-white rounded-lg px-2.5 py-1 text-xs border border-white/20 font-mono">
+            ETA: <span class="font-bold text-tertiary-fixed">1h 14m (11:45 AM)</span>
+</div>
+<!-- Geofence Checkpoint Banner -->
+<div class="absolute bottom-2.5 left-2.5 right-2.5 bg-surface-container-lowest/95 backdrop-blur-md rounded-lg p-2 flex items-center justify-between border border-outline-variant shadow-sm">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-secondary text-base" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-xs font-semibold text-on-surface">Passed Ibadan Toll Gate Interlink</span>
+</div>
+<span class="text-xs font-bold text-primary font-mono">59 km left to Silo</span>
+</div>
+</div>
+<!-- Dynamic Corridor Progress Bar -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center text-xs">
+<span class="font-semibold text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="route">route</span>
+              Milestone Progress
+            </span>
+<span class="font-bold text-primary font-mono">68% Completed</span>
+</div>
+<div class="w-full bg-surface-container h-2.5 rounded-full overflow-hidden p-0.5 border border-outline-variant">
+<div class="bg-primary h-full rounded-full transition-all duration-500 ease-out" style="width: 68%;"></div>
+</div>
+<div class="flex justify-between text-[11px] text-on-surface-variant font-medium pt-0.5">
+<span>Saki Aggregation Hub</span>
+<span class="text-secondary font-bold">Ogere Transit Yard</span>
+<span>Ikeja Feeds Silo</span>
+</div>
+</div>
+<!-- Carrier & Driver Dossier -->
+<div class="bg-surface-container-low rounded-xl p-3 border border-outline-variant flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary font-bold">
+<span class="material-symbols-outlined" data-icon="rv_hookup">rv_hookup</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md font-bold text-on-surface">Sikiru Alabi</span>
+<span class="material-symbols-outlined text-xs text-primary" data-icon="fingerprint" title="Biometric ID Verified">fingerprint</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Mack 30T Flatbed • <strong class="text-on-surface font-mono">TRK-LAG-488</strong></p>
+<div class="flex items-center gap-1 text-[11px] text-secondary font-semibold">
+<span class="material-symbols-outlined text-xs" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+                Verified Transit Partner
+              </div>
+</div>
+</div>
+<a aria-label="Call Hauler Driver" class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-container shadow-sm active:scale-95 transition-transform" href="tel:+2348030004921">
+<span class="material-symbols-outlined text-lg" data-icon="phone" style="font-variation-settings: 'FILL' 1;">phone</span>
+</a>
+</div>
+<!-- Escrow Multi-Milestone Status -->
+<div class="p-3 rounded-xl bg-surface-container border border-outline-variant space-y-2.5">
+<div class="flex items-center justify-between text-xs">
+<span class="font-bold text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="account_balance_wallet">account_balance_wallet</span>
+              RAMLP Smart Contract Escrow
+            </span>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-fixed text-on-secondary-fixed uppercase">Autonomous</span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div class="p-2 rounded-lg bg-surface-container-lowest border border-outline-variant">
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-medium">Milestone 1</span>
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="font-currency-display text-sm font-bold text-on-surface mt-1">₦525,000</div>
+<span class="text-[10px] text-secondary font-medium">Loading Advance (Paid)</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-lowest border border-tertiary-fixed-dim/50">
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-medium">Milestone 2</span>
+<span class="material-symbols-outlined text-sm text-tertiary" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div class="font-currency-display text-sm font-bold text-tertiary mt-1">₦1,225,000</div>
+<span class="text-[10px] text-on-surface-variant font-medium">Pending Gate Scale-In</span>
+</div>
+</div>
+</div>
+<!-- Action Cluster -->
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button class="h-11 rounded-lg bg-primary hover:bg-primary-container text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span>
+            e-Waybill Manifest
+          </button>
+<button class="h-11 rounded-lg bg-surface-container-lowest hover:bg-surface-container border border-primary text-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="shield">shield</span>
+            Escrow Vault Status
+          </button>
+</div>
+</div>
+</article>
+<!-- Secondary Consignments Subheading -->
+<div class="flex items-center justify-between pt-4">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="inventory_2">inventory_2</span>
+        Other Active &amp; Settled Consignments
+      </h2>
+<span class="text-xs text-primary font-semibold hover:underline cursor-pointer">Archive History</span>
+</div>
+<!-- Secondary Consignments Stack -->
+<div class="space-y-3">
+<!-- Item 1: Yellow Maize at Destination Lab -->
+<article class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant shadow-sm hover:border-primary transition-colors">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-tertiary-fixed text-on-tertiary-fixed flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="biotech">biotech</span>
+                Lab Sampling
+              </span>
+<span class="font-mono text-xs text-outline font-bold">#AGL-ORD-104</span>
+</div>
+<h3 class="font-headline-sm text-base font-bold text-on-surface mt-1.5">45 MT Yellow Maize (Feed Grade 1)</h3>
+<p class="font-body-sm text-xs text-on-surface-variant">Flour Mills Nigeria PLC • Apapa Grain Terminal</p>
+</div>
+<div class="text-right">
+<span class="font-currency-display text-base font-extrabold text-on-surface">₦11,250,000</span>
+<span class="text-[10px] text-tertiary font-bold block">In Escrow Vault</span>
+</div>
+</div>
+<div class="mt-3 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant space-y-1 text-xs">
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-secondary" data-icon="scale">scale</span>
+              Destination Weighbridge Passed
+            </span>
+<span class="font-bold text-on-surface">Net: 44.82 MT</span>
+</div>
+<div class="flex items-center justify-between text-on-surface">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-tertiary" data-icon="science">science</span>
+              Moisture &amp; Aflatoxin Assaying
+            </span>
+<span class="font-mono text-xs font-semibold bg-surface-container-highest px-1.5 py-0.2 rounded">Lab #NIS-88914</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2 border-t border-outline-variant text-xs">
+<span class="text-outline">Carrier: Dangote Freight (MAN 40T)</span>
+<button class="text-primary font-bold flex items-center gap-0.5 hover:underline">
+            View Lab Ticket <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Item 2: Cassava Tubers Awaiting Gate-in -->
+<article class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant shadow-sm hover:border-primary transition-colors">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="schedule">schedule</span>
+                Loading &amp; Staging
+              </span>
+<span class="font-mono text-xs text-outline font-bold">#AGL-ORD-092</span>
+</div>
+<h3 class="font-headline-sm text-base font-bold text-on-surface mt-1.5">35 MT Cassava Tubers (Starch-Dense)</h3>
+<p class="font-body-sm text-xs text-on-surface-variant">Nestlé Agro Processing Hub • Agbara Industrial Zone</p>
+</div>
+<div class="text-right">
+<span class="font-currency-display text-base font-extrabold text-on-surface">₦3,150,000</span>
+<span class="text-[10px] text-outline font-medium block">Escrow Contract Active</span>
+</div>
+</div>
+<div class="mt-3 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between text-xs">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-base" data-icon="warehouse">warehouse</span>
+<span class="text-on-surface font-medium">Awaiting Truck Gate-in at Saki Aggregation Hub</span>
+</div>
+<span class="font-mono text-xs bg-surface-container px-2 py-0.5 rounded font-semibold text-on-surface">Bay 04</span>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2 border-t border-outline-variant text-xs">
+<span class="text-outline">Assigned: Oyo State Haulage Coop</span>
+<button class="text-primary font-bold flex items-center gap-0.5 hover:underline">
+            Generate Gate Pass <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Item 3: Smoked Catfish Delivered & Settled -->
+<article class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant shadow-sm hover:border-secondary transition-colors">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-secondary-fixed text-on-secondary-fixed flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="task_alt" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+                Settled &amp; Closed
+              </span>
+<span class="font-mono text-xs text-outline font-bold">#AGL-ORD-081</span>
+</div>
+<h3 class="font-headline-sm text-base font-bold text-on-surface mt-1.5">200 kg Smoked Catfish (Export Vacuum Pouch)</h3>
+<p class="font-body-sm text-xs text-on-surface-variant">Shoprite Retail Outlets • Lekki Mall Lagos</p>
+</div>
+<div class="text-right">
+<span class="font-currency-display text-base font-extrabold text-secondary">₦1,440,000</span>
+<span class="text-[10px] text-secondary font-bold block flex items-center justify-end gap-0.5">
+<span class="material-symbols-outlined text-[11px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span> NIBSS Instant
+            </span>
+</div>
+</div>
+<div class="mt-3 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between text-xs">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-secondary text-base" data-icon="receipt_long">receipt_long</span>
+<span class="text-on-surface font-medium">Auto-credited to Zenith Bank: *******4901</span>
+</div>
+<span class="text-outline font-mono text-[11px]">Ref: NIBSS/9921/REV</span>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2 border-t border-outline-variant text-xs">
+<span class="text-outline">Delivered: Yesterday, 16:40 WAT</span>
+<button class="text-secondary font-bold flex items-center gap-0.5 hover:underline">
+            Download Tax Receipt <span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+</button>
+</div>
+</article>
+</div>
+<!-- Field Agent Help & SOS Bar -->
+<div class="bg-surface-container rounded-xl p-3 border border-outline-variant flex items-center justify-between mt-4">
+<div class="flex items-center space-x-2.5">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="support_agent">support_agent</span>
+<div>
+<p class="text-xs font-bold text-on-surface">RAMLP Corridor Dispatch Emergency?</p>
+<p class="text-[11px] text-on-surface-variant">24/7 Agro-Escrow &amp; Route Logistics Support</p>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-surface-container-lowest text-primary border border-outline-variant rounded-lg text-xs font-bold hover:bg-surface-container-high transition-colors">
+        Toll-Free Dial
+      </button>
+</div>
+</main>
+<!-- Docked Bottom Navigation Bar (Shared Component: BottomNavBar with 'Orders' Active) -->
+<nav aria-label="Bottom Navigation" class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-2 bg-surface-container-lowest border-t border-outline-variant shadow-md">
+<!-- Home Tab -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-colors active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="font-label-sm text-label-sm mt-0.5">Home</span>
+</a>
+<!-- Products Tab -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-colors active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-sm text-label-sm mt-0.5">Products</span>
+</a>
+<!-- Orders Tab (MANDATORY ACTIVE ITEM) -->
+<a aria-current="page" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1.5 font-semibold active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+<span class="font-label-sm text-label-sm mt-0.5 text-white">Orders</span>
+</a>
+<!-- Prices Tab -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-colors active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="font-label-sm text-label-sm mt-0.5">Prices</span>
+</a>
+<!-- Profile Tab -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-colors active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-0.5">Profile</span>
+</a>
+</nav>
+<!-- Interactive script for quick filter tabs feedback -->
+<script>
+    document.querySelectorAll('nav[aria-label="Waybill Status Filters"] button').forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('nav[aria-label="Waybill Status Filters"] button').forEach(b => {
+          b.className = 'shrink-0 h-9 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors';
+        });
+        this.className = 'shrink-0 h-9 px-4 rounded-lg bg-primary-container text-white font-label-md text-label-md font-semibold shadow-sm flex items-center gap-1.5';
+      });
+    });
+  </script>
+</body></html>

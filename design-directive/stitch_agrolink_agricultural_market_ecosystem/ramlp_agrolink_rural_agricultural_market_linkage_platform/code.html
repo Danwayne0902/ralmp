@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>RAMLP AgroLink - Rural Agricultural Market Linkage Platform</title>
+
+  <!-- Material Symbols Outlined (Exact verbatim link) -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <!-- Google Fonts: Inter & Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS v3 with Plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Tailwind Configuration -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#f3fcef",
+            "tertiary-container": "#7b5700",
+            "on-primary-container": "#98e9ab",
+            "error-container": "#ffdad6",
+            "primary-fixed": "#a3f5b6",
+            "tertiary-fixed-dim": "#f8bd45",
+            "error": "#ba1a1a",
+            "surface-container-high": "#e2ebde",
+            "inverse-on-surface": "#eaf3e7",
+            "on-surface": "#161d16",
+            "outline": "#707a6f",
+            "on-secondary-fixed-variant": "#175200",
+            "tertiary-fixed": "#ffdea7",
+            "on-error-container": "#93000a",
+            "surface-bright": "#f3fcef",
+            "on-background": "#161d16",
+            "secondary-fixed": "#b0f491",
+            "outline-variant": "#bfc9bd",
+            "primary": "#005128",
+            "on-surface-variant": "#404940",
+            "surface-container": "#e8f0e4",
+            "tertiary": "#5d4100",
+            "surface-tint": "#196c3b",
+            "on-secondary-fixed": "#052100",
+            "secondary-fixed-dim": "#95d878",
+            "primary-container": "#176b3a",
+            "secondary": "#306b19",
+            "on-primary-fixed-variant": "#005228",
+            "primary-fixed-dim": "#88d89c",
+            "surface-container-lowest": "#ffffff",
+            "inverse-primary": "#88d89c",
+            "inverse-surface": "#2a322a",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#36721f",
+            "secondary-container": "#b0f491",
+            "surface-variant": "#dce5d9",
+            "surface-container-low": "#edf6e9",
+            "on-primary-fixed": "#00210d",
+            "on-tertiary": "#ffffff",
+            "surface-dim": "#d4ddd0",
+            "on-tertiary-container": "#ffd07c",
+            "background": "#f3fcef",
+            "on-secondary": "#ffffff",
+            "surface-container-highest": "#dce5d9",
+            "on-error": "#ffffff",
+            "on-tertiary-fixed": "#271900"
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            manrope: ['Manrope', 'sans-serif'],
+            'body-md': ['Inter'],
+            'body-sm': ['Inter'],
+            'headline-lg-mobile': ['Manrope'],
+            'headline-md': ['Manrope'],
+            'display-lg-mobile': ['Manrope'],
+            'currency-display': ['Manrope'],
+            'label-sm': ['Inter'],
+            'label-md': ['Inter'],
+            'headline-sm': ['Manrope'],
+            'body-lg': ['Inter'],
+            'label-lg': ['Inter'],
+            'headline-lg': ['Manrope'],
+            'display-lg': ['Manrope']
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            md: "0.375rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            "2xl": "1rem",
+            full: "9999px"
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .tactile-card {
+      border: 1px solid #E5EAE3;
+      box-shadow: 0 1px 3px rgba(32, 40, 32, 0.04), 0 1px 2px rgba(32, 40, 32, 0.02);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.35); opacity: 0.2; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring {
+      animation: pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .security-guilloche {
+      background-image: radial-gradient(#176b3a 0.6px, transparent 0.6px), radial-gradient(#176b3a 0.6px, #ffffff 0.6px);
+      background-size: 16px 16px;
+      background-position: 0 0, 8px 8px;
+      opacity: 0.035;
+    }
+    .watermark-stamp {
+      transform: rotate(-18deg);
+      border: 3px dashed rgba(23, 107, 58, 0.28);
+    }
+  </style>
+
+  <!-- React 18, React Router v6.3.0 & Babel Standalone CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+  <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+  <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased font-body-md min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { createRoot } = ReactDOM;
+    const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+    // --- SHARED HEADER COMPONENT ---
+    function SharedNavbar({ currentRole = "farmer" }) {
+      const navigate = useNavigate();
+      const location = useLocation();
+
+      return (
+        <header className="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50 shadow-sm">
+          <div className="flex justify-between items-center w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto h-16">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
+                <span className="material-symbols-outlined text-2xl fill-icon">agriculture</span>
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-headline-sm text-base sm:text-lg font-bold text-primary tracking-tight">AgroLink</span>
+                  <span className="text-[10px] font-label-sm uppercase tracking-wider bg-tertiary-fixed text-on-tertiary-fixed font-bold px-1.5 py-0.5 rounded">RAMLP</span>
+                </div>
+                <span className="text-[10px] text-on-surface-variant font-label-sm hidden sm:block">Regulated Commodity &amp; Escrow</span>
+              </div>
+            </Link>
+
+            <nav className="hidden lg:flex items-center space-x-6">
+              <Link to="/marketplace" className={`font-label-md text-sm transition pb-1 ${location.pathname === '/marketplace' ? 'border-b-2 border-primary text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Marketplace</Link>
+              <Link to="/haulage" className={`font-label-md text-sm transition pb-1 ${location.pathname === '/haulage' ? 'border-b-2 border-primary text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Waybill &amp; Haulage</Link>
+              <Link to="/quality-lab" className={`font-label-md text-sm transition pb-1 ${location.pathname === '/quality-lab' ? 'border-b-2 border-primary text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Quality Lab</Link>
+              <Link to="/disputes" className={`font-label-md text-sm transition pb-1 ${location.pathname === '/disputes' ? 'border-b-2 border-primary text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Disputes &amp; Escrow</Link>
+              <Link to="/settlements" className={`font-label-md text-sm transition pb-1 ${location.pathname === '/settlements' ? 'border-b-2 border-primary text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Settlements</Link>
+            </nav>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-xs text-primary font-medium border border-outline-variant">
+                <span className="material-symbols-outlined text-sm fill-icon text-secondary">verified_user</span>
+                <span>CBN Verified</span>
+              </div>
+
+              <Link to="/auth" className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-surface-container transition">
+                Switch Role / Login
+              </Link>
+            </div>
+          </div>
+
+          {/* Quick Route Switcher Bar for prototype demonstration */}
+          <div className="bg-surface-container-high px-4 py-1.5 overflow-x-auto no-scrollbar border-t border-outline-variant/60 flex items-center gap-2 text-xs">
+            <span className="text-outline font-semibold uppercase tracking-wider text-[10px] shrink-0">Demo Screens:</span>
+            <Link to="/" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Landing</Link>
+            <Link to="/farmer-sales" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Farmer Payouts</Link>
+            <Link to="/farmer-orders" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Waybill Tracking</Link>
+            <Link to="/produce-history" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Farmer Listings</Link>
+            <Link to="/list-produce" className="px-2 py-0.5 rounded bg-primary-container text-white font-medium shrink-0">+ List Produce</Link>
+            <Link to="/marketplace" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Wholesale Market</Link>
+            <Link to="/batch-negotiation" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Batch Negotiation</Link>
+            <Link to="/escrow-checkout" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Escrow Checkout</Link>
+            <Link to="/haulage" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Haulage Hub</Link>
+            <Link to="/carrier-dispatch" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Mobile Dispatch</Link>
+            <Link to="/quality-lab" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Quality Lab</Link>
+            <Link to="/lab-inspector" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Inspector Terminal</Link>
+            <Link to="/disputes" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Escrow Freeze</Link>
+            <Link to="/settlements" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">Reconciliation</Link>
+            <Link to="/receipt-modal" className="px-2 py-0.5 rounded bg-surface-container text-primary hover:bg-white font-medium shrink-0">NIBSS Receipt</Link>
+          </div>
+        </header>
+      );
+    }
+
+    // --- SHARED FOOTER ---
+    function SharedFooter() {
+      return (
+        <footer className="bg-surface-container-highest border-t border-outline-variant py-8 mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-on-surface-variant">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-base">verified_user</span>
+              <span>© 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus &amp; NIBSS Settlement Secured.</span>
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs">
+              <span className="hover:underline cursor-pointer">CBN Compliance</span>
+              <span className="hover:underline cursor-pointer">Dispute Framework</span>
+              <span className="hover:underline cursor-pointer">Weighbridge Protocol</span>
+              <span className="hover:underline cursor-pointer">Moisture Standards</span>
+              <span className="hover:underline cursor-pointer">Privacy Notice</span>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    // --- MOBILE DOCKED BOTTOM NAVBAR ---
+    function MobileDockedNav({ activeTab = "home" }) {
+      return (
+        <nav aria-label="Mobile Navigation" className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-2 bg-surface-container-lowest max-w-md mx-auto shadow-md border-t border-outline-variant/40 md:hidden">
+          <Link to="/" className={`flex flex-col items-center justify-center px-3 py-1.5 ${activeTab === 'home' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
+            <span className="material-symbols-outlined text-2xl">storefront</span>
+            <span className="text-[10px] mt-0.5">Home</span>
+          </Link>
+          <Link to="/produce-history" className={`flex flex-col items-center justify-center px-3 py-1.5 ${activeTab === 'products' ? 'bg-primary-container text-white rounded-xl' : 'text-on-surface-variant'}`}>
+            <span className="material-symbols-outlined text-2xl">inventory_2</span>
+            <span className="text-[10px] mt-0.5">Products</span>
+          </Link>
+          <Link to="/farmer-orders" className={`flex flex-col items-center justify-center px-3 py-1.5 ${activeTab === 'orders' ? 'bg-primary-container text-white rounded-xl' : 'text-on-surface-variant'}`}>
+            <span className="material-symbols-outlined text-2xl">receipt_long</span>
+            <span className="text-[10px] mt-0.5">Orders</span>
+          </Link>
+          <Link to="/marketplace" className={`flex flex-col items-center justify-center px-3 py-1.5 ${activeTab === 'prices' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
+            <span className="material-symbols-outlined text-2xl">trending_up</span>
+            <span className="text-[10px] mt-0.5">Market</span>
+          </Link>
+          <Link to="/farmer-sales" className={`flex flex-col items-center justify-center px-3 py-1.5 ${activeTab === 'profile' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
+            <span className="material-symbols-outlined text-2xl">person</span>
+            <span className="text-[10px] mt-0.5">Account</span>
+          </Link>
+        </nav>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 6: LANDING PAGE (ID: 1ddb60dc3e0e4f83930c2abbc026ee17)
+    // =========================================================================
+    function LandingPage() {
+      const navigate = useNavigate();
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          <SharedNavbar />
+          
+          <main className="flex-1">
+            {/* Live Ticker */}
+            <div className="bg-surface-container-high border-b border-outline-variant py-2 overflow-hidden text-xs">
+              <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2 font-bold text-primary shrink-0">
+                  <span className="material-symbols-outlined text-sm animate-pulse">broadcast_on_personal</span>
+                  <span>SPOT BENCHMARKS:</span>
+                </div>
+                <div className="flex items-center gap-6 overflow-x-auto whitespace-nowrap no-scrollbar text-on-surface-variant">
+                  <span>White Maize (Kano): <strong className="text-primary font-bold">₦760,000 / MT</strong> <span className="text-secondary font-bold">(+2.4%)</span></span>
+                  <span>•</span>
+                  <span>Cassava Tubers (Benue): <strong className="text-primary font-bold">₦145,000 / MT</strong> <span className="text-error font-bold">(-0.8%)</span></span>
+                  <span>•</span>
+                  <span>Yellow Maize (Oyo): <strong className="text-primary font-bold">₦740,000 / MT</strong> <span className="text-secondary font-bold">(+1.1%)</span></span>
+                  <span>•</span>
+                  <span>Soybeans (Kaduna): <strong className="text-primary font-bold">₦890,000 / MT</strong> <span className="text-secondary font-bold">(+3.2%)</span></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Hero Section */}
+            <section className="py-12 md:py-20 bg-gradient-to-b from-surface-container-lowest via-surface to-background px-4 sm:px-6 lg:px-8">
+              <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="lg:col-span-7 space-y-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-container/60 border border-secondary text-on-secondary-container text-xs font-semibold">
+                    <span className="material-symbols-outlined text-base">verified</span>
+                    <span>Federal Ministry of Agriculture &amp; Food Security Endorsed</span>
+                  </div>
+                  <h1 className="font-headline-lg text-3xl sm:text-5xl font-extrabold text-primary leading-tight">
+                    Connecting Farmers to Markets. <br/>
+                    <span className="text-on-surface">Empowering Agriculture.</span>
+                  </h1>
+                  <p className="font-body-lg text-base sm:text-lg text-on-surface-variant leading-relaxed max-w-xl">
+                    RAMLP is building Nigeria's smarter agricultural marketplace that connects rural farming clusters, industrial millers, and certified haulage providers with central bank-backed smart escrow.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+                    <Link to="/auth" className="bg-primary-container text-on-primary hover:bg-primary font-bold px-8 py-3.5 rounded-lg shadow-sm text-center flex items-center justify-center gap-2">
+                      <span>Launch Portal</span>
+                      <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                    </Link>
+                    <Link to="/marketplace" className="bg-surface-container-lowest border-2 border-primary-container text-primary font-bold px-6 py-3 rounded-lg text-center flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-lg">storefront</span>
+                      <span>Explore Wholesale Market</span>
+                    </Link>
+                  </div>
+
+                  <div className="pt-6 border-t border-outline-variant/60 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-base">account_balance</span>
+                      <span className="font-medium">CBN Regulated Escrow</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-base">scale</span>
+                      <span className="font-medium">Dual Weighbridge Sync</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-base">science</span>
+                      <span className="font-medium">Certified Lab Moisture Check</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Interactive Highlights */}
+                <div className="lg:col-span-5 space-y-4">
+                  {/* Escrow Lock Banner */}
+                  <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-sm space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary text-xl">lock</span>
+                        <h3 className="font-headline-sm text-sm font-bold text-on-surface">SafeTrade™ Escrow Custody</h3>
+                      </div>
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">
+                        ACTIVE ESCROW
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-outline uppercase font-semibold">Total Consignment Vault</span>
+                      <div className="font-currency-display text-2xl font-extrabold text-primary">₦10,360,000.00</div>
+                    </div>
+                    <div className="w-full bg-surface-container rounded-full h-2 overflow-hidden flex">
+                      <div className="bg-primary h-full w-2/3"></div>
+                      <div className="bg-secondary-container h-full w-1/3 animate-pulse"></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-on-surface-variant font-medium">
+                      <span>45 MT Yellow Maize</span>
+                      <span className="text-primary font-bold">M2: Gate-in Verified</span>
+                    </div>
+                  </div>
+
+                  {/* Telematics Snapshot */}
+                  <div className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary">local_shipping</span>
+                        <h3 className="font-headline-sm text-sm font-bold text-on-surface">Live Haulage Telematics</h3>
+                      </div>
+                      <span className="font-mono text-xs text-outline">TRK-LAG-488</span>
+                    </div>
+                    <div className="bg-surface-container-low p-3 rounded-lg text-xs flex justify-between items-center">
+                      <div>
+                        <span className="text-outline block text-[10px]">ROUTE CORRIDOR</span>
+                        <span className="font-bold text-on-surface">Iseyin Bypass → Ikeja Silo</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-outline block text-[10px]">ETA DESTINATION</span>
+                        <span className="font-bold text-secondary">01h 14m (54 km/h)</span>
+                      </div>
+                    </div>
+                    <Link to="/farmer-orders" className="block text-center text-xs font-bold text-primary hover:underline">
+                      Open Live Telematics Corridor →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Stakeholder Perspective Grid */}
+            <section className="py-16 bg-surface-container-lowest border-y border-outline-variant px-4 sm:px-6 lg:px-8">
+              <div className="max-w-7xl mx-auto space-y-10">
+                <div className="text-center max-w-2xl mx-auto space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-primary">Ecosystem Alignment</span>
+                  <h2 className="font-headline-lg text-2xl sm:text-3xl font-bold text-primary">Designed for Every Agricultural Stakeholder</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Farmer */}
+                  <div className="p-6 bg-surface rounded-xl border border-outline-variant space-y-4 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="w-12 h-12 rounded-xl bg-primary-container text-white flex items-center justify-center">
+                        <span className="material-symbols-outlined text-2xl">spa</span>
+                      </div>
+                      <h3 className="font-headline-sm text-lg font-bold text-on-surface">Producers &amp; Farmers</h3>
+                      <p className="text-xs text-on-surface-variant leading-relaxed">
+                        Eliminate non-value middleman markdowns. List lots, benchmark farm-gate prices, and receive guaranteed T+0 NIBSS payout directly to your cooperative account.
+                      </p>
+                    </div>
+                    <Link to="/produce-history" className="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                      Farmer Dashboard <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </Link>
+                  </div>
+
+                  {/* Buyer */}
+                  <div className="p-6 bg-surface rounded-xl border-2 border-primary space-y-4 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="w-12 h-12 rounded-xl bg-secondary-container text-primary flex items-center justify-center">
+                        <span className="material-symbols-outlined text-2xl">factory</span>
+                      </div>
+                      <h3 className="font-headline-sm text-lg font-bold text-on-surface">Industrial Off-takers</h3>
+                      <p className="text-xs text-on-surface-variant leading-relaxed">
+                        Source verified volume (250+ MT) with strict moisture &lt;12.5% guarantees, multi-lot aggregation, and dual-signatory escrow protection.
+                      </p>
+                    </div>
+                    <Link to="/marketplace" className="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                      Off-taker Marketplace <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </Link>
+                  </div>
+
+                  {/* Logistics */}
+                  <div className="p-6 bg-surface rounded-xl border border-outline-variant space-y-4 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="w-12 h-12 rounded-xl bg-surface-container-high text-primary flex items-center justify-center">
+                        <span className="material-symbols-outlined text-2xl">local_shipping</span>
+                      </div>
+                      <h3 className="font-headline-sm text-lg font-bold text-on-surface">Logistics &amp; Fleet</h3>
+                      <p className="text-xs text-on-surface-variant leading-relaxed">
+                        Access pre-funded backhaul contracts, automated 30% departure diesel advances, and digital e-waybills validated at transit weighbridges.
+                      </p>
+                    </div>
+                    <Link to="/haulage" className="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                      Fleet Dispatch Portal <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 9: AUTH & ROLE-BASED ACCESS (ID: 869e4ac1efa44a12b49e31fa7e7148c9)
+    // =========================================================================
+    function AuthPage() {
+      const [authMode, setAuthMode] = useState('register');
+      const [selectedRole, setSelectedRole] = useState('farmer');
+      const navigate = useNavigate();
+
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto w-full my-6 px-4 sm:px-6 lg:px-8 gap-6">
+            {/* Left Info Panel */}
+            <div className="lg:w-5/12 bg-surface-container-low p-6 sm:p-8 rounded-2xl border border-outline-variant flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <span className="px-3 py-1 rounded-full bg-surface-container-lowest border border-outline-variant text-[11px] font-bold text-primary uppercase">
+                  Regulated Rural Agro Exchange
+                </span>
+                <h1 className="font-headline-lg text-2xl sm:text-3xl font-bold text-primary">
+                  Institutional Escrow &amp; Guaranteed Settlement
+                </h1>
+                <p className="text-sm text-on-surface-variant leading-relaxed">
+                  Join verified farming clusters, industrial millers, certified testing laboratories, and haulage carriers operating with CBN-accredited commercial escrow.
+                </p>
+
+                <div className="space-y-3 pt-4 border-t border-outline-variant/60 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-base">verified_user</span>
+                    <span>Providus Bank Escrow Custody Account</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-base">bolt</span>
+                    <span>Instant NIBSS Electronic Settlement</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-base">scale</span>
+                    <span>Dual Weighbridge Calibration Verification</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant text-xs space-y-1">
+                <div className="font-bold text-primary">Need Onboarding Assistance?</div>
+                <div className="text-on-surface-variant">Toll-free RAMLP desk: <strong>0800-AGROLINK-HQ</strong></div>
+              </div>
+            </div>
+
+            {/* Right Auth Form */}
+            <div className="lg:w-7/12 bg-surface-container-lowest p-6 sm:p-8 rounded-2xl border border-outline-variant shadow-sm space-y-6">
+              <div className="flex bg-surface-container-low p-1.5 rounded-xl border border-outline-variant">
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('register')}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${authMode === 'register' ? 'bg-primary-container text-white shadow-sm' : 'text-on-surface-variant'}`}
+                >
+                  Create New Account
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('login')}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition ${authMode === 'login' ? 'bg-primary-container text-white shadow-sm' : 'text-on-surface-variant'}`}
+                >
+                  Sign In to Portal
+                </button>
+              </div>
+
+              {authMode === 'register' ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface uppercase mb-2">1. Select Value Chain Role:</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      <div
+                        onClick={() => setSelectedRole('farmer')}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition ${selectedRole === 'farmer' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                      >
+                        <div className="font-bold text-primary flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-base">agriculture</span>
+                          Farmer / Cooperative
+                        </div>
+                        <p className="text-[11px] text-on-surface-variant mt-1">List harvest lots &amp; receive escrow payouts.</p>
+                      </div>
+
+                      <div
+                        onClick={() => setSelectedRole('buyer')}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition ${selectedRole === 'buyer' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                      >
+                        <div className="font-bold text-primary flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-base">factory</span>
+                          Industrial Off-taker
+                        </div>
+                        <p className="text-[11px] text-on-surface-variant mt-1">Wholesale bulk grain procurement.</p>
+                      </div>
+
+                      <div
+                        onClick={() => setSelectedRole('carrier')}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition ${selectedRole === 'carrier' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                      >
+                        <div className="font-bold text-primary flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-base">local_shipping</span>
+                          Haulage Carrier
+                        </div>
+                        <p className="text-[11px] text-on-surface-variant mt-1">GPS waybills &amp; backhaul freight dispatch.</p>
+                      </div>
+
+                      <div
+                        onClick={() => setSelectedRole('lab')}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition ${selectedRole === 'lab' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                      >
+                        <div className="font-bold text-primary flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-base">science</span>
+                          Quality Testing Lab
+                        </div>
+                        <p className="text-[11px] text-on-surface-variant mt-1">Moisture &amp; weighbridge sign-offs.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); navigate(selectedRole === 'buyer' ? '/marketplace' : selectedRole === 'carrier' ? '/haulage' : selectedRole === 'lab' ? '/quality-lab' : '/farmer-sales'); }}>
+                    <div>
+                      <label className="block text-xs font-semibold text-on-surface mb-1">Entity / Cooperative Legal Name *</label>
+                      <input type="text" required placeholder="e.g. Musa Agro Cooperative Farms Ltd" className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs font-semibold text-on-surface mb-1">Phone Number (+234) *</label>
+                        <input type="tel" required placeholder="803 123 4567" className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-on-surface mb-1">Trade Cluster / Hub *</label>
+                        <select className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface">
+                          <option>Oyo — Bodija / Iseyin Hub</option>
+                          <option>Kano — Dawanau Grain Hub</option>
+                          <option>Benue — Gboko Tuber Hub</option>
+                          <option>Kaduna — Giwa Grain Silos</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-on-surface mb-1">RC / Cooperative Registration No. *</label>
+                      <input type="text" required placeholder="e.g. RC-992144 or COOP-OYO-082" className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface" />
+                    </div>
+
+                    <button type="submit" className="w-full py-3 bg-primary-container text-white font-bold rounded-lg text-xs shadow hover:bg-primary transition mt-2">
+                      Complete Registration &amp; Enter Dashboard
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); navigate('/farmer-sales'); }}>
+                  <div>
+                    <label className="block text-xs font-semibold text-on-surface mb-1">Registered Phone or Email *</label>
+                    <input type="text" required defaultValue="musa.ibrahim@agrolink.ng" className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-on-surface mb-1">Access PIN / Password *</label>
+                    <input type="password" required defaultValue="••••••••" className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface" />
+                  </div>
+                  <button type="submit" className="w-full py-3 bg-primary text-white font-bold rounded-lg text-xs shadow hover:bg-primary-container transition">
+                    Sign In to RAMLP Terminal
+                  </button>
+                </form>
+              )}
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 1 & 5: FARMER SALES, PAYOUTS & PRODUCE (ID: 1345bdb54a4646b0858a34141bac23c2 & 3eb2b2776df44946b3663a60cfa1d3ed)
+    // =========================================================================
+    function FarmerSalesPage() {
+      const [viewTab, setViewTab] = useState('sales'); // 'active' or 'sales'
+      const navigate = useNavigate();
+
+      return (
+        <div className="bg-background min-h-screen pb-24 text-on-surface">
+          <SharedNavbar />
+
+          <div className="max-w-[420px] mx-auto min-h-screen px-4 py-4 space-y-4">
+            {/* Identity Card */}
+            <section className="bg-surface-container-lowest rounded-2xl p-4 tactile-card space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary font-bold text-base border border-outline-variant/40">
+                    IM
+                  </div>
+                  <div>
+                    <h1 className="font-headline-sm text-base font-bold text-on-surface">Mallam Ibrahim Musa</h1>
+                    <p className="font-body-sm text-xs text-on-surface-variant">Musa Agro Farms • Bodija Node, Oyo</p>
+                  </div>
+                </div>
+                <Link to="/list-produce" className="px-2.5 py-1 bg-primary text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                  <span className="material-symbols-outlined text-sm">add</span> List
+                </Link>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-outline-variant/30">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container-high text-primary">
+                  <span className="material-symbols-outlined text-xs mr-1 fill-icon">verified_user</span>
+                  RAMLP V-Tier 1 Verified
+                </span>
+                <span className="text-[11px] text-outline font-mono">Terminal: OYO-BDJ-84</span>
+              </div>
+            </section>
+
+            {/* Sub-tab Navigation */}
+            <nav className="bg-surface-container p-1 rounded-xl flex items-center justify-between space-x-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setViewTab('active')}
+                className={`flex-1 py-2 px-3 text-center rounded-lg font-semibold transition ${viewTab === 'active' ? 'bg-primary-container text-white shadow-sm' : 'text-on-surface-variant'}`}
+              >
+                Active Listings (4)
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewTab('sales')}
+                className={`flex-1 py-2 px-3 text-center rounded-lg font-semibold transition ${viewTab === 'sales' ? 'bg-primary-container text-white shadow-sm' : 'text-on-surface-variant'}`}
+              >
+                Sales &amp; Payouts (₦4.62M)
+              </button>
+            </nav>
+
+            {viewTab === 'sales' ? (
+              <div className="space-y-4">
+                {/* Financial Summary */}
+                <section className="bg-surface-container-lowest rounded-2xl p-4 tactile-card space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase font-semibold text-on-surface-variant">Direct Disbursed Payouts</span>
+                    <span className="text-[11px] px-2 py-0.5 bg-surface-container-high text-primary font-bold rounded-md">Live Escrow</span>
+                  </div>
+                  <div>
+                    <div className="font-currency-display text-2xl font-extrabold text-primary">₦4,620,000<span className="text-sm font-semibold">.00</span></div>
+                    <p className="text-xs text-on-surface-variant mt-0.5">Disbursed to linked clearing balance (2025 YTD)</p>
+                  </div>
+
+                  {/* Escrow Lock Banner */}
+                  <div className="bg-surface-container-low border border-outline-variant/50 rounded-xl p-3 flex items-start space-x-3">
+                    <span className="material-symbols-outlined text-tertiary text-lg mt-0.5">lock_clock</span>
+                    <div className="flex-1 text-xs">
+                      <div className="flex justify-between font-bold text-on-surface">
+                        <span>₦1,830,000 Locked in Escrow</span>
+                        <span className="text-tertiary">En-Route</span>
+                      </div>
+                      <p className="text-[11px] text-on-surface-variant mt-0.5">Awaiting destination lab sign-off &amp; weighbridge gate-in.</p>
+                    </div>
+                  </div>
+
+                  {/* Bank Pill */}
+                  <div className="bg-surface p-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 rounded bg-primary-container text-white flex items-center justify-center font-bold text-[10px]">PB</div>
+                      <div>
+                        <p className="font-semibold text-on-surface">Providus Bank ••••• 4192</p>
+                        <p className="text-[10px] text-on-surface-variant">Musa Agro Enterprises (NIBSS Clearing)</p>
+                      </div>
+                    </div>
+                    <span className="material-symbols-outlined text-primary text-base">verified</span>
+                  </div>
+                </section>
+
+                {/* Ledger Title */}
+                <div className="flex items-center justify-between px-1">
+                  <h2 className="text-xs font-bold text-on-surface uppercase tracking-tight">Settlement Ledger &amp; Consignments</h2>
+                  <span className="text-xs text-primary font-semibold">3 Recent Lots</span>
+                </div>
+
+                {/* Record 1 */}
+                <article className="bg-surface-container-lowest rounded-2xl p-4 tactile-card space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-primary">#AGL-TX-2025-0841</span>
+                      <h3 className="text-sm font-bold text-on-surface">Clean Yellow Feed Maize (45 MT)</h3>
+                      <p className="text-xs text-on-surface-variant">Flour Mills Nigeria PLC (Ikeja Terminal)</p>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-container-high text-primary">
+                      NIBSS Settled
+                    </span>
+                  </div>
+
+                  <div className="bg-surface p-3 rounded-xl border border-outline-variant/30 space-y-2 text-xs">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-on-surface-variant">Total Disbursed:</span>
+                      <span className="text-lg font-bold text-primary font-currency-display">₦6,216,000.00</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div>
+                        <span className="text-outline block text-[10px]">Milestone 1 (10%)</span>
+                        <span className="font-semibold">₦1,036,000</span>
+                      </div>
+                      <div>
+                        <span className="text-outline block text-[10px]">Milestone 2 (60%)</span>
+                        <span className="font-semibold">₦6,216,000</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <Link to="/receipt-modal" className="h-9 px-3 rounded-xl bg-primary text-white text-xs font-semibold flex items-center justify-center space-x-1 shadow-sm">
+                      <span className="material-symbols-outlined text-sm">receipt</span>
+                      <span>NIBSS Receipt</span>
+                    </Link>
+                    <button className="h-9 px-3 rounded-xl border border-outline-variant text-xs font-semibold flex items-center justify-center space-x-1 bg-surface-container-lowest">
+                      <span className="material-symbols-outlined text-sm">share</span>
+                      <span>Share Invoice</span>
+                    </button>
+                  </div>
+                </article>
+
+                {/* Record 2 */}
+                <article className="bg-surface-container-lowest rounded-2xl p-4 tactile-card space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-tertiary">#AGL-TX-2025-0982</span>
+                      <h3 className="text-sm font-bold text-on-surface">Premium White Export Yam</h3>
+                      <p className="text-xs text-on-surface-variant">Grand Cereals &amp; Feeds PLC</p>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-tertiary-fixed text-tertiary">
+                      Milestone 1 Disbursed
+                    </span>
+                  </div>
+
+                  <div className="bg-surface p-3 rounded-xl border border-outline-variant/30 space-y-2 text-xs">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <span className="text-outline block text-[10px]">30% Loading Paid</span>
+                        <span className="font-bold text-primary">₦525,000.00</span>
+                      </div>
+                      <div>
+                        <span className="text-tertiary block text-[10px]">70% Escrow</span>
+                        <span className="font-bold text-tertiary">₦1,225,000.00</span>
+                      </div>
+                    </div>
+                    <div className="bg-surface-container-low p-2 rounded text-[11px] flex items-center gap-1">
+                      <span className="material-symbols-outlined text-primary text-sm animate-pulse">navigation</span>
+                      <span>Driver: Sikiru Alabi (Mack 30T) • Passed Ibadan Toll</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <Link to="/farmer-orders" className="h-9 px-3 rounded-xl bg-surface-container text-xs font-semibold flex items-center justify-center space-x-1">
+                      <span className="material-symbols-outlined text-sm">route</span>
+                      <span>Track e-Waybill</span>
+                    </Link>
+                    <Link to="/escrow-checkout" className="h-9 px-3 rounded-xl border border-tertiary text-tertiary text-xs font-semibold flex items-center justify-center space-x-1">
+                      <span className="material-symbols-outlined text-sm">shield</span>
+                      <span>Escrow Vault</span>
+                    </Link>
+                  </div>
+                </article>
+              </div>
+            ) : (
+              /* Active Listings Tab */
+              <div className="space-y-3.5">
+                <div className="bg-surface-container-lowest rounded-xl p-3.5 border border-outline-variant/60 shadow-sm flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-outline block">Farmgate Inventory</span>
+                    <strong className="text-sm text-on-surface">82 MT Across 4 Crops</strong>
+                  </div>
+                  <Link to="/list-produce" className="px-3 py-1.5 bg-primary text-white rounded-lg font-semibold flex items-center gap-1 shadow-sm">
+                    <span className="material-symbols-outlined text-sm">add_circle</span> New Lot
+                  </Link>
+                </div>
+
+                {/* Crop 1 */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-3.5 shadow-sm space-y-2 text-xs">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-[10px] text-primary font-bold bg-primary/10 px-1.5 py-0.2 rounded">LOT #AGL-LOT-102</span>
+                      <h3 className="text-sm font-bold text-on-surface mt-0.5">Clean Yellow Feed Maize</h3>
+                      <p className="text-on-surface-variant">Iseyin Aggregation Hub, Oyo</p>
+                    </div>
+                    <span className="text-primary font-bold text-sm">₦78,000 / bag</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 bg-surface p-2 rounded text-center text-[11px]">
+                    <div><span>Vol:</span> <strong>45 MT</strong></div>
+                    <div><span>Moisture:</span> <strong className="text-secondary">11.8%</strong></div>
+                    <div><span>Offers:</span> <strong className="text-primary">2 Pending</strong></div>
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <Link to="/batch-negotiation" className="flex-1 h-8 rounded border border-primary text-primary font-semibold flex items-center justify-center">
+                      View Offers (₦3.9M)
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Crop 2 */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-3.5 shadow-sm space-y-2 text-xs">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-[10px] text-tertiary font-bold bg-tertiary-fixed px-1.5 py-0.2 rounded">LOT #AGL-LOT-088</span>
+                      <h3 className="text-sm font-bold text-on-surface mt-0.5">Premium White Export Yam</h3>
+                      <p className="text-on-surface-variant">Saki Farm Gate, Oyo</p>
+                    </div>
+                    <span className="text-primary font-bold text-sm">₦3,500 / tuber</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 bg-surface p-2 rounded text-center text-[11px]">
+                    <div><span>Vol:</span> <strong>500 Tubers</strong></div>
+                    <div><span>Inspection:</span> <strong className="text-secondary">Passed</strong></div>
+                    <div><span>Status:</span> <strong className="text-on-surface">Ready</strong></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <MobileDockedNav activeTab="profile" />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 2: FARMER ORDERS & LIVE WAYBILL TRACKING (ID: 610262463efb4b6e95c7d1a1a4fdbe4c)
+    // =========================================================================
+    function FarmerOrdersPage() {
+      return (
+        <div className="bg-background min-h-screen pb-24 text-on-surface">
+          <SharedNavbar />
+
+          <main className="pt-4 px-4 max-w-xl mx-auto space-y-4">
+            {/* Identity Card */}
+            <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant shadow-sm flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-full bg-primary-container text-white font-bold flex items-center justify-center text-lg">
+                  IM
+                </div>
+                <div>
+                  <h1 className="text-sm font-bold text-on-surface">Mallam Ibrahim Musa</h1>
+                  <p className="text-xs text-on-surface-variant">Musa Agro Farms Ltd • Saki, Oyo State</p>
+                  <span className="inline-block mt-0.5 text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full">
+                    RAMLP Tier-1 Biometric Verified
+                  </span>
+                </div>
+              </div>
+              <Link to="/produce-history" className="text-xs text-primary font-bold hover:underline">
+                View Lots
+              </Link>
+            </div>
+
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="bg-surface-container-low rounded-lg p-2.5">
+                <span className="text-on-surface-variant block text-[10px]">Active Escrow</span>
+                <strong className="text-sm text-primary block mt-0.5">₦1.75M</strong>
+                <span className="text-[10px] text-secondary">Secured</span>
+              </div>
+              <div className="bg-surface-container-low rounded-lg p-2.5">
+                <span className="text-on-surface-variant block text-[10px]">In Transit</span>
+                <strong className="text-sm text-on-surface block mt-0.5">2 Lots</strong>
+                <span className="text-[10px] text-on-surface-variant">Mack 30T</span>
+              </div>
+              <div className="bg-surface-container-low rounded-lg p-2.5">
+                <span className="text-on-surface-variant block text-[10px]">Settled (MTD)</span>
+                <strong className="text-sm text-primary block mt-0.5">₦4.82M</strong>
+                <span className="text-[10px] text-secondary">100% NIBSS</span>
+              </div>
+            </div>
+
+            {/* Live Corridor Highlight */}
+            <article className="bg-surface-container-lowest rounded-xl border-2 border-primary shadow-sm overflow-hidden text-xs">
+              <div className="bg-surface-container-low px-4 py-2.5 border-b border-outline-variant flex items-center justify-between">
+                <div className="flex items-center space-x-2 font-bold">
+                  <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+                  <span className="text-primary uppercase tracking-wide">En-Route Haulage</span>
+                  <span className="font-mono text-on-surface">#EWB-2025-0982</span>
+                </div>
+                <span className="text-on-surface-variant text-[11px]">Dispatched 06:30 AM</span>
+              </div>
+
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-sm text-on-surface">500 Tubers Premium Export Yam</h3>
+                    <p className="text-on-surface-variant mt-0.5">Off-Taker: <strong>Grand Cereals &amp; Feeds PLC</strong></p>
+                    <p className="text-outline text-[11px]">Dest: Ikeja Logistics Terminal, Lagos</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-outline uppercase block">Vault Total</span>
+                    <span className="text-base font-extrabold text-primary font-currency-display">₦1,750,000</span>
+                  </div>
+                </div>
+
+                {/* Simulated Telemetry Map Strip */}
+                <div className="relative w-full h-36 rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant flex flex-col justify-between p-3">
+                  <div className="bg-black/75 text-white rounded px-2 py-0.5 text-[10px] font-mono self-start flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    <span>54 km/h • Corridor A1 (Ibadan Expressway)</span>
+                  </div>
+                  <div className="bg-white/95 backdrop-blur rounded p-2 text-[11px] flex justify-between items-center shadow">
+                    <span className="font-semibold text-on-surface">Passed Ibadan Toll Interlink</span>
+                    <span className="text-primary font-bold font-mono">59 km left</span>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[11px]">
+                    <span className="font-semibold">Corridor Progress</span>
+                    <span className="font-bold text-primary">68% Completed</span>
+                  </div>
+                  <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+                    <div className="bg-primary h-full rounded-full" style={{ width: '68%' }}></div>
+                  </div>
+                </div>
+
+                {/* Driver */}
+                <div className="bg-surface-container-low rounded-xl p-3 border border-outline-variant flex items-center justify-between">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary font-bold">
+                      <span className="material-symbols-outlined">rv_hookup</span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-on-surface">Sikiru Alabi</span>
+                      <p className="text-on-surface-variant text-[11px]">Mack 30T • <span className="font-mono">TRK-LAG-488</span></p>
+                    </div>
+                  </div>
+                  <a href="tel:+2348034567890" className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow">
+                    <span className="material-symbols-outlined text-sm">phone</span>
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <Link to="/carrier-dispatch" className="h-9 rounded-lg bg-primary text-white font-semibold flex items-center justify-center gap-1 shadow">
+                    <span className="material-symbols-outlined text-sm">description</span>
+                    <span>Waybill Details</span>
+                  </Link>
+                  <Link to="/escrow-checkout" className="h-9 rounded-lg border border-primary text-primary font-semibold flex items-center justify-center gap-1 bg-white">
+                    <span className="material-symbols-outlined text-sm">shield</span>
+                    <span>Escrow Status</span>
+                  </Link>
+                </div>
+              </div>
+            </article>
+
+            {/* Other Orders */}
+            <div className="space-y-3 pt-2">
+              <h2 className="text-xs font-bold uppercase text-on-surface">Other Active Consignments</h2>
+
+              <article className="bg-surface-container-lowest rounded-xl p-3.5 border border-outline-variant shadow-sm space-y-2 text-xs">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="text-[10px] font-semibold bg-tertiary-fixed text-tertiary px-2 py-0.5 rounded-full">Lab Sampling</span>
+                    <h3 className="font-bold text-sm text-on-surface mt-1">45 MT Yellow Maize (Feed Grade 1)</h3>
+                    <p className="text-on-surface-variant">Flour Mills Nigeria PLC • Apapa Grain Terminal</p>
+                  </div>
+                  <span className="font-bold text-on-surface font-currency-display">₦11,250,000</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-outline-variant text-[11px]">
+                  <span className="text-outline">Carrier: Dangote Freight (MAN 40T)</span>
+                  <Link to="/quality-lab" className="text-primary font-bold hover:underline flex items-center">
+                    Lab Results <span className="material-symbols-outlined text-sm">chevron_right</span>
+                  </Link>
+                </div>
+              </article>
+            </div>
+          </main>
+
+          <MobileDockedNav activeTab="orders" />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 4: NIBSS SETTLEMENT RECEIPT MODAL (ID: dd61f77d12bc403696ae37b3ae0c903e)
+    // =========================================================================
+    function ReceiptModalPage() {
+      const navigate = useNavigate();
+
+      return (
+        <div className="min-h-screen bg-black/60 flex flex-col justify-center items-center p-3 sm:p-4">
+          <div className="relative w-full max-w-md bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-2xl overflow-hidden flex flex-col my-auto max-h-[795px]">
+            {/* Header */}
+            <div className="bg-primary text-on-primary px-4 py-2.5 flex items-center justify-between shadow-sm z-20">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-xl">account_balance</span>
+                <div>
+                  <span className="text-[10px] font-bold text-primary-fixed block uppercase">Central Bank of Nigeria &amp; NIBSS</span>
+                  <span className="text-[9px] text-white/90">Verified Electronic Settlement Receipt</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono font-bold bg-primary-container px-2 py-0.5 rounded border border-primary-fixed-dim/40 text-white">
+                NODE #0841
+              </span>
+            </div>
+
+            {/* Scrollable Receipt Body */}
+            <div className="p-4 overflow-y-auto space-y-3.5 text-xs relative">
+              <div className="flex justify-between border-b border-outline-variant/60 pb-2">
+                <div>
+                  <span className="text-[10px] text-outline uppercase font-semibold">CLEARING GATEWAY</span>
+                  <div className="font-bold text-primary text-sm">Providus Bank Escrow</div>
+                  <span className="text-[11px] font-mono text-on-surface-variant">e-BillsPay Direct</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-outline uppercase font-semibold">DATE &amp; TIME</span>
+                  <div className="font-semibold text-on-surface text-[11px]">14 Oct 2025, 11:42 WAT</div>
+                  <span className="text-[10px] font-mono text-outline">Ref: PRV-NIP-99214</span>
+                </div>
+              </div>
+
+              {/* Reference */}
+              <div className="bg-surface-container-low p-2 rounded-lg border border-outline-variant/50 flex justify-between font-mono text-[11px]">
+                <span className="text-outline">Tx Reference:</span>
+                <span className="font-bold text-on-surface">NIBSS/PRV/RAMLP-99214-0841</span>
+              </div>
+
+              {/* Amount Cleared */}
+              <div className="text-center py-2 bg-surface-container-high/40 rounded-xl border border-outline-variant text-xs">
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#E8F4EC] text-[#176B3A] mb-1">
+                  CLEARED &amp; LIQUIDATED (T+0 INSTANT)
+                </span>
+                <div className="font-currency-display text-2xl font-extrabold text-primary">₦6,216,000.00</div>
+                <p className="text-[11px] text-on-surface-variant italic">"Six Million, Two Hundred &amp; Sixteen Thousand Naira Only"</p>
+              </div>
+
+              {/* QR and Ledger seal */}
+              <div className="p-3 bg-surface rounded-xl border border-outline-variant flex items-center gap-3">
+                <div className="w-16 h-16 bg-white p-1 rounded border border-primary/30 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-4xl text-primary">qr_code_2</span>
+                </div>
+                <div className="space-y-1 overflow-hidden">
+                  <div className="font-bold text-[11px] text-primary flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">shield</span>
+                    Cryptographic SHA-256 Ledger Seal
+                  </div>
+                  <div className="font-mono text-[9px] text-outline truncate bg-surface-container px-1 py-0.5 rounded">
+                    b8e4f1a09d6c773a4e9b2512f458ce32483d91cf9aa054b1f481093c8374fa09
+                  </div>
+                  <p className="text-[10px] text-on-surface-variant leading-tight">Directly verifiable on CBN Commercial Produce Registry.</p>
+                </div>
+              </div>
+
+              {/* Parameters Breakdown */}
+              <div className="border border-outline-variant rounded-xl p-3 space-y-2 text-[11px]">
+                <div className="flex justify-between">
+                  <span className="text-on-surface-variant">Consignment:</span>
+                  <span className="font-bold text-on-surface">45 MT Clean Yellow Feed Maize</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-on-surface-variant">Settled Milestone:</span>
+                  <span className="font-bold text-primary">Milestone 2 (Dest. Lab 11.8% Passed)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-on-surface-variant">Off-taker (Payer):</span>
+                  <span className="font-semibold text-on-surface">Flour Mills Nigeria PLC</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-on-surface-variant">Beneficiary:</span>
+                  <span className="font-semibold text-on-surface">Musa Agro Farms (Mallam I. Musa)</span>
+                </div>
+                <div className="flex justify-between border-t border-outline-variant/40 pt-1.5">
+                  <span className="text-on-surface-variant">Statutory WHT &amp; Fees:</span>
+                  <span className="font-bold text-secondary">₦0.00 (Sec. 23 CITA Exempt)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="p-3 bg-surface-container-lowest border-t border-outline-variant space-y-2">
+              <button
+                type="button"
+                onClick={() => alert("Downloading NIBSS-RAMLP Official Clearance PDF...")}
+                className="w-full py-2.5 bg-primary text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow"
+              >
+                <span className="material-symbols-outlined text-base">download</span>
+                <span>Download Official PDF Receipt</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="w-full py-2 border border-outline-variant text-on-surface font-semibold rounded-xl text-xs hover:bg-surface-container"
+              >
+                Close Receipt
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 15: LIST NEW PRODUCE MODAL (ID: b5d12701414f4fde934e4d1cae7cbcaa)
+    // =========================================================================
+    function ListProducePage() {
+      const navigate = useNavigate();
+      const [moisture, setMoisture] = useState(11.5);
+
+      return (
+        <div className="min-h-screen bg-black/60 flex flex-col justify-end max-w-lg mx-auto">
+          <div className="bg-surface-container-lowest w-full rounded-t-3xl shadow-2xl flex flex-col max-h-[813px] overflow-hidden border-t border-outline-variant">
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-surface-container flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wide">AgroLink Verified Listing</span>
+                <h1 className="text-base font-bold text-on-surface">List New Harvest Produce</h1>
+                <p className="text-xs text-on-surface-variant">Step 1 of 3: Commodity Details</p>
+              </div>
+              <button onClick={() => navigate(-1)} className="p-1 rounded-full text-on-surface-variant hover:bg-surface-container">
+                <span className="material-symbols-outlined text-xl">close</span>
+              </button>
+            </div>
+
+            {/* Scrollable Form */}
+            <div className="p-4 overflow-y-auto space-y-4 text-xs">
+              {/* Photo Upload Simulation */}
+              <div>
+                <label className="block font-semibold text-on-surface mb-1">Produce Photos &amp; Verification</label>
+                <div className="border-2 border-dashed border-outline-variant rounded-xl p-3 bg-surface-container-low flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-2xl text-primary">photo_camera</span>
+                    <div>
+                      <div className="font-bold text-on-surface">Maize-Cut-BatchA.jpg</div>
+                      <span className="text-[10px] text-secondary">Verified Field Probe Uploaded</span>
+                    </div>
+                  </div>
+                  <span className="material-symbols-outlined text-secondary">check_circle</span>
+                </div>
+              </div>
+
+              {/* Commodity specification */}
+              <div>
+                <label className="block font-semibold text-on-surface mb-1">Commodity Specification</label>
+                <select className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface">
+                  <option>Clean Yellow Feed Maize (Grade A)</option>
+                  <option>White Flint Maize (Food Grade)</option>
+                  <option>Non-GMO Soybeans (Oil Seed Grade)</option>
+                  <option>Industrial Cassava Tubers (High Starch)</option>
+                  <option>Export Grade White Yams</option>
+                </select>
+              </div>
+
+              {/* Volume */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-semibold text-on-surface mb-1">Total Available Harvest</label>
+                  <input type="number" defaultValue="45" className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface font-bold" />
+                </div>
+                <div>
+                  <label className="block font-semibold text-on-surface mb-1">Unit of Measure</label>
+                  <select className="w-full text-xs rounded-lg border-outline-variant bg-surface px-3 py-2 text-on-surface">
+                    <option>Metric Tonnes (MT)</option>
+                    <option>100kg Bags</option>
+                    <option>Tubers</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Asking Price */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="font-semibold text-on-surface">Asking Price per 100kg Bag</label>
+                  <span className="text-[10px] text-secondary font-bold">Bodija Benchmark: ₦78,000</span>
+                </div>
+                <div className="flex rounded-lg border border-outline-variant overflow-hidden">
+                  <span className="bg-surface-container px-3 py-2 text-primary font-bold">₦</span>
+                  <input type="text" defaultValue="78,000" className="w-full text-xs border-0 bg-surface px-3 py-2 font-bold font-currency-display" />
+                </div>
+                <p className="text-[10px] text-on-surface-variant mt-1">Expected gross revenue for 45 MT: <strong className="text-primary">₦35,100,000.00</strong></p>
+              </div>
+
+              {/* Moisture Slider */}
+              <div className="p-3 bg-surface rounded-xl border border-outline-variant space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-on-surface">Moisture Self-Declaration</span>
+                  <span className="px-2 py-0.5 bg-primary text-white rounded-full font-bold text-[10px]">{moisture}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="9"
+                  max="18"
+                  step="0.1"
+                  value={moisture}
+                  onChange={(e) => setMoisture(e.target.value)}
+                  className="w-full accent-primary h-2"
+                />
+                <div className="flex justify-between text-[10px] text-outline">
+                  <span>Optimal (&lt;12%)</span>
+                  <span>Commercial (12-14%)</span>
+                  <span>Disqualified (&gt;15%)</span>
+                </div>
+              </div>
+
+              {/* Escrow Guarantee Callout */}
+              <div className="p-3 bg-secondary-container/30 rounded-xl border border-secondary/30 flex items-start gap-2 text-[11px]">
+                <span className="material-symbols-outlined text-secondary text-base mt-0.5">lock</span>
+                <div>
+                  <strong className="text-primary block">Protected by AgroLink SafeTrade™ Escrow</strong>
+                  <span className="text-on-surface-variant">Buyers deposit 100% bonded funds with Providus Bank before dispatch.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="p-3 border-t border-outline-variant bg-surface-container-lowest space-y-2">
+              <button
+                type="button"
+                onClick={() => { alert("Produce Lot Listed! Redirecting to Produce Registry..."); navigate('/produce-history'); }}
+                className="w-full py-3 bg-primary-container text-white font-bold rounded-xl text-xs shadow hover:bg-primary transition"
+              >
+                Publish Lot &amp; Enter Marketplace
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="w-full py-2 text-outline text-xs font-semibold hover:text-on-surface"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 10: BUYER MARKETPLACE (ID: ccf7af83e4ec4491b0967322c907cbc4)
+    // =========================================================================
+    function MarketplacePage() {
+      const [filterCat, setFilterCat] = useState('all');
+      const navigate = useNavigate();
+
+      const lots = [
+        {
+          id: "#AGL-LOT-102",
+          title: "Clean Yellow Feed Maize (Grade A, <12.5% Moisture)",
+          origin: "Musa Agro Farms, Oyo State",
+          price: "₦78,000",
+          unit: "100kg bag",
+          qty: "45 MT (450 Bags)",
+          moisture: "11.8%",
+          category: "grains"
+        },
+        {
+          id: "#AGL-LOT-088",
+          title: "Premium White Export Yams (Fresh Harvest Tubers)",
+          origin: "Gboko Hub, Benue State",
+          price: "₦3,500",
+          unit: "tuber",
+          qty: "3,200 Tubers",
+          moisture: "Standard",
+          category: "tubers"
+        },
+        {
+          id: "#AGL-LOT-064",
+          title: "Kiln-Smoked Clarias Catfish (Oven Dry)",
+          origin: "Epe Fishery Cluster, Lagos",
+          price: "₦4,800",
+          unit: "kg",
+          qty: "1,200 kg",
+          moisture: "<6% Vacuum",
+          category: "fish"
+        },
+        {
+          id: "#AGL-LOT-041",
+          title: "Industrial Cassava Tubers (High Starch Yield)",
+          origin: "Ogun Central Outgrowers, Abeokuta",
+          price: "₦145,000",
+          unit: "Tonne",
+          qty: "85 Metric Tonnes",
+          moisture: "24h Fresh",
+          category: "tubers"
+        },
+        {
+          id: "#AGL-LOT-052",
+          title: "Non-GMO Soybean Seeds (Cleaned & Bagged)",
+          origin: "Zaria Silos, Kaduna State",
+          price: "₦940,000",
+          unit: "Tonne",
+          qty: "60 Metric Tonnes",
+          moisture: "10.8%",
+          category: "grains"
+        }
+      ];
+
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+            {/* Header Banner */}
+            <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between md:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase">
+                  <span>RAMLP Institutional Wholesale Desk</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  <span>1,420 Verified Lots</span>
+                </div>
+                <h1 className="font-headline-lg text-2xl sm:text-3xl font-bold text-on-surface mt-1">
+                  Wholesale Commodity Exchange &amp; Direct Off-take
+                </h1>
+                <p className="text-xs text-on-surface-variant mt-0.5">
+                  Direct farm gate procurement backed by Providus Bank tripartite escrow custody.
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <Link to="/batch-negotiation" className="px-4 py-2 bg-primary-container text-white rounded-lg text-xs font-bold shadow hover:bg-primary transition flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm">forum</span>
+                  <span>Batch Negotiation</span>
+                </Link>
+                <Link to="/escrow-checkout" className="px-4 py-2 border border-primary text-primary rounded-lg text-xs font-bold hover:bg-surface-container transition flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm">lock</span>
+                  <span>Escrow Checkout</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
+              <button
+                onClick={() => setFilterCat('all')}
+                className={`px-3 py-1.5 rounded-full font-semibold shrink-0 ${filterCat === 'all' ? 'bg-primary text-white' : 'bg-surface-container border border-outline-variant text-on-surface'}`}
+              >
+                All Lots (144)
+              </button>
+              <button
+                onClick={() => setFilterCat('grains')}
+                className={`px-3 py-1.5 rounded-full font-semibold shrink-0 ${filterCat === 'grains' ? 'bg-primary text-white' : 'bg-surface-container border border-outline-variant text-on-surface'}`}
+              >
+                Grains &amp; Cereals
+              </button>
+              <button
+                onClick={() => setFilterCat('tubers')}
+                className={`px-3 py-1.5 rounded-full font-semibold shrink-0 ${filterCat === 'tubers' ? 'bg-primary text-white' : 'bg-surface-container border border-outline-variant text-on-surface'}`}
+              >
+                Tubers &amp; Roots
+              </button>
+              <button
+                onClick={() => setFilterCat('fish')}
+                className={`px-3 py-1.5 rounded-full font-semibold shrink-0 ${filterCat === 'fish' ? 'bg-primary text-white' : 'bg-surface-container border border-outline-variant text-on-surface'}`}
+              >
+                Aquaculture
+              </button>
+            </div>
+
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {lots.filter(l => filterCat === 'all' || l.category === filterCat).map((lot, idx) => (
+                <div key={idx} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-4 flex flex-col justify-between hover:border-primary transition">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start">
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-full">{lot.id}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-full">Grade A Tested</span>
+                    </div>
+
+                    <h3 className="font-headline-sm text-base font-bold text-on-surface leading-snug">{lot.title}</h3>
+                    <p className="text-xs text-on-surface-variant flex items-center gap-1">
+                      <span className="material-symbols-outlined text-sm text-outline">location_on</span>
+                      {lot.origin}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2 bg-surface p-2.5 rounded-lg text-xs">
+                      <div>
+                        <span className="text-outline block text-[10px]">Stock Available</span>
+                        <strong className="text-on-surface">{lot.qty}</strong>
+                      </div>
+                      <div>
+                        <span className="text-outline block text-[10px]">Moisture Lab</span>
+                        <strong className="text-secondary">{lot.moisture}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-3 border-t border-outline-variant/60">
+                    <div className="flex justify-between items-baseline">
+                      <div>
+                        <span className="text-lg font-bold text-primary font-currency-display">{lot.price}</span>
+                        <span className="text-xs text-outline"> / {lot.unit}</span>
+                      </div>
+                      <span className="text-[11px] text-secondary font-semibold">CBN Escrow Ready</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link to="/batch-negotiation" className="py-2 text-center rounded-lg border border-primary text-primary text-xs font-semibold hover:bg-surface-container transition">
+                        Negotiate Bid
+                      </Link>
+                      <Link to="/escrow-checkout" className="py-2 text-center rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-container transition shadow">
+                        Commit Escrow
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 16: BATCH NEGOTIATION (ID: 877eca17aa014d4ebfa8978ad796ae08)
+    // =========================================================================
+    function BatchNegotiationPage() {
+      const [bidPrice, setBidPrice] = useState(755000);
+
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+            <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">Commercial Off-take Desk</span>
+                <h1 className="font-headline-lg text-2xl font-bold text-on-surface mt-1">Batch Procurement &amp; Price Negotiation</h1>
+                <p className="text-xs text-on-surface-variant">Aggregating 250 MT Yellow Maize across 3 Regional Cooperatives.</p>
+              </div>
+              <div className="bg-surface-container-low px-3.5 py-2 rounded-lg border border-outline-variant text-right">
+                <span className="text-[10px] text-outline block">Escrow Vault Facility</span>
+                <strong className="text-sm text-primary font-bold">₦225,000,000 Providus Bonded</strong>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column */}
+              <div className="lg:col-span-8 space-y-6">
+                {/* Lots Table */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden text-xs">
+                  <div className="p-4 border-b border-outline-variant font-bold text-sm text-on-surface">
+                    Consolidated Lot Aggregation Deck (250 MT Target)
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="bg-surface-container-low text-on-surface-variant text-[11px] uppercase border-b border-outline-variant">
+                        <tr>
+                          <th className="p-3">Lot &amp; Cooperative</th>
+                          <th className="p-3 text-center">Volume</th>
+                          <th className="p-3">Asking / MT</th>
+                          <th className="p-3">Counter / MT</th>
+                          <th className="p-3">Escrow Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-outline-variant">
+                        <tr>
+                          <td className="p-3"><strong>Lot #841</strong> - Musa Agro Farms (Oyo)</td>
+                          <td className="p-3 text-center font-bold">45 MT</td>
+                          <td className="p-3 line-through text-outline">₦775k</td>
+                          <td className="p-3 font-bold text-primary">₦760,000</td>
+                          <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-semibold">Agreed &amp; Locked</span></td>
+                        </tr>
+                        <tr className="bg-primary/5">
+                          <td className="p-3"><strong>Lot #844</strong> - Gboko Union (Benue)</td>
+                          <td className="p-3 text-center font-bold">120 MT</td>
+                          <td className="p-3 font-semibold">₦780,000</td>
+                          <td className="p-3 font-bold text-tertiary">₦{bidPrice.toLocaleString()}</td>
+                          <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-tertiary-fixed text-tertiary font-semibold">Active Counter-Offer</span></td>
+                        </tr>
+                        <tr>
+                          <td className="p-3"><strong>Lot #849</strong> - Dawanau Hub (Kano)</td>
+                          <td className="p-3 text-center font-bold">85 MT</td>
+                          <td className="p-3 line-through text-outline">₦770k</td>
+                          <td className="p-3 font-bold text-primary">₦765,000</td>
+                          <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-semibold">Accepted, Escrow Due</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Negotiation Thread & Controls */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 space-y-4 text-xs">
+                  <div className="flex justify-between items-center pb-2 border-b border-outline-variant">
+                    <h3 className="font-bold text-sm text-on-surface">Active Counter-Offer Slider (Lot #844 - 120 MT)</h3>
+                    <span className="font-bold text-primary text-sm font-currency-display">₦{bidPrice.toLocaleString()} / MT</span>
+                  </div>
+
+                  <input
+                    type="range"
+                    min="740000"
+                    max="780000"
+                    step="1000"
+                    value={bidPrice}
+                    onChange={(e) => setBidPrice(Number(e.target.value))}
+                    className="w-full accent-primary h-2"
+                  />
+                  <div className="flex justify-between text-[11px] text-outline">
+                    <span>Floor Target: ₦740,000</span>
+                    <span>Current Counter: ₦{bidPrice.toLocaleString()}</span>
+                    <span>Asking: ₦780,000</span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button onClick={() => setBidPrice(bidPrice - 5000)} className="px-3 py-1.5 rounded border border-outline-variant hover:bg-surface font-semibold">-₦5,000</button>
+                    <button onClick={() => setBidPrice(bidPrice + 5000)} className="px-3 py-1.5 rounded border border-outline-variant hover:bg-surface font-semibold">+₦5,000</button>
+                    <Link to="/escrow-checkout" className="ml-auto px-5 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-container transition shadow">
+                      Lock Escrow for Lot (₦{(bidPrice * 120 / 1000000).toFixed(2)}M)
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column / Escrow Breakdown */}
+              <div className="lg:col-span-4 bg-surface-container-lowest rounded-xl border border-outline-variant p-5 shadow-sm space-y-4 text-xs">
+                <div className="flex justify-between items-center pb-2 border-b border-outline-variant font-bold text-sm text-on-surface">
+                  <span>Batch Escrow Ledger</span>
+                  <span className="text-primary font-mono font-bold">250 MT</span>
+                </div>
+
+                <div className="space-y-2 text-on-surface-variant">
+                  <div className="flex justify-between">
+                    <span>Consolidated Produce (250 MT):</span>
+                    <strong className="text-on-surface">₦190,625,000</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Multi-corridor Haulage (3 routes):</span>
+                    <strong className="text-on-surface">₦8,450,000</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Moisture Lab &amp; Weighbridge Sync:</span>
+                    <strong className="text-secondary">FREE (Subsidized)</strong>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-surface-container-low rounded-lg border border-outline-variant space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-outline">Total Escrow Commitment Required</span>
+                  <div className="font-currency-display text-2xl font-black text-primary">₦199,075,000</div>
+                  <span className="text-[10px] text-secondary font-semibold block">Providus Vault Bonded Limit: ₦225M Available</span>
+                </div>
+
+                <Link to="/escrow-checkout" className="block w-full py-3 bg-primary text-white text-center font-bold rounded-lg shadow hover:bg-primary-container transition">
+                  Proceed to Escrow Checkout →
+                </Link>
+              </div>
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 11: ESCROW VAULT SETTLEMENT & CHECKOUT (ID: 557034ec10cd4d479fe8d75b0006c272)
+    // =========================================================================
+    function EscrowCheckoutPage() {
+      const [locked, setLocked] = useState(false);
+      const navigate = useNavigate();
+
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+            {/* Header */}
+            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-primary uppercase">
+                  <span>RAMLP Guaranteed Contract #AGL-TX-2025-0841</span>
+                  <span>•</span>
+                  <span>SafeTrade™ Protected</span>
+                </div>
+                <h1 className="font-headline-lg text-2xl font-bold text-on-surface mt-1">Escrow Vault Allocation &amp; Settlement</h1>
+                <p className="text-xs text-on-surface-variant">Flour Mills Nigeria PLC off-take for 45 MT Clean Yellow Feed Maize.</p>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-bold text-xs">
+                Zero Default Guarantee
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Milestone Schedule & Details */}
+              <div className="lg:col-span-8 space-y-6 text-xs">
+                {/* Milestone Schedule */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 space-y-4">
+                  <h3 className="font-headline-sm text-sm font-bold text-on-surface">3-Stage Tripartite Settlement Schedule</h3>
+
+                  {/* Milestone 1 */}
+                  <div className="p-3.5 rounded-lg border-2 border-primary bg-primary/5 flex justify-between items-center">
+                    <div>
+                      <strong className="text-on-surface text-sm block">Milestone 1: Vault Allocation &amp; Dispatch (10%)</strong>
+                      <span className="text-on-surface-variant">Secures dedicated 30T flatbed &amp; farm gate loading seal.</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-base font-bold text-primary font-currency-display">₦1,036,000</div>
+                      <span className="text-[10px] text-primary font-semibold">Immediate Lock</span>
+                    </div>
+                  </div>
+
+                  {/* Milestone 2 */}
+                  <div className="p-3.5 rounded-lg border border-outline-variant bg-surface flex justify-between items-center">
+                    <div>
+                      <strong className="text-on-surface text-sm block">Milestone 2: Destination Gate-in &amp; Lab Sign-off (60%)</strong>
+                      <span className="text-on-surface-variant">Weighbridge net match + moisture analysis &lt;12.5%.</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-base font-bold text-on-surface font-currency-display">₦6,216,000</div>
+                      <span className="text-[10px] text-outline">Lab Triggered</span>
+                    </div>
+                  </div>
+
+                  {/* Milestone 3 */}
+                  <div className="p-3.5 rounded-lg border border-outline-variant bg-surface flex justify-between items-center">
+                    <div>
+                      <strong className="text-on-surface text-sm block">Milestone 3: Silo Discharge &amp; Final Sign-off (30%)</strong>
+                      <span className="text-on-surface-variant">Discharge complete, 24-hr auto-clearance window.</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-base font-bold text-on-surface font-currency-display">₦3,108,000</div>
+                      <span className="text-[10px] text-outline">Buyer Approval</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bank / Dedicated NUBAN */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 space-y-3">
+                  <h3 className="font-bold text-sm text-on-surface">Dedicated Providus Bank Escrow Vault NUBAN</h3>
+                  <div className="p-3.5 bg-surface-container-low rounded-lg border border-outline-variant grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <span className="text-[10px] text-outline uppercase block">Settlement Bank</span>
+                      <strong className="text-on-surface text-sm">Providus Bank PLC</strong>
+                      <span className="text-[10px] text-secondary block">CBN License #044/21</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-outline uppercase block">Allocated NUBAN</span>
+                      <strong className="text-base font-mono text-primary font-bold">0128940192</strong>
+                      <span className="text-[10px] text-outline block">Dedicated to Lot #841</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-outline uppercase block">Account Name</span>
+                      <strong className="text-on-surface text-xs block">AgroLink SafeTrade / Lot 841</strong>
+                      <span className="text-[10px] text-primary font-semibold">Live Liquidity Lock</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Order Ledger & Lock Action */}
+              <div className="lg:col-span-4 bg-surface-container-lowest rounded-xl border border-outline-variant p-5 shadow-sm space-y-4 text-xs">
+                <div className="flex justify-between items-center pb-2 border-b border-outline-variant font-bold text-sm text-on-surface">
+                  <span>Escrow Commitment Ledger</span>
+                  <span className="text-outline font-mono">NGN (₦)</span>
+                </div>
+
+                <div className="space-y-2 text-on-surface-variant">
+                  <div className="flex justify-between">
+                    <span>Base Maize Value (45 MT):</span>
+                    <strong className="text-on-surface">₦9,975,000</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Freight (Iseyin to Ikeja):</span>
+                    <strong className="text-on-surface">₦385,000</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Moisture &amp; Lab Seal:</span>
+                    <strong className="text-secondary font-bold">FREE</strong>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-outline-variant">
+                  <span className="text-[10px] text-outline uppercase font-semibold">Total Escrow Vault Commitment</span>
+                  <div className="font-currency-display text-2xl font-extrabold text-primary">₦10,360,000.00</div>
+                  <p className="text-[11px] text-on-surface-variant mt-0.5">Held in CBN trustee escrow until delivery weighbridge sign-off.</p>
+                </div>
+
+                {locked ? (
+                  <div className="p-3 bg-secondary-container/40 rounded-lg text-center space-y-2">
+                    <span className="material-symbols-outlined text-3xl text-secondary">verified</span>
+                    <div className="font-bold text-primary">₦10,360,000 Locked in Escrow Vault!</div>
+                    <Link to="/farmer-orders" className="block text-xs font-bold text-primary underline">
+                      View Waybill Status &amp; Driver GPS →
+                    </Link>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setLocked(true)}
+                    className="w-full py-3 bg-primary text-white font-bold rounded-lg text-xs shadow hover:bg-primary-container transition flex items-center justify-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-base">lock</span>
+                    <span>Lock Funds in Escrow Vault (₦10.36M)</span>
+                  </button>
+                )}
+
+                <Link to="/receipt-modal" className="block text-center py-2 border border-outline-variant rounded-lg font-semibold text-on-surface hover:bg-surface">
+                  Generate Proforma NIBSS Slip
+                </Link>
+              </div>
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 7 & 14: QUALITY INSPECTION & LAB SIGN-OFF (ID: 3cf72420e6724bf5865dff3aeaf0ef03 & 723b15d2374e491d93eb233927cbf690)
+    // =========================================================================
+    function QualityLabPage() {
+      const [verdict, setVerdict] = useState('approve');
+      const [released, setReleased] = useState(false);
+
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+            {/* Header */}
+            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                  <span className="material-symbols-outlined text-sm">biotech</span>
+                  <span>RAMLP Certified Agro-Inspection Unit #14 • Ikeja Receiving Hub</span>
+                </div>
+                <h1 className="font-headline-lg text-2xl font-bold text-on-surface mt-1">Quality Inspection &amp; Moisture Lab Sign-off</h1>
+                <p className="text-xs text-on-surface-variant">Inspector: <strong>Engr. Folake Adeleke</strong> (NIS/NAFDAC Certified Agro-Analyst #88914)</p>
+              </div>
+              <div className="bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant text-right">
+                <span className="text-[10px] text-outline block">LOT REFERENCE</span>
+                <strong className="text-sm text-primary font-bold">#AGL-TX-2025-0841</strong>
+                <span className="text-[10px] text-secondary block font-semibold">45 MT Yellow Maize</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Spectrometry & Scale */}
+              <div className="lg:col-span-7 space-y-6 text-xs">
+                {/* Moisture Gauge */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 space-y-4">
+                  <div className="flex justify-between items-center pb-2 border-b border-outline-variant">
+                    <span className="font-bold text-sm text-on-surface flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-primary text-base">water_drop</span>
+                      NIR Spectrometry Moisture Reading
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-[#E8F4EC] text-[#176B3A] font-bold">PASSED (&lt;12.5%)</span>
+                  </div>
+
+                  <div className="bg-surface-container-low p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-outline uppercase font-semibold">ISO 6540 NIR READING</span>
+                      <div className="font-headline-lg text-4xl font-extrabold text-primary">11.8%</div>
+                      <span className="text-secondary font-semibold">-0.7% Below 12.5% Safe Limit</span>
+                    </div>
+                    <div className="w-20 h-20 rounded-full border-4 border-primary flex items-center justify-center bg-white shadow-inner">
+                      <span className="material-symbols-outlined text-3xl text-primary">done_all</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="p-2.5 bg-surface rounded border border-outline-variant">
+                      <span className="text-outline text-[10px] block">Aflatoxin B1</span>
+                      <strong className="text-sm font-bold">4.8 ppb</strong>
+                      <span className="text-[10px] text-secondary block font-semibold">&lt;10ppb PASS</span>
+                    </div>
+                    <div className="p-2.5 bg-surface rounded border border-outline-variant">
+                      <span className="text-outline text-[10px] block">Foreign Chaff</span>
+                      <strong className="text-sm font-bold">1.10%</strong>
+                      <span className="text-[10px] text-secondary block font-semibold">&lt;1.5% PASS</span>
+                    </div>
+                    <div className="p-2.5 bg-surface rounded border border-outline-variant">
+                      <span className="text-outline text-[10px] block">Live Insects</span>
+                      <strong className="text-sm font-bold text-secondary">0 Found</strong>
+                      <span className="text-[10px] text-secondary block font-semibold">CLEAN</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dual Weighbridge */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 space-y-3">
+                  <div className="flex justify-between items-center pb-2 border-b border-outline-variant font-bold text-sm text-on-surface">
+                    <span className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-primary text-base">scale</span>
+                      Dual Weighbridge Reconciliation
+                    </span>
+                    <span className="text-secondary font-bold">Reconciled</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-surface rounded border border-outline-variant">
+                      <span className="text-outline text-[10px] block">1. Origin Farm Gate (Iseyin Scale)</span>
+                      <strong className="text-base font-bold text-on-surface font-currency-display">45,280 kg</strong>
+                      <span className="text-[10px] text-outline block">Gross Dispatch</span>
+                    </div>
+                    <div className="p-3 bg-surface rounded border border-outline-variant">
+                      <span className="text-outline text-[10px] block">2. Destination Scale (Ikeja Hub)</span>
+                      <strong className="text-base font-bold text-primary font-currency-display">45,190 kg</strong>
+                      <span className="text-[10px] text-outline block">Gross Gate-In</span>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 bg-surface-container-low rounded border border-outline-variant flex justify-between items-center text-[11px]">
+                    <span>Net Transit Variance: <strong className="text-secondary">-90 kg (-0.19%)</strong></span>
+                    <span className="font-semibold text-primary">Permissible Moisture Drift (&lt;1.0%)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Verdict & Escrow Release */}
+              <div className="lg:col-span-5 bg-surface-container-lowest rounded-xl border-2 border-primary/30 p-5 shadow-sm space-y-4 text-xs">
+                <div className="flex justify-between items-center pb-2 border-b border-outline-variant">
+                  <h3 className="font-bold text-sm text-on-surface">Inspection Verdict &amp; Escrow Trigger</h3>
+                  <span className="font-bold text-primary">Milestone 2 (60%)</span>
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    onClick={() => setVerdict('approve')}
+                    className={`block p-3 rounded-lg border-2 cursor-pointer transition ${verdict === 'approve' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                  >
+                    <div className="flex justify-between font-bold text-on-surface">
+                      <span>Full Approval &amp; Release Milestone 2</span>
+                      <span className="text-primary font-currency-display">₦6,216,000 (60%)</span>
+                    </div>
+                    <p className="text-[11px] text-on-surface-variant mt-0.5">Parameters pass Grade A thresholds. Immediate NIBSS credit to farmer.</p>
+                  </label>
+
+                  <label
+                    onClick={() => setVerdict('discount')}
+                    className={`block p-3 rounded-lg border-2 cursor-pointer transition ${verdict === 'discount' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                  >
+                    <div className="flex justify-between font-bold text-on-surface">
+                      <span>Conditional Clearance with Moisture Discount</span>
+                      <span className="text-tertiary font-currency-display">₦6,060,600</span>
+                    </div>
+                    <p className="text-[11px] text-on-surface-variant mt-0.5">Deduct 2.5% drying surcharge before releasing net funds.</p>
+                  </label>
+
+                  <label
+                    onClick={() => setVerdict('dispute')}
+                    className={`block p-3 rounded-lg border-2 cursor-pointer transition ${verdict === 'dispute' ? 'border-error bg-error/5' : 'border-outline-variant bg-surface'}`}
+                  >
+                    <div className="flex justify-between font-bold text-error">
+                      <span>Escrow Freeze &amp; Quality Dispute</span>
+                      <span className="font-currency-display">Hold in Vault</span>
+                    </div>
+                    <p className="text-[11px] text-on-surface-variant mt-0.5">Halt payout immediately. Lock funds for formal arbitration.</p>
+                  </label>
+                </div>
+
+                {/* Digital Signature */}
+                <div className="p-3 bg-surface rounded-lg border border-outline-variant space-y-2">
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-outline">Inspector E-Signature:</span>
+                    <span className="text-secondary font-bold">FIPS 140-2 Valid</span>
+                  </div>
+                  <div className="h-16 bg-white rounded border border-dashed border-outline-variant flex items-center justify-center font-serif italic text-lg text-primary font-bold">
+                    F. Adeleke (NAFDAC/NIS-8841)
+                  </div>
+                  <div className="flex justify-between text-[10px] text-outline font-mono">
+                    <span>Token: YubiKey NFC #0941</span>
+                    <span>GPS: 6.5954° N, 3.3364° E</span>
+                  </div>
+                </div>
+
+                {released ? (
+                  <div className="p-3 bg-secondary-container/40 rounded-lg text-center space-y-1">
+                    <span className="material-symbols-outlined text-3xl text-secondary">verified</span>
+                    <div className="font-bold text-primary">₦6,216,000 Disbursed via NIBSS!</div>
+                    <Link to="/receipt-modal" className="text-xs font-bold text-primary underline block">
+                      View Official NIBSS Clearance Receipt →
+                    </Link>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setReleased(true)}
+                    className="w-full py-3 bg-primary text-white font-bold rounded-lg shadow hover:bg-primary-container transition flex items-center justify-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-base">verified</span>
+                    <span>Approve &amp; Release Milestone 2 (₦6,216,000)</span>
+                  </button>
+                )}
+
+                <Link to="/disputes" className="block text-center text-xs text-error font-semibold hover:underline">
+                  Flag Consignment for Arbitration Review →
+                </Link>
+              </div>
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 8 & 13: LOGISTICS HAULAGE & DISPATCH (ID: 567e8f092c7045b38327d2814fbff425 & 6bf9f42a92e2407fac8da14d31ac32c4)
+    // =========================================================================
+    function HaulagePage() {
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+            {/* Hub Banner */}
+            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <span className="text-[10px] font-bold text-primary uppercase bg-primary/10 px-2 py-0.5 rounded">Carrier Fleet Operations</span>
+                <h1 className="font-headline-lg text-2xl font-bold text-on-surface mt-1">Kobo360 RAMLP Dedicated Fleet Hub</h1>
+                <p className="text-xs text-on-surface-variant">South-West Transit Corridor (Oyo - Ogun - Lagos) • 28 Active Flatbed Rigs</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-surface p-2.5 rounded-lg border border-outline-variant text-center">
+                  <span className="text-outline text-[10px] block">In-Transit Freight</span>
+                  <strong className="text-sm font-bold text-secondary">14 Trucks</strong>
+                </div>
+                <div className="bg-surface p-2.5 rounded-lg border border-outline-variant text-center">
+                  <span className="text-outline text-[10px] block">Carrier Escrow</span>
+                  <strong className="text-sm font-bold text-primary">₦8,450,000</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Live GPS Corridor */}
+              <div className="lg:col-span-7 space-y-6 text-xs">
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 space-y-4">
+                  <div className="flex justify-between items-center pb-2 border-b border-outline-variant">
+                    <span className="font-bold text-sm text-on-surface flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-primary text-base">route</span>
+                      Active e-Waybill Corridor #EWB-2025-0982
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-[#EDF7EE] text-[#14532D] font-bold">In-Transit</span>
+                  </div>
+
+                  <div className="bg-surface-container-low p-4 rounded-xl space-y-2">
+                    <div className="flex justify-between items-center text-xs font-semibold">
+                      <span>Iseyin Bypass Hub (0 km)</span>
+                      <span className="text-primary font-bold">Ibadan Corridor (126 km)</span>
+                      <span>Ikeja Silo (185 km)</span>
+                    </div>
+                    <div className="w-full bg-surface-container-highest h-2.5 rounded-full overflow-hidden">
+                      <div className="bg-primary h-full rounded-full" style={{ width: '68%' }}></div>
+                    </div>
+                    <div className="flex justify-between text-[11px] text-outline pt-1">
+                      <span>Speed: 54 km/h (Gov Capped)</span>
+                      <span className="text-secondary font-bold">59 km left to gate-in</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-surface rounded-lg border border-outline-variant">
+                      <span className="text-outline text-[10px] block">Driver Asset Profile</span>
+                      <strong className="text-on-surface font-bold">Sikiru Alabi (Mack 30T)</strong>
+                      <span className="text-[10px] text-outline font-mono block">Plate: #TRK-LAG-488</span>
+                    </div>
+                    <div className="p-3 bg-surface rounded-lg border border-outline-variant">
+                      <span className="text-outline text-[10px] block">Marine Transit Policy</span>
+                      <strong className="text-primary font-bold">Sovereign Trust PLC</strong>
+                      <span className="text-[10px] text-secondary block font-semibold">₦45M Cargo Covered</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Backhaul Match Card */}
+                <div className="bg-gradient-to-br from-[#FEF6E7] to-[#FFF9F0] rounded-xl border border-tertiary-fixed p-5 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-tertiary uppercase flex items-center gap-1">
+                      <span className="material-symbols-outlined text-sm">recycling</span>
+                      Zero-Waste Backhaul Match
+                    </span>
+                    <span className="text-xs font-bold text-tertiary">Ikeja → Ibadan</span>
+                  </div>
+                  <h3 className="font-bold text-sm text-on-surface">25 MT Bagged Fertilizer (NPK 15-15-15)</h3>
+                  <p className="text-on-surface-variant">Immediate factory pickup at Ikeja after maize discharge.</p>
+                  <div className="flex justify-between items-center pt-2 border-t border-tertiary-fixed-dim/40">
+                    <div>
+                      <span className="text-[10px] text-outline block">Guaranteed Freight Pay</span>
+                      <strong className="text-lg font-bold text-tertiary font-currency-display">₦240,000</strong>
+                    </div>
+                    <button onClick={() => alert("Backhaul Freight Contract Pre-Booked & Escrow Locked!")} className="px-4 py-2 bg-tertiary-fixed-dim text-on-tertiary-fixed font-bold rounded-lg shadow">
+                      Accept Backhaul
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: e-Waybill Manifest & Tare Slips */}
+              <div className="lg:col-span-5 bg-surface-container-lowest rounded-xl border border-outline-variant p-5 shadow-sm space-y-4 text-xs">
+                <div className="flex justify-between items-center pb-2 border-b border-outline-variant font-bold text-sm text-on-surface">
+                  <span>e-Waybill Digital Tare Manifest</span>
+                  <span className="font-mono text-primary font-bold">#EWB-2025-0982</span>
+                </div>
+
+                <div className="p-3.5 bg-surface-container-low rounded-lg border border-outline-variant space-y-2">
+                  <div className="grid grid-cols-3 gap-2 text-center bg-surface p-2 rounded">
+                    <div>
+                      <span className="text-outline text-[10px] block">Gross Weight</span>
+                      <strong className="text-on-surface">45,280 kg</strong>
+                    </div>
+                    <div>
+                      <span className="text-outline text-[10px] block">Tare Truck</span>
+                      <strong className="text-on-surface">14,800 kg</strong>
+                    </div>
+                    <div>
+                      <span className="text-primary text-[10px] font-bold block">Net Load</span>
+                      <strong className="text-primary font-bold">30,480 kg</strong>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-outline">Gross tolerance threshold calibrated at &lt;1.0% variance.</p>
+                </div>
+
+                {/* Milestone Payouts for Carrier */}
+                <div className="p-3 bg-surface rounded-lg border border-outline-variant space-y-2">
+                  <span className="font-bold text-on-surface block">Carrier Freight Milestones (₦385,000 Total)</span>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span>1. 30% Departure Advance:</span>
+                    <strong className="text-secondary font-bold">₦115,500 (PAID)</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span>2. 70% Gate-in &amp; Net Scale:</span>
+                    <strong className="text-tertiary font-bold">₦269,500 (IN ESCROW)</strong>
+                  </div>
+                </div>
+
+                <Link to="/carrier-dispatch" className="block text-center py-3 bg-primary text-white font-bold rounded-lg shadow hover:bg-primary-container transition">
+                  Open Driver Mobile Dispatch Card →
+                </Link>
+              </div>
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 12: DISPUTE & ESCROW FREEZE REVIEW (ID: 875886298071421ab02a21af3a26ba4d)
+    // =========================================================================
+    function DisputeReviewPage() {
+      const [ruling, setRuling] = useState('insurance');
+      const [resolved, setResolved] = useState(false);
+
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+            {/* Header */}
+            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold text-error uppercase">
+                  <span className="material-symbols-outlined text-sm">pause_circle</span>
+                  <span>Escrow Milestone Frozen • Case #DSP-2025-0142</span>
+                </div>
+                <h1 className="font-headline-lg text-2xl font-bold text-on-surface mt-1">Dispute Review &amp; Escrow Freeze Ledger</h1>
+                <p className="text-xs text-on-surface-variant">Quality &amp; Moisture Variance Dispute — Soya Beans Lot #792 (Animal Care vs Gboko Soya Union)</p>
+              </div>
+              <div className="bg-error-container/40 px-3.5 py-2 rounded-lg border border-error/30 text-right">
+                <span className="text-[10px] text-error font-bold block uppercase">Frozen Escrow Sum</span>
+                <strong className="text-base text-error font-currency-display font-bold">₦5,040,000.00</strong>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Forensic Evidence */}
+              <div className="lg:col-span-7 space-y-6 text-xs">
+                {/* Forensic Side by Side */}
+                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 space-y-4">
+                  <h3 className="font-bold text-sm text-on-surface flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-primary text-base">biotech</span>
+                    Forensic Lab Cross-Verification
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 bg-surface rounded-lg border border-secondary">
+                      <span className="text-[10px] font-bold text-secondary uppercase block">Origin: Benue Agro-Gate</span>
+                      <div className="text-xl font-bold text-secondary font-currency-display mt-1">11.6% Moisture</div>
+                      <p className="text-[11px] text-on-surface-variant mt-1">Certified Grade A by NIS Analyst K. Terungwa before departure.</p>
+                    </div>
+
+                    <div className="p-3.5 bg-surface rounded-lg border border-error">
+                      <span className="text-[10px] font-bold text-error uppercase block">Destination: Animal Care Ogun</span>
+                      <div className="text-xl font-bold text-error font-currency-display mt-1">13.8% Moisture</div>
+                      <p className="text-[11px] text-on-surface-variant mt-1">+2.2% excess moisture detected after truck tarp tear during heavy rainfall.</p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-surface-container-low rounded-lg border border-outline-variant space-y-1">
+                    <div className="font-bold text-on-surface flex items-center gap-1">
+                      <span className="material-symbols-outlined text-sm text-primary">shield</span>
+                      Active Marine Transit Insurance Policy #STP-CARGO-771
+                    </div>
+                    <p className="text-on-surface-variant text-[11px]">
+                      Underwritten by <strong>Sovereign Trust Insurance PLC</strong>. Covers rain ingress and tarp tear up to ₦12,000,000.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Ruling Console */}
+              <div className="lg:col-span-5 bg-surface-container-lowest rounded-xl border-2 border-primary/40 p-5 shadow-sm space-y-4 text-xs">
+                <div className="flex justify-between items-center pb-2 border-b border-outline-variant font-bold text-sm text-on-surface">
+                  <span className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-primary text-base">gavel</span>
+                    Arbitrator Ruling Console
+                  </span>
+                  <span className="text-secondary text-[11px] font-mono">2FA Active</span>
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    onClick={() => setRuling('insurance')}
+                    className={`block p-3 rounded-lg border-2 cursor-pointer transition ${ruling === 'insurance' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                  >
+                    <strong className="text-on-surface block text-xs">Option C: Trigger Marine Transit Insurance Claim (Recommended)</strong>
+                    <p className="text-[11px] text-on-surface-variant mt-0.5">
+                      Disburse frozen ₦5,040,000 to farmer cooperative (loading passed). Sovereign Trust pays ₦1,008,000 to buyer for moisture re-drying.
+                    </p>
+                  </label>
+
+                  <label
+                    onClick={() => setRuling('refund')}
+                    className={`block p-3 rounded-lg border-2 cursor-pointer transition ${ruling === 'refund' ? 'border-primary bg-primary/5' : 'border-outline-variant bg-surface'}`}
+                  >
+                    <strong className="text-on-surface block text-xs">Option A: Full Rejection &amp; 100% Escrow Refund</strong>
+                    <p className="text-[11px] text-on-surface-variant mt-0.5">Return entire ₦5,040,000 to Buyer. Lot redirected.</p>
+                  </label>
+                </div>
+
+                {resolved ? (
+                  <div className="p-3 bg-secondary-container/40 rounded-lg text-center space-y-1">
+                    <span className="material-symbols-outlined text-3xl text-secondary">verified</span>
+                    <div className="font-bold text-primary">Binding Ruling Executed!</div>
+                    <p className="text-[11px] text-on-surface-variant">₦5,040,000 released to Gboko Union &amp; ₦1,008,000 claim filed for Buyer.</p>
+                    <Link to="/settlements" className="text-xs font-bold text-primary underline block pt-1">
+                      View Central Settlement Ledger →
+                    </Link>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setResolved(true)}
+                    className="w-full py-3 bg-primary text-white font-bold rounded-lg shadow hover:bg-primary-container transition flex items-center justify-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-base">enhanced_encryption</span>
+                    <span>Execute Binding Ruling &amp; Disburse</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SCREEN 3: SETTLEMENT & RECONCILIATION LEDGER (ID: 9ef538f087c14b258dc5e2b47b131138)
+    // =========================================================================
+    function SettlementsPage() {
+      return (
+        <div className="min-h-screen flex flex-col bg-surface">
+          <SharedNavbar />
+
+          <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+            {/* Header */}
+            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <span className="text-[10px] font-bold text-primary uppercase bg-primary/10 px-2 py-0.5 rounded">CBN Institutional License #REG-2024-AGRO</span>
+                <h1 className="font-headline-lg text-2xl font-bold text-on-surface mt-1">Institutional Escrow Ledger &amp; NIBSS Reconciliation</h1>
+                <p className="text-xs text-on-surface-variant">Flour Mills Nigeria PLC • Real-time tripartite multi-tranche clearing records.</p>
+              </div>
+              <Link to="/receipt-modal" className="px-3.5 py-2 bg-primary text-white rounded-lg text-xs font-bold shadow hover:bg-primary-container transition flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">receipt</span>
+                <span>NIBSS Clearance Slip</span>
+              </Link>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+                <span className="text-outline uppercase text-[10px] font-bold block">Total Bonded Facility</span>
+                <div className="font-currency-display text-2xl font-extrabold text-primary mt-1">₦225,000,000</div>
+                <span className="text-on-surface-variant text-[11px]">Providus Bank Escrow Pool</span>
+              </div>
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+                <span className="text-outline uppercase text-[10px] font-bold block">Active In-Transit</span>
+                <div className="font-currency-display text-2xl font-extrabold text-tertiary mt-1">₦48,320,000</div>
+                <span className="text-on-surface-variant text-[11px]">8 active consignments</span>
+              </div>
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+                <span className="text-outline uppercase text-[10px] font-bold block">Liquidated (MTD)</span>
+                <div className="font-currency-display text-2xl font-extrabold text-secondary mt-1">₦114,850,000</div>
+                <span className="text-secondary text-[11px] font-semibold">T+0 Instant NIBSS Direct</span>
+              </div>
+              <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant">
+                <span className="text-outline uppercase text-[10px] font-bold block">Zero-Default Rate</span>
+                <div className="font-currency-display text-2xl font-extrabold text-primary mt-1">100.0%</div>
+                <span className="text-on-surface-variant text-[11px]">Tripartite Lock Verified</span>
+              </div>
+            </div>
+
+            {/* Ledger Master Table */}
+            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm text-xs">
+              <div className="p-4 border-b border-outline-variant font-bold text-sm text-on-surface flex justify-between items-center">
+                <span>Escrow Reconciliation Master Ledger</span>
+                <span className="text-secondary flex items-center gap-1 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span> Live NIBSS Feed
+                </span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-surface-container-low text-on-surface-variant text-[11px] uppercase border-b border-outline-variant">
+                    <tr>
+                      <th className="p-3">Lot &amp; Tx ID</th>
+                      <th className="p-3">Commodity &amp; Volume</th>
+                      <th className="p-3">Producer / Co-op</th>
+                      <th className="p-3 text-right">Total Bonded</th>
+                      <th className="p-3">Progress</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant">
+                    <tr>
+                      <td className="p-3 font-mono font-bold text-primary">#LOT-841</td>
+                      <td className="p-3"><strong>Clean Yellow Maize</strong> (45 MT)</td>
+                      <td className="p-3">Musa Agro Farms (Oyo)</td>
+                      <td className="p-3 text-right font-bold font-currency-display">₦10,360,000</td>
+                      <td className="p-3"><span className="text-secondary font-semibold">M1 &amp; M2 Paid (70%)</span></td>
+                      <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-semibold">Milestone 2 Cleared</span></td>
+                      <td className="p-3 text-center">
+                        <Link to="/receipt-modal" className="px-2.5 py-1 bg-primary text-white rounded text-[11px] font-bold shadow">
+                          NIBSS Slip
+                        </Link>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-mono font-bold text-primary">#LOT-844</td>
+                      <td className="p-3"><strong>Dried White Maize</strong> (120 MT)</td>
+                      <td className="p-3">Gboko Union (Benue)</td>
+                      <td className="p-3 text-right font-bold font-currency-display">₦90,600,000</td>
+                      <td className="p-3"><span className="text-tertiary font-semibold">M1 Paid (10%)</span></td>
+                      <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-tertiary-fixed text-tertiary font-semibold">In Transit Corridor</span></td>
+                      <td className="p-3 text-center">
+                        <Link to="/farmer-orders" className="px-2.5 py-1 border border-outline-variant rounded text-[11px] font-semibold hover:bg-surface">
+                          Track
+                        </Link>
+                      </td>
+                    </tr>
+                    <tr className="bg-error-container/20">
+                      <td className="p-3 font-mono font-bold text-error">#LOT-792</td>
+                      <td className="p-3"><strong>Soya Beans Lot</strong> (40 MT)</td>
+                      <td className="p-3">Gboko Soya Union</td>
+                      <td className="p-3 text-right font-bold font-currency-display text-error">₦8,400,000</td>
+                      <td className="p-3"><span className="text-error font-bold">M2 FROZEN</span></td>
+                      <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-error-container text-error font-bold">Arbitration Active</span></td>
+                      <td className="p-3 text-center">
+                        <Link to="/disputes" className="px-2.5 py-1 bg-error text-white rounded text-[11px] font-bold shadow">
+                          Review
+                        </Link>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </main>
+
+          <SharedFooter />
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // MAIN APP COMPONENT WITH MEMORYROUTER
+    // =========================================================================
+    function App() {
+      return (
+        <MemoryRouter initialEntries={["/"]}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/farmer-sales" element={<FarmerSalesPage />} />
+            <Route path="/farmer-orders" element={<FarmerOrdersPage />} />
+            <Route path="/produce-history" element={<FarmerSalesPage />} />
+            <Route path="/receipt-modal" element={<ReceiptModalPage />} />
+            <Route path="/list-produce" element={<ListProducePage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/batch-negotiation" element={<BatchNegotiationPage />} />
+            <Route path="/escrow-checkout" element={<EscrowCheckoutPage />} />
+            <Route path="/quality-lab" element={<QualityLabPage />} />
+            <Route path="/lab-inspector" element={<QualityLabPage />} />
+            <Route path="/haulage" element={<HaulagePage />} />
+            <Route path="/carrier-dispatch" element={<HaulagePage />} />
+            <Route path="/disputes" element={<DisputeReviewPage />} />
+            <Route path="/settlements" element={<SettlementsPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+    }
+
+    const rootElement = document.getElementById('root');
+    const root = createRoot(rootElement);
+    root.render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import {
+  ArrowRight, CalendarDays, CheckCircle2, ClipboardCheck, Compass,
+  Gauge, Loader2, MapPin, Navigation, Phone, RefreshCw, Route,
+  ShieldCheck, Truck, Wallet,
+} from 'lucide-react'
+import { PageHeader, Stat, EmptyState, Skeleton, Table, Th, Td, Tr } from '../components/ui/Data'
+import { Button } from '../components/ui/Button'
+import { Badge } from '../components/ui/Badge'
+import { Field, Input, NativeSelect, Textarea } from '../components/ui/Form'
+import { Modal } from '../components/ui/Overlay'
+import { logisticsService } from '../lib/services'
+import { fmtDate, money } from '../lib/format'
+import { parseError, cn } from '../lib/utils'
+import { useAuth } from '../store/auth'
+
+const BOARD = [
+  { key: 'assigned', label: 'Accepted', tone: 'pending', next: 'picked_up', nextLabel: 'Mark picked up' },
+  { key: 'picked_up', label: 'Picked up', tone: 'gold', next: 'in_transit', nextLabel: 'Start transit' },
+  { key: 'in_transit', label: 'In transit', tone: 'transit', next: 'delivered', nextLabel: 'Confirm delivery' },
+  { key: 'delivered', label: 'Delivered', tone: 'verified', next: null },
+]
+
+const TONE_STYLES = {
+  pending: 'border-harvest-200 bg-harvest-50 text-harvest-600',
+  gold: 'border-harvest-200 bg-harvest-50 text-harvest-600',
+  transit: 'border-transit-200 bg-transit-50 text-transit-700',
+  verified: 'border-forest-200 bg-forest-50 text-forest-600',
+}
+
+export default function LogisticsDashboard() {
+  const { user } = useAuth()
+  const [dashboard, setDashboard] = useState(null)
+  const [deliveries, setDeliveries] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [active, setActive] = useState(null)
+  const [event, setEvent] = useState({ status: 'picked_up', location: '', notes: '' })
+  const [saving, setSaving] = useState(false)
+  const [estimate, setEstimate] = useState({ distance: '', weight: '', delivery_type: 'standard' })
+  const [quote, setQuote] = useState(null)
+  const [quoting, setQuoting] = useState(false)
+
+  async function load() {
+    setLoading(true)
+    try {
+      const [dashRes, deliveryRes] = await Promise.all([
+        logisticsService.dashboard(),
+        logisticsService.deliveries({ per_page: 50 }),
+      ])
+      setDashboard(dashRes.data)
+      setDeliveries(deliveryRes.data?.data || [])
+      setError('')
+    } catch (err) {
+      setError(parseError(err))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const grouped = useMemo(() => {
+    const map = { assigned: [], picked_up: [], in_transit: [], delivered: [] }
+    deliveries.forEach((delivery) => {
+      const key = map[delivery.status] ? delivery.status : delivery.status === 'pending' ? 'assigned' : 'delivered'
+      map[key].push(delivery)
+    })
+    return map
+  }, [deliveries])
+
+  const activeValue = deliveries
+    .filter((delivery) => delivery.status !== 'delivered')
+    .reduce((sum, delivery) => sum + Number(delivery.delivery_cost || 0), 0)
+  const completedValue = deliveries
+    .filter((delivery) => delivery.status === 'delivered')
+    .reduce((sum, delivery) => sum + Number(delivery.delivery_cost || 0), 0)
+
+  function openUpdate(delivery, status) {
+    setActive(delivery)
+    setEvent({
+      status: status || (delivery.status === 'assigned' ? 'picked_up' : delivery.status),
+      location: delivery.pickup_location || '',
+      notes: '',
+    })
+  }
+
+  async function submitUpdate(e) {
+    e.preventDefault()
+    if (!active) return
+    setSaving(true)
+    try {
+      await logisticsService.addTracking(active.id, {
+        status: event.status,
+        location: event.location || undefined,
+        notes: event.notes || undefined,
+      })
+      toast.success('Waybill milestone recorded')
+      setActive(null)
+      await load()
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function getQuote(e) {
+    e.preventDefault()
+    setQuoting(true)
+    try {
+      const res = await logisticsService.estimate({
+        distance: Number(estimate.distance),
+        weight: Number(estimate.weight),
+        delivery_type: estimate.delivery_type,
+      })
+      setQuote(res.data)
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setQuoting(false)
+    }
+  }
+
+  return (
+    <div className="page-wrap page-pad">
+      <PageHeader
+        eyebrow="Carrier dispatch"
+        title="Fleet & waybill board"
+        description="Haulage assigned to your fleet, with milestone capture and a live freight estimator."
+        actions={
+          <Button variant="outline" size="md" onClick={load} disabled={loading}>
+            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh board
+          </Button>
+        }
+      />
+
+      {error && (
+        <p className="mb-4 rounded-card border border-critical-200 bg-critical-50 px-4 py-3 text-[12.5px] text-critical-600">
+          {error}
+        </p>
+      )}
+
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
+        ) : (
+          <>
+            <Stat icon={Truck} label="Active hauls" value={dashboard?.active_deliveries ?? 0} hint="Accepted, picked up or in transit" />
+            <Stat icon={CheckCircle2} label="Completed" value={dashboard?.completed_deliveries ?? 0} tone="sprout" hint="Delivered to destination" />
+            <Stat icon={Wallet} label="Freight in motion" value={money(activeValue)} tone="gold" hint="Pre-funded inside escrow" size="lg" />
+            <Stat icon={ShieldCheck} label="Settled freight" value={money(completedValue)} tone="neutral" hint="Delivered and release-eligible" size="lg" />
+          </>
+        )}
+      </div>
+
+      <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
+        <div className="min-w-0 space-y-5">
+          <div className="rounded-card border border-line bg-white shadow-card">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+              <div>
+                <h2 className="font-display text-[15px] font-bold text-ink">Dispatch board</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Move a haul by recording the physical milestone. Buyers and growers see it immediately.</p>
+              </div>
+              <Badge tone="live" size="sm"><span className="h-1.5 w-1.5 rounded-full bg-forest-500" /> Live</Badge>
+            </div>
+
+            {loading ? (
+              <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-48 rounded-xl" />)}
+              </div>
+            ) : deliveries.length === 0 ? (
+              <EmptyState
+                icon={Truck}
+                title="No hauls assigned yet"
+                description="The trade desk matches carriers against funded orders. When a haul is assigned to your fleet it appears here with origin, destination and freight value."
+                className="border-0 shadow-none"
+                action={<Button variant="outline" onClick={load}><RefreshCw size={14} /> Check again</Button>}
+              />
+            ) : (
+              <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4">
+                {BOARD.map((column) => (
+                  <div key={column.key} className="rounded-xl border border-line bg-canvas p-2.5">
+                    <div className="flex items-center justify-between px-1 pb-2">
+                      <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">{column.label}</p>
+                      <span className="rounded-full bg-white px-1.5 py-0.5 text-[10px] font-bold text-muted tnum">
+                        {grouped[column.key].length}
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {grouped[column.key].length === 0 && (
+                        <p className="rounded-lg border border-dashed border-sage-400 px-2.5 py-6 text-center text-[10.5px] text-muted">
+                          No hauls
+                        </p>
+                      )}
+                      {grouped[column.key].map((delivery) => (
+                        <article key={delivery.id} className="rounded-lg border border-line bg-white p-3 shadow-card">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className={cn('rounded-full border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide', TONE_STYLES[column.tone])}>
+                              #{delivery.id}
+                            </span>
+                            {delivery.delivery_cost && (
+                              <span className="text-[10.5px] font-bold text-forest-600 tnum">
+                                {money(delivery.delivery_cost)}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-2 flex items-start gap-1 text-[10.5px] leading-4 text-ink-soft">
+                            <MapPin size={10} className="mt-0.5 shrink-0 text-forest-500" />
+                            <span className="">{delivery.pickup_location || 'Origin'}</span>
+                          </p>
+                          <p className="mt-1 flex items-start gap-1 text-[10.5px] leading-4 text-muted">
+                            <Navigation size={10} className="mt-0.5 shrink-0 text-harvest-500" />
+                            <span className="">{delivery.delivery_location || 'Destination'}</span>
+                          </p>
+                          <p className="mt-2 flex items-center gap-1 text-[9.5px] text-muted">
+                            <CalendarDays size={9} /> {fmtDate(delivery.pickup_date || delivery.created_at)}
+                          </p>
+                          {delivery.tracking_number && (
+                            <p className="mt-1 break-words font-mono text-[9px] text-muted">WB {delivery.tracking_number}</p>
+                          )}
+                          <div className="mt-2.5 flex gap-1.5">
+                            {column.next ? (
+                              <Button size="sm" className="h-7 flex-1 px-2 text-[10.5px]" onClick={() => openUpdate(delivery, column.next)}>
+                                {column.nextLabel}
+                              </Button>
+                            ) : (
+                              <Badge tone="verified" size="sm" className="w-full justify-center">Settled</Badge>
+                            )}
+                            <Button size="icon-sm" variant="outline" onClick={() => openUpdate(delivery)} aria-label={`Update haul ${delivery.id}`}>
+                              <Compass size={12} />
+                            </Button>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-card border border-line bg-white shadow-card">
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+              <div>
+                <h2 className="font-display text-[15px] font-bold text-ink">Haulage register</h2>
+                <p className="mt-0.5 text-[11px] text-muted">All hauls assigned to {user?.name || 'your fleet'}.</p>
+              </div>
+              <span className="text-[10.5px] text-muted">{deliveries.length} records</span>
+            </div>
+            {loading ? (
+              <div className="space-y-2 p-5">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+            ) : deliveries.length === 0 ? (
+              <p className="px-5 py-8 text-center text-[12px] text-muted">No haulage records yet.</p>
+            ) : (
+              <Table minWidth={760}>
+                <thead>
+                  <tr>
+                    <Th>Haul</Th>
+                    <Th>Route</Th>
+                    <Th>Driver / vehicle</Th>
+                    <Th className="text-right">Freight</Th>
+                    <Th>Status</Th>
+                    <Th>Tracking</Th>
+                    <Th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {deliveries.map((delivery) => (
+                    <Tr key={delivery.id}>
+                      <Td>
+                        <p className="font-semibold text-ink">#{delivery.id}</p>
+                        <p className="text-[10px] text-muted">Order #{delivery.order_id}</p>
+                      </Td>
+                      <Td>
+                        <p className="break-words text-[11.5px]">{delivery.pickup_location}</p>
+                        <p className="break-words text-[10px] text-muted">→ {delivery.delivery_location}</p>
+                      </Td>
+                      <Td>
+                        <p className="text-[11.5px]">{delivery.driver_name || 'Not assigned'}</p>
+                        <p className="text-[10px] text-muted">{delivery.vehicle_info || 'No vehicle record'}</p>
+                      </Td>
+                      <Td className="text-right font-semibold tnum">{delivery.delivery_cost ? money(delivery.delivery_cost) : '—'}</Td>
+                      <Td><Badge tone="neutral" size="sm" className="capitalize">{delivery.status?.replace('_', ' ')}</Badge></Td>
+                      <Td className="font-mono text-[10px] text-muted">{delivery.tracking_number || '—'}</Td>
+                      <Td>
+                        <Button variant="ghost" size="icon-sm" onClick={() => openUpdate(delivery)} aria-label="Update haul">
+                          <ArrowRight size={14} />
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </tbody>
+              </Table>
+            )}
+          </div>
+        </div>
+
+        <aside className="space-y-4">
+          <div className="rounded-card border border-line bg-white shadow-card">
+            <div className="flex items-center gap-2 border-b border-line px-4 py-3.5">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-harvest-50 text-harvest-600">
+                <Route size={15} />
+              </span>
+              <div>
+                <h2 className="font-display text-[13.5px] font-bold text-ink">Freight estimator</h2>
+                <p className="text-[10px] text-muted">Platform reference rate</p>
+              </div>
+            </div>
+            <form onSubmit={getQuote} className="space-y-3 p-4">
+              <Field label="Route distance (km)" required>
+                <Input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  required
+                  value={estimate.distance}
+                  onChange={(e) => setEstimate((prev) => ({ ...prev, distance: e.target.value }))}
+                  placeholder="e.g. 145"
+                  className="h-10 text-[12.5px]"
+                />
+              </Field>
+              <Field label="Cargo weight (kg)" required>
+                <Input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  required
+                  value={estimate.weight}
+                  onChange={(e) => setEstimate((prev) => ({ ...prev, weight: e.target.value }))}
+                  placeholder="e.g. 12000"
+                  className="h-10 text-[12.5px]"
+                />
+              </Field>
+              <Field label="Service level" required>
+                <NativeSelect
+                  value={estimate.delivery_type}
+                  onChange={(e) => setEstimate((prev) => ({ ...prev, delivery_type: e.target.value }))}
+                  className="h-10 text-[12.5px]"
+                >
+                  <option value="standard">Standard</option>
+                  <option value="express">Express (1.5×)</option>
+                </NativeSelect>
+              </Field>
+              <Button type="submit" size="sm" className="w-full" disabled={quoting}>
+                {quoting ? <Loader2 size={13} className="animate-spin" /> : <Gauge size={13} />}
+                {quoting ? 'Calculating…' : 'Estimate freight'}
+              </Button>
+            </form>
+
+            {quote && (
+              <div className="border-t border-line px-4 py-3.5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Estimated haulage</p>
+                <p className="mt-0.5 font-display text-[24px] font-extrabold tracking-tight text-forest-600 tnum">
+                  {money(quote.estimated_cost)}
+                </p>
+                <dl className="mt-2 space-y-1 text-[10.5px]">
+                  <div className="flex justify-between"><dt className="text-muted">Base</dt><dd className="tnum">{money(quote.breakdown?.base_cost)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-muted">Distance</dt><dd className="tnum">{money(quote.breakdown?.distance_cost)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-muted">Weight</dt><dd className="tnum">{money(quote.breakdown?.weight_cost)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-muted">Service multiplier</dt><dd className="tnum">{quote.breakdown?.express_multiplier}×</dd></div>
+                </dl>
+                <p className="mt-2 text-[9.5px] leading-4 text-muted">
+                  Reference only. Final freight is fixed inside the buyer&apos;s escrow at checkout.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
+            <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
+              <ClipboardCheck size={13} /> Evidence checklist
+            </p>
+            <ul className="mt-2 space-y-2 text-[10.5px] leading-4 text-forest-700/80">
+              <li>Origin gross–tare slip before departure</li>
+              <li>Driver identity and plate captured on the e-Waybill</li>
+              <li>Destination re-weigh on arrival</li>
+              <li>Buyer receiving receipt at silo discharge</li>
+            </ul>
+          </div>
+
+          <div className="rounded-card border border-line bg-white p-4">
+            <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
+              <Phone size={12} /> Dispatch desk
+            </p>
+            <p className="mt-1.5 text-[11px] leading-5 text-muted">
+              For unassigned loads and capacity disputes, contact the haulage desk with your fleet availability.
+            </p>
+            <a href="tel:+2348000725670" className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-forest-600 hover:underline">
+              <Phone size={12} /> +234 800 072 5670
+            </a>
+          </div>
+        </aside>
+      </div>
+
+      <Modal
+        open={Boolean(active)}
+        onOpenChange={(open) => !open && setActive(null)}
+        title={active ? `Record milestone · haul #${active.id}` : 'Record milestone'}
+        description="The milestone updates the delivery record and the buyer's order timeline."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setActive(null)} disabled={saving}>Cancel</Button>
+            <Button onClick={submitUpdate} disabled={saving}>
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+              {saving ? 'Recording…' : 'Record milestone'}
+            </Button>
+          </>
+        }
+      >
+        {active && (
+          <form onSubmit={submitUpdate} className="space-y-4">
+            <dl className="grid gap-2 rounded-xl border border-line bg-canvas px-4 py-3 text-[11.5px] sm:grid-cols-2">
+              <div><dt className="text-muted">Pickup</dt><dd className="font-semibold text-ink">{active.pickup_location}</dd></div>
+              <div><dt className="text-muted">Destination</dt><dd className="font-semibold text-ink">{active.delivery_location}</dd></div>
+              <div><dt className="text-muted">Freight</dt><dd className="font-semibold text-ink tnum">{money(active.delivery_cost)}</dd></div>
+              <div><dt className="text-muted">Current state</dt><dd className="font-semibold capitalize text-ink">{active.status?.replace('_', ' ')}</dd></div>
+            </dl>
+
+            <Field label="Milestone status" required>
+              <NativeSelect value={event.status} onChange={(e) => setEvent((prev) => ({ ...prev, status: e.target.value }))}>
+                <option value="assigned">Accepted / assigned</option>
+                <option value="picked_up">Picked up at origin</option>
+                <option value="in_transit">In transit</option>
+                <option value="delivered">Delivered to destination</option>
+                <option value="cancelled">Cancelled</option>
+              </NativeSelect>
+            </Field>
+
+            <Field label="Location" hint="Weighbridge, hub or gate">
+              <Input
+                value={event.location}
+                onChange={(e) => setEvent((prev) => ({ ...prev, location: e.target.value }))}
+                placeholder="e.g. Ijebu-Ife weighbridge"
+              />
+            </Field>
+
+            <Field label="Weighbridge / milestone notes">
+              <Textarea
+                rows={3}
+                maxLength={1000}
+                value={event.notes}
+                onChange={(e) => setEvent((prev) => ({ ...prev, notes: e.target.value }))}
+                placeholder="Gross weight, tare, seal number, receiving officer…"
+              />
+            </Field>
+          </form>
+        )}
+      </Modal>
+    </div>
+  )
+}

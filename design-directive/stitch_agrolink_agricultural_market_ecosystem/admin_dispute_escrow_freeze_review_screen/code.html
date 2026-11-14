@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RAMLP AgroLink - Admin Dispute &amp; Escrow Freeze Review</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#98e9ab",
+            "inverse-surface": "#2a322a",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#a3f5b6",
+            "tertiary-fixed": "#ffdea7",
+            "secondary": "#306b19",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "error": "#ba1a1a",
+            "outline": "#707a6f",
+            "primary-container": "#176b3a",
+            "surface": "#f3fcef",
+            "secondary-container": "#b0f491",
+            "tertiary-container": "#7b5700",
+            "surface-dim": "#d4ddd0",
+            "on-surface-variant": "#404940",
+            "surface-container": "#e8f0e4",
+            "on-secondary-fixed": "#052100",
+            "on-tertiary": "#ffffff",
+            "primary": "#005128",
+            "surface-container-low": "#edf6e9",
+            "surface-container-highest": "#dce5d9",
+            "on-tertiary-fixed": "#271900",
+            "background": "#f3fcef",
+            "surface-tint": "#196c3b",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#95d878",
+            "on-background": "#161d16",
+            "surface-bright": "#f3fcef",
+            "tertiary": "#5d4100",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "outline-variant": "#bfc9bd",
+            "secondary-fixed": "#b0f491",
+            "on-primary-fixed": "#00210d",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#175200",
+            "inverse-on-surface": "#eaf3e7",
+            "on-surface": "#161d16",
+            "surface-container-high": "#e2ebde",
+            "on-primary-fixed-variant": "#005228",
+            "surface-variant": "#dce5d9",
+            "tertiary-fixed-dim": "#f8bd45",
+            "inverse-primary": "#88d89c",
+            "on-secondary-container": "#36721f",
+            "on-tertiary-container": "#ffd07c",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#88d89c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "label-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "currency-display": ["Manrope"],
+            "label-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "headline-md": ["Manrope"]
+          },
+          "fontSize": {
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- ==================== SHARED COMPONENT: TopNavBar ==================== -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-7xl mx-auto h-16">
+<!-- Brand Anchor -->
+<div class="flex items-center gap-6">
+<a class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed tracking-tight flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+<span>AgroLink RAMLP</span>
+</a>
+<span class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container text-on-surface-variant border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Legal &amp; Escrow Wing
+        </span>
+</div>
+<!-- Navigation Links (Context: Disputes & Escrow is ACTIVE) -->
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Marketplace</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Waybill &amp; Haulage</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Quality Lab</a>
+<a class="border-b-2 border-primary dark:border-primary-fixed text-primary dark:text-primary-fixed font-label-md text-label-md pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Disputes &amp; Escrow</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Settlements</a>
+</nav>
+<!-- Trailing Cluster -->
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition duration-150 ease-in-out flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+<span>CBN Verification</span>
+</button>
+<button class="px-4 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition duration-150 ease-in-out shadow-sm">
+            Launch Portal
+          </button>
+</div>
+<div class="h-6 w-px bg-outline-variant mx-1"></div>
+<button aria-label="Notifications" class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<button aria-label="Support Agent" class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition">
+<span class="material-symbols-outlined text-xl">support_agent</span>
+</button>
+<div class="flex items-center gap-2 pl-2">
+<img alt="Officer profile picture" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary" data-alt="Close-up professional portrait of a senior Nigerian male financial compliance arbitrator in a formal charcoal suit and green tie, smiling confidently in a modern high-tech banking office in Lagos." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKfYo7Of0l6yYbWahndHYF82Evra8iQz9YiyIsSamIbHfzm0WoQydGcqM_MonWbE05gKiwchxztzPe4W4BGYqySbqDlmFCnRxAjKjLwzTZ_k-w_HUPXqqZujhDN7KgmeaKRW3gsVHJTRhgXDRlcz_xc06Elnd2hTIllNXVcjyB9VFdGob3vMWUfCYafj-R5Y2SMyznruZ0zslGpaqzBheM-p-4a0ISJH19HRhNXO4"/>
+<div class="hidden xl:block text-left leading-none">
+<p class="text-xs font-semibold text-on-surface">Barr. A. Aliyu</p>
+<p class="text-[10px] text-on-surface-variant">Legal Lead #RAMLP-09</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- ==================== EXECUTIVE AUDIT BANNER & SYSTEM TELEMETRY ==================== -->
+<section class="bg-surface-container-low border-b border-outline-variant py-4 px-margin-desktop">
+<div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+          Central Bank of Nigeria • Legal Arbitration Console
+        </div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-0.5">Dispute Review &amp; Escrow Freeze Ledger</h1>
+</div>
+<!-- Top status summary metrics -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:gap-4">
+<div class="bg-surface-container-lowest p-2.5 rounded-lg border border-outline-variant shadow-sm flex items-center gap-3">
+<div class="w-9 h-9 rounded bg-secondary-container/50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div>
+<p class="text-[11px] text-on-surface-variant leading-tight">Escrow Vault Status</p>
+<p class="font-headline-sm text-sm font-bold text-primary">₦184.2M <span class="text-[10px] font-normal text-on-surface-variant">Bonded</span></p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg border border-outline-variant shadow-sm flex items-center gap-3">
+<div class="w-9 h-9 rounded bg-error-container/60 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<div>
+<p class="text-[11px] text-on-surface-variant leading-tight">Active Disputes</p>
+<p class="font-headline-sm text-sm font-bold text-error">3 Cases <span class="text-[10px] font-normal text-on-surface-variant">Pending</span></p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg border border-outline-variant shadow-sm flex items-center gap-3">
+<div class="w-9 h-9 rounded bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">timelapse</span>
+</div>
+<div>
+<p class="text-[11px] text-on-surface-variant leading-tight">Avg Resolution Time</p>
+<p class="font-headline-sm text-sm font-bold text-on-surface">3.4 Hours</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg border border-outline-variant shadow-sm flex items-center gap-3">
+<div class="w-9 h-9 rounded bg-secondary-container/60 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div>
+<p class="text-[11px] text-on-surface-variant leading-tight">CBN/NIBSS Compliance</p>
+<p class="font-headline-sm text-sm font-bold text-primary">100% Fully Bonded</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-margin-desktop py-6">
+<!-- Active Dispute Header & Freeze Status Pill -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 mb-6 shadow-sm">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-outline-variant">
+<div>
+<div class="flex flex-wrap items-center gap-2 mb-1.5">
+<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-error-container text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">pause_circle</span>
+              ESCROW MILESTONE FROZEN
+            </span>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-container text-on-surface-variant">
+              Priority: CRITICAL
+            </span>
+<span class="text-xs text-on-surface-variant font-mono">Initiated: 14 Oct 2025 • 08:42 WAT</span>
+</div>
+<h2 class="font-headline-md text-headline-sm md:text-headline-md text-on-surface font-bold tracking-tight">
+            CASE #DSP-2025-0142: Quality &amp; Moisture Variance Dispute — Soya Beans Lot #792
+          </h2>
+</div>
+<div class="flex items-center gap-3 self-start md:self-auto bg-surface-container-low px-4 py-2.5 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-error text-2xl" style="font-variation-settings: 'FILL' 1;">lock_clock</span>
+<div>
+<p class="text-[11px] text-on-surface-variant uppercase font-semibold">Providus Bank Custody ID</p>
+<p class="font-mono text-xs font-bold text-on-surface">PRV-ESC-9082-NGN</p>
+</div>
+</div>
+</div>
+<!-- Fast Contested Escrow Summary Sub-Deck -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+<div>
+<p class="text-xs text-on-surface-variant">Total Contract Value</p>
+<p class="font-headline-sm text-lg font-bold text-on-surface">₦8,400,000</p>
+<p class="text-[11px] text-on-surface-variant">40.0 MT @ ₦210,000/MT</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant">Contested Milestone #2</p>
+<p class="font-headline-sm text-lg font-bold text-error">₦5,040,000 Frozen</p>
+<p class="text-[11px] text-error font-medium">60% Gate-In Delivery Payout</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant">Dispatched Milestone #1</p>
+<p class="font-headline-sm text-lg font-bold text-secondary">₦3,360,000 Released</p>
+<p class="text-[11px] text-on-surface-variant">40% Loading Mobilization</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant">Insured Haulage Value</p>
+<p class="font-headline-sm text-lg font-bold text-primary">₦12,000,000 Active</p>
+<p class="text-[11px] text-on-surface-variant">Sovereign Trust Marine Policy</p>
+</div>
+</div>
+</div>
+<!-- 3-COLUMN / ASYMMETRIC BENTO GRID LAYOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN (7 COLS): DOSSIER & FORENSIC TELEMATICS EVIDENCE -->
+<div class="lg:col-span-7 space-y-6">
+<!-- MODULE 1: Stakeholder Profiles & Claims -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-outline-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">badge</span>
+              Dispute Dossier &amp; Stakeholder Claims
+            </h3>
+<span class="text-xs font-semibold px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">3 Verified Parties</span>
+</div>
+<!-- Parties Cards -->
+<div class="space-y-4">
+<!-- Buyer / Complainant -->
+<div class="p-3.5 rounded-lg border-l-4 border-l-error bg-surface-container-low border border-outline-variant">
+<div class="flex items-start justify-between">
+<div>
+<span class="inline-block px-2 py-0.5 text-[10px] font-bold rounded bg-error-container text-error uppercase mb-1">Complainant (Buyer)</span>
+<h4 class="font-headline-sm text-base font-bold text-on-surface">Animal Care Feeds Ltd</h4>
+<p class="text-xs text-on-surface-variant">Ogere Processing Mill, Ogun State • ID #BUY-OG-441</p>
+</div>
+<span class="material-symbols-outlined text-error">report_problem</span>
+</div>
+<p class="mt-2 text-xs text-on-surface font-medium bg-surface-container-lowest p-2 rounded border border-outline-variant">
+<strong class="text-error font-semibold">Claim:</strong> Moisture exceeds maximum contracted limit of 12.0%. Destination digital probe measured 13.8% at Ogun gate-in. Unacceptable for commercial feed milling due to high mycotoxin/spoilage hazard. Rejection demanded unless penalty offset applied.
+              </p>
+</div>
+<!-- Seller / Respondent -->
+<div class="p-3.5 rounded-lg border-l-4 border-l-secondary bg-surface-container-low border border-outline-variant">
+<div class="flex items-start justify-between">
+<div>
+<span class="inline-block px-2 py-0.5 text-[10px] font-bold rounded bg-secondary-container text-on-secondary-container uppercase mb-1">Respondent (Farmer / Seller)</span>
+<h4 class="font-headline-sm text-base font-bold text-on-surface">Gboko Soya Farmers Union</h4>
+<p class="text-xs text-on-surface-variant">Gboko Aggregation Hub, Benue State • ID #COOP-BN-108</p>
+</div>
+<span class="material-symbols-outlined text-secondary">agriculture</span>
+</div>
+<p class="mt-2 text-xs text-on-surface font-medium bg-surface-container-lowest p-2 rounded border border-outline-variant">
+<strong class="text-secondary font-semibold">Claim:</strong> Soya lot was oven-dry calibrated and certified at 11.6% moisture at Benue exit gate (Federal Seed Lab Cert #FSL-9821). Haulage truck was delayed 38 hours between Makurdi, Lokoja, and Ore under torrential rains due to washed-out bridge bypasses. Produce was sealed dry at loading.
+              </p>
+</div>
+<!-- Haulage Carrier -->
+<div class="p-3.5 rounded-lg border-l-4 border-l-outline bg-surface-container-low border border-outline-variant">
+<div class="flex items-start justify-between">
+<div>
+<span class="inline-block px-2 py-0.5 text-[10px] font-bold rounded bg-surface-container text-on-surface-variant uppercase mb-1">Haulage Carrier &amp; Asset</span>
+<h4 class="font-headline-sm text-base font-bold text-on-surface">Tarkaa Logistics Fleet</h4>
+<p class="text-xs text-on-surface-variant">Heavy Duty IVECO EuroTrakker • Registration: #BEN-382-XA • Driver: M. Danladi</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">local_shipping</span>
+</div>
+<p class="mt-2 text-xs text-on-surface font-medium bg-surface-container-lowest p-2 rounded border border-outline-variant">
+<strong class="text-on-surface font-semibold">Incident Report:</strong> Severe thunderstorm at Ore-Sagamu corridor. Fallen tree branch struck trailer rib #3, puncturing secondary vinyl tarpaulin. Driver documented immediate incident log at 03:15 WAT via RAMLP Hauler App.
+              </p>
+</div>
+</div>
+</section>
+<!-- MODULE 2: Forensic Side-by-Side Lab & Telematics Comparison -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-outline-variant">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">biotech</span>
+                Forensic Inspection &amp; Telematics Cross-Verification
+              </h3>
+<p class="text-xs text-on-surface-variant">Automated IoT weighbridge data, moisture calibrations &amp; transit telemetry</p>
+</div>
+<span class="px-2.5 py-1 rounded bg-tertiary-container/20 text-tertiary font-mono text-xs font-bold">
+              Delta: +2.2% Moisture
+            </span>
+</div>
+<!-- Side-by-side Lab Comparison Bento -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Origin Sheet -->
+<div class="border border-outline-variant rounded-lg p-4 bg-surface-container-lowest relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-secondary-container/20 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant">
+<div>
+<span class="text-[10px] font-bold uppercase tracking-wider text-secondary">Origin Checkpoint</span>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">Benue Agro-Gate Lab</h4>
+</div>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="mt-3 space-y-2 text-xs">
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Moisture Reading:</span>
+<span class="font-bold font-mono text-secondary">11.6% (Passed &lt;12.0%)</span>
+</div>
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Certified Net Weight:</span>
+<span class="font-bold font-mono text-on-surface">40.20 Metric Tons</span>
+</div>
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Foreign Matter / Trash:</span>
+<span class="font-bold font-mono text-on-surface">0.8% (Grade A)</span>
+</div>
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Digital Seal Code:</span>
+<span class="font-mono text-[11px] text-on-surface">NGA-BN-88219-OK</span>
+</div>
+<div class="flex justify-between py-1">
+<span class="text-on-surface-variant">Timestamp:</span>
+<span class="text-on-surface">11 Oct 2025, 14:10 WAT</span>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant flex items-center gap-1.5 text-[11px] text-secondary">
+<span class="material-symbols-outlined text-xs">verified</span>
+                Certified by Analyst: K. Terungwa (NIS Certified)
+              </div>
+</div>
+<!-- Destination Sheet -->
+<div class="border border-outline-variant rounded-lg p-4 bg-surface-container-lowest relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-error-container/30 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant">
+<div>
+<span class="text-[10px] font-bold uppercase tracking-wider text-error">Destination Gate-In</span>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">Animal Care Ogun Lab</h4>
+</div>
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div class="mt-3 space-y-2 text-xs">
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Moisture Reading:</span>
+<span class="font-bold font-mono text-error">13.8% (Violates SLA)</span>
+</div>
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Weighbridge Gross:</span>
+<span class="font-bold font-mono text-error">40.60 MT (+400kg Water)</span>
+</div>
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Internal Bag Humidity:</span>
+<span class="font-bold font-mono text-error">78% RH (Critical Spoilage)</span>
+</div>
+<div class="flex justify-between py-1 border-b border-surface-container">
+<span class="text-on-surface-variant">Seal Integrity:</span>
+<span class="font-mono text-[11px] text-error">Tampered / Water Wetted</span>
+</div>
+<div class="flex justify-between py-1">
+<span class="text-on-surface-variant">Timestamp:</span>
+<span class="text-on-surface">14 Oct 2025, 07:45 WAT</span>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant flex items-center gap-1.5 text-[11px] text-error">
+<span class="material-symbols-outlined text-xs">warning</span>
+                Variance exceeds standard 0.5% natural atmospheric transit drift.
+              </div>
+</div>
+</div>
+<!-- Telematics Timeline & Cargo Policy Card -->
+<div class="mt-4 p-4 rounded-lg bg-surface-container-low border border-outline-variant">
+<h4 class="text-xs font-bold uppercase tracking-wider text-on-surface flex items-center gap-1.5 mb-2">
+<span class="material-symbols-outlined text-sm">route</span>
+              IoT Telematics &amp; Insurance Audit Record
+            </h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant">
+<div class="flex items-center gap-2 font-semibold text-on-surface mb-1">
+<span class="material-symbols-outlined text-tertiary text-sm">gps_fixed</span>
+                  14-Hour Unscheduled Transit Stoppage
+                </div>
+<p class="text-on-surface-variant text-[11px]">
+                  GPS Geofence Log: Truck #BEN-382-XA stalled between KM 114-118 near Ore-Sagamu from Oct 12 21:00 to Oct 13 11:30. Doppler radar confirmed 84mm precipitation during stoppage. Moisture gradient confirms localized top-layer ingress.
+                </p>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant">
+<div class="flex items-center gap-2 font-semibold text-primary mb-1">
+<span class="material-symbols-outlined text-primary text-sm">shield</span>
+                  Active Marine Transit Policy #STP-CARGO-771
+                </div>
+<p class="text-on-surface-variant text-[11px]">
+                  Underwriter: <strong class="text-on-surface">Sovereign Trust Insurance PLC</strong>. Covers rainwater ingress, tarpaulin tear, and highway flood hazards up to ₦12,000,000. Verified active with premium fully settled via RAMLP automated haulage toll.
+                </p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- RIGHT COLUMN (5 COLS): ARBITRATOR RULING & ESCROW LIQUIDATION CONSOLE -->
+<div class="lg:col-span-5 space-y-6">
+<section class="bg-surface-container-lowest border-2 border-primary-container rounded-xl p-5 shadow-sm sticky top-20">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-base font-bold text-on-surface">Arbitrator Liquidation Console</h3>
+<p class="text-[11px] text-on-surface-variant">Statutory Binding Enforcement</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container text-on-secondary-container uppercase">
+              Providus 2FA Active
+            </span>
+</div>
+<!-- Resolution Action Selection Radios -->
+<div class="mt-4">
+<label class="block text-xs font-bold text-on-surface uppercase tracking-wider mb-2">
+              Select Binding Resolution Mechanism
+            </label>
+<div class="space-y-2.5">
+<!-- Option A -->
+<label class="flex items-start gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition cursor-pointer bg-surface-container-lowest">
+<input class="mt-1 h-4 w-4 text-primary focus:ring-primary" name="arbitration_decision" type="radio" value="option_a"/>
+<div>
+<span class="text-xs font-bold text-on-surface block">Option A: Full Rejection &amp; 100% Escrow Refund</span>
+<span class="text-[11px] text-on-surface-variant block mt-0.5 leading-snug">
+                    Release entire remaining ₦5,040,000 to Buyer. Lot redirected to industrial bio-ethanol distiller or returned to cooperative.
+                  </span>
+</div>
+</label>
+<!-- Option B -->
+<label class="flex items-start gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition cursor-pointer bg-surface-container-lowest">
+<input class="mt-1 h-4 w-4 text-primary focus:ring-primary" name="arbitration_decision" type="radio" value="option_b"/>
+<div>
+<span class="text-xs font-bold text-on-surface block">Option B: Commercial Re-negotiation with Price Adjustment</span>
+<span class="text-[11px] text-on-surface-variant block mt-0.5 leading-snug">
+                    Apply 12% moisture discount (₦1,008,000 penalty deducted from farmer payout); disburse adjusted balance ₦4,032,000 to farmer. Buyer keeps produce.
+                  </span>
+</div>
+</label>
+<!-- Option C (Recommended / Pre-selected) -->
+<label class="flex items-start gap-3 p-3 rounded-lg border-2 border-primary bg-surface-container-low transition cursor-pointer relative shadow-sm">
+<div class="absolute -top-2.5 right-3 bg-primary text-on-primary text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                  Recommended Equity Finding
+                </div>
+<input checked="" class="mt-1 h-4 w-4 text-primary focus:ring-primary" name="arbitration_decision" type="radio" value="option_c"/>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-bold text-primary block">Option C: Trigger Marine Transit Insurance Claim</span>
+</div>
+<span class="text-[11px] text-on-surface-variant block mt-1 leading-snug">
+                    Disburse frozen ₦5,040,000 in full to Gboko Farmers (origin test passed). Trigger Sovereign Trust claim of ₦1,008,000 payable directly to Buyer for moisture conditioning expenses.
+                  </span>
+</div>
+</label>
+<!-- Option D -->
+<label class="flex items-start gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition cursor-pointer bg-surface-container-lowest">
+<input class="mt-1 h-4 w-4 text-primary focus:ring-primary" name="arbitration_decision" type="radio" value="option_d"/>
+<div>
+<span class="text-xs font-bold text-on-surface block">Option D: Hold for State Arbitrator Secondary Lab Test</span>
+<span class="text-[11px] text-on-surface-variant block mt-0.5 leading-snug">
+                    Retain funds in Providus escrow vault for 48 hours. Dispatch neutral referee from Federal Ministry of Agriculture Reference Lab, Ibadan.
+                  </span>
+</div>
+</label>
+</div>
+</div>
+<!-- Escrow Financial Disbursement Breakdown Ledger -->
+<div class="mt-5 p-3.5 rounded-lg bg-surface-container border border-outline-variant">
+<h4 class="text-xs font-bold text-on-surface uppercase tracking-wide mb-2 flex items-center justify-between">
+<span>Proposed Disbursement Ledger</span>
+<span class="text-[10px] text-primary font-mono font-bold">NIBSS Real-Time Rails</span>
+</h4>
+<div class="space-y-1.5 text-xs">
+<div class="flex justify-between text-on-surface-variant">
+<span>Gboko Soya Union (Seller Account):</span>
+<span class="font-mono font-semibold text-on-surface">₦5,040,000.00</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>Sovereign Trust Claim Payout to Buyer:</span>
+<span class="font-mono font-semibold text-secondary">₦1,008,000.00</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>RAMLP Arbitration Surcharge (0.25%):</span>
+<span class="font-mono font-semibold text-on-surface">₦21,000.00</span>
+</div>
+<div class="pt-2 border-t border-outline-variant flex justify-between font-bold text-sm text-primary">
+<span>Net Escrow Vault Liquidation:</span>
+<span class="font-mono">₦5,040,000.00</span>
+</div>
+</div>
+</div>
+<!-- Arbitrator Legal Findings Note Field -->
+<div class="mt-4">
+<label class="block text-xs font-bold text-on-surface uppercase tracking-wider mb-1" for="arbitrator_notes">
+              Arbitrator Legal Finding &amp; Statutory Justification
+            </label>
+<textarea class="w-full text-xs font-mono rounded-lg border border-outline-variant bg-surface-container-lowest p-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary" id="arbitrator_notes" placeholder="Enter formal legal arbitration finding..." rows="3">Pursuant to RAMLP Rule 14(B) and Section 34 of the Arbitration and Mediation Act 2023, the seller complied with loading parameters (11.6% moisture certified by NIS #88219). Moisture variance (+2.2%) is attributable to vehicular tarpaulin tear during documented severe storm event at Ore-Sagamu. Carrier insurance policy #STP-CARGO-771 invoked to compensate buyer without penalizing cooperative.</textarea>
+</div>
+<!-- Statutory Compliance Badge -->
+<div class="mt-4 p-2.5 rounded bg-surface-container-low border border-outline-variant flex items-start gap-2 text-[10px] text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-base shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">policy</span>
+<p>
+<strong>Statutory Compliance:</strong> RAMLP Arbitration complies with Federal Ministry of Agriculture &amp; Food Security Guidelines and Arbitration and Mediation Act 2023. Rulings executed here are legally binding, final, and registered with the High Court Commercial Division.
+            </p>
+</div>
+<!-- 2FA & Execution Button -->
+<div class="mt-5 space-y-3">
+<div class="flex items-center gap-2">
+<div class="relative flex-1">
+<span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-base">pin</span>
+</span>
+<input class="w-full text-xs font-mono pl-8 pr-2.5 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary text-on-surface" placeholder="Enter Providus 2FA Token" type="password" value="894210"/>
+</div>
+<span class="text-[10px] font-mono font-semibold text-secondary shrink-0 bg-secondary-container/50 px-2 py-2 rounded border border-outline-variant">
+                TOKEN VALID (24s)
+              </span>
+</div>
+<button class="w-full py-3 px-4 bg-primary hover:bg-[#11522C] text-on-primary font-label-lg text-sm rounded-lg transition duration-150 ease-in-out font-bold flex items-center justify-center gap-2 shadow-md active:scale-[0.99]" type="button">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">enhanced_encryption</span>
+<span>Execute Binding Ruling &amp; Disburse Escrow Funds</span>
+</button>
+</div>
+</section>
+</div>
+</div>
+<!-- AUDIT TRAIL & LOGISTICS CHAIN OF CUSTODY TABLE -->
+<section class="mt-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-outline-variant">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history_edu</span>
+            Immutable Audit Trail &amp; Chain of Custody Log
+          </h3>
+<p class="text-xs text-on-surface-variant">SHA-256 cryptographic events stamped onto RAMLP ledger</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-mono text-on-surface-variant">Ledger Hash: 0x8a92...e41c</span>
+<button class="text-xs text-primary font-semibold hover:underline flex items-center gap-0.5">
+<span class="material-symbols-outlined text-sm">download</span> Export PDF Dossier
+          </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs text-on-surface">
+<thead class="bg-surface-container-low text-on-surface-variant uppercase text-[10px] font-bold border-y border-outline-variant">
+<tr>
+<th class="py-2.5 px-3">Timestamp (WAT)</th>
+<th class="py-2.5 px-3">Event Code</th>
+<th class="py-2.5 px-3">Initiator / Node</th>
+<th class="py-2.5 px-3">Action Description</th>
+<th class="py-2.5 px-3">Verification Telemetry</th>
+<th class="py-2.5 px-3 text-right">Escrow Impact</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-mono">
+<tr class="hover:bg-surface-container/50">
+<td class="py-2.5 px-3 text-on-surface-variant">11 Oct 2025 11:20</td>
+<td class="py-2.5 px-3 font-semibold text-primary">RAMLP-ESC-01</td>
+<td class="py-2.5 px-3">Providus Bank API Gateway</td>
+<td class="py-2.5 px-3 font-sans">Buyer deposited ₦8,400,000 into RAMLP Bonded Vault</td>
+<td class="py-2.5 px-3 text-secondary">NIBSS-TX-9901824-OK</td>
+<td class="py-2.5 px-3 text-right font-bold text-on-surface">+₦8,400,000 Locked</td>
+</tr>
+<tr class="hover:bg-surface-container/50">
+<td class="py-2.5 px-3 text-on-surface-variant">11 Oct 2025 14:15</td>
+<td class="py-2.5 px-3 font-semibold text-primary">RAMLP-LAB-01</td>
+<td class="py-2.5 px-3">Benue State Seed Lab</td>
+<td class="py-2.5 px-3 font-sans">Lot #792 sampled &amp; certified. Moisture 11.6%, Weight 40.2 MT</td>
+<td class="py-2.5 px-3 text-secondary">CAL-SPECTRO-441-PASSED</td>
+<td class="py-2.5 px-3 text-right font-bold text-secondary">-₦3,360,000 (M1 Paid)</td>
+</tr>
+<tr class="hover:bg-surface-container/50">
+<td class="py-2.5 px-3 text-on-surface-variant">12 Oct 2025 21:04</td>
+<td class="py-2.5 px-3 font-semibold text-tertiary">RAMLP-LOG-03</td>
+<td class="py-2.5 px-3">Tarkaa Telematics Unit #382</td>
+<td class="py-2.5 px-3 font-sans">Unscheduled stoppage flagged. Tarp damage logged by driver M. Danladi</td>
+<td class="py-2.5 px-3 text-tertiary">GPS: 6.7214° N, 4.8821° E</td>
+<td class="py-2.5 px-3 text-right text-on-surface-variant">No Balance Shift</td>
+</tr>
+<tr class="hover:bg-surface-container/50">
+<td class="py-2.5 px-3 text-on-surface-variant">14 Oct 2025 08:12</td>
+<td class="py-2.5 px-3 font-semibold text-error">RAMLP-DISP-01</td>
+<td class="py-2.5 px-3">Animal Care Mill Lab</td>
+<td class="py-2.5 px-3 font-sans">Gate-In moisture variance 13.8% recorded. Formal dispute lodged</td>
+<td class="py-2.5 px-3 text-error">PROBE-DEV-902-FAIL</td>
+<td class="py-2.5 px-3 text-right font-bold text-error">₦5,040,000 FROZEN</td>
+</tr>
+<tr class="bg-surface-container-low font-sans">
+<td class="py-2.5 px-3 text-on-surface-variant font-mono">14 Oct 2025 09:30</td>
+<td class="py-2.5 px-3 font-semibold text-primary font-mono">RAMLP-ARB-PENDING</td>
+<td class="py-2.5 px-3">Admin Console (Barr. Aliyu)</td>
+<td class="py-2.5 px-3 font-bold text-primary">Arbitrator Review Active — Option C Trigger Proposed</td>
+<td class="py-2.5 px-3 text-primary font-mono">STP-POL-771-MATCHED</td>
+<td class="py-2.5 px-3 text-right font-bold text-primary">Awaiting 2FA Stamp</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<!-- ==================== SHARED COMPONENT: Footer ==================== -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface border-t border-outline-variant dark:border-outline docked full-width bottom mt-12">
+<div class="w-full py-8 px-margin-desktop max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">AgroLink RAMLP</span>
+<span class="hidden sm:inline text-outline-variant">|</span>
+<p class="text-on-surface-variant dark:text-outline-variant font-body-sm text-body-sm max-w-xl">
+          © 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus &amp; NIBSS Settlement Secured.
+        </p>
+</div>
+<!-- Footer Institutional Links -->
+<nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed transition-colors duration-150" href="#">CBN Compliance</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed transition-colors duration-150" href="#">Dispute Framework</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed transition-colors duration-150" href="#">Weighbridge Protocol</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed transition-colors duration-150" href="#">Moisture Standards</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed transition-colors duration-150" href="#">Developer APIs</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed transition-colors duration-150" href="#">Privacy Notice</a>
+</nav>
+</div>
+</footer>
+</body></html>

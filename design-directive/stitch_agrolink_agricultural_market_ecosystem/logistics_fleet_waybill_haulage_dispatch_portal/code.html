@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RAMLP AgroLink - Logistics Fleet Waybill &amp; Haulage Dispatch Portal</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#98e9ab",
+            "inverse-surface": "#2a322a",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#a3f5b6",
+            "tertiary-fixed": "#ffdea7",
+            "secondary": "#306b19",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "error": "#ba1a1a",
+            "outline": "#707a6f",
+            "primary-container": "#176b3a",
+            "surface": "#f3fcef",
+            "secondary-container": "#b0f491",
+            "tertiary-container": "#7b5700",
+            "surface-dim": "#d4ddd0",
+            "on-surface-variant": "#404940",
+            "surface-container": "#e8f0e4",
+            "on-secondary-fixed": "#052100",
+            "on-tertiary": "#ffffff",
+            "primary": "#005128",
+            "surface-container-low": "#edf6e9",
+            "surface-container-highest": "#dce5d9",
+            "on-tertiary-fixed": "#271900",
+            "background": "#f3fcef",
+            "surface-tint": "#196c3b",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#95d878",
+            "on-background": "#161d16",
+            "surface-bright": "#f3fcef",
+            "tertiary": "#5d4100",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "outline-variant": "#bfc9bd",
+            "secondary-fixed": "#b0f491",
+            "on-primary-fixed": "#00210d",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#175200",
+            "inverse-on-surface": "#eaf3e7",
+            "on-surface": "#161d16",
+            "surface-container-high": "#e2ebde",
+            "on-primary-fixed-variant": "#005228",
+            "surface-variant": "#dce5d9",
+            "tertiary-fixed-dim": "#f8bd45",
+            "inverse-primary": "#88d89c",
+            "on-secondary-container": "#36721f",
+            "on-tertiary-container": "#ffd07c",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#88d89c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "label-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "currency-display": ["Manrope"],
+            "label-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "headline-md": ["Manrope"]
+          },
+          "fontSize": {
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-7xl mx-auto h-16">
+<!-- Brand Logo / Product Name -->
+<div class="flex items-center gap-8">
+<a class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-primary-container text-3xl" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span>AgroLink RAMLP</span>
+</a>
+<!-- Navigation Links -->
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Marketplace</a>
+<a class="border-b-2 border-primary dark:border-primary-fixed text-primary dark:text-primary-fixed font-label-md text-label-md pb-1 transition duration-150 ease-in-out active:scale-[0.99] font-semibold" href="#">Waybill &amp; Haulage</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Quality Lab</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Disputes &amp; Escrow</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Settlements</a>
+</nav>
+</div>
+<!-- Trailing Actions & Search -->
+<div class="flex items-center gap-3">
+<!-- Search bar on right -->
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg pl-9 pr-4 py-1.5 text-body-sm focus:border-primary-container focus:ring-0 w-56 transition-all" placeholder="Search Waybill / Truck ID..." type="text"/>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container transition-colors relative" title="Notifications" type="button">
+<span class="material-symbols-outlined text-xl">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface-container-lowest"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container transition-colors" title="Support Agent" type="button">
+<span class="material-symbols-outlined text-xl">support_agent</span>
+</button>
+<div class="h-6 w-px bg-outline-variant mx-1"></div>
+<button class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary text-primary font-label-sm hover:bg-surface-container transition-all" type="button">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span>CBN Verification</span>
+</button>
+<button class="bg-primary-container hover:bg-primary text-on-primary font-label-md px-4 py-2 rounded-lg shadow-sm hover:shadow transition-all duration-150 active:scale-[0.99]" type="button">
+          Launch Portal
+        </button>
+<!-- Officer Profile -->
+<div class="flex items-center gap-2 pl-2">
+<img class="w-8 h-8 rounded-full border border-primary-fixed object-cover" data-alt="High-resolution circular portrait of an official Nigerian agricultural haulage compliance officer wearing a smart institutional uniform and safety badge in a brightly lit modern logistics operations center with fleet monitor displays in the soft background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa_0wXF78J2aW8iggZfyCi16s11TyWKhY6_ue5WTeR9pPBm7620J53Cg7VGV88EuOnB-FGKRSZprFXzHahINFywP32Av8WJN6mXVkCaDkPuOCxdST56By3O3rL3ZqZ8IPknH_CsBWV8iUtommvByvzEbTaBosORIt6PI4dbN5K_qO0gQXQ28pE6HU3d0m4jHIe2RI_s5gKGGaDjIUUM89jTVFv1X3hGuHxJCsh45o"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar Anchor + Main Viewport Layout -->
+<div class="flex flex-1 max-w-7xl w-full mx-auto px-margin-desktop py-6 gap-6">
+<!-- Portal Drawer Sidebar (Shared Component Blueprint) -->
+<aside class="w-64 shrink-0 hidden xl:flex flex-col justify-between bg-surface-container-low border border-outline-variant rounded-xl p-4 shadow-none">
+<div class="space-y-6">
+<!-- Sidebar Brand/Header -->
+<div class="flex items-center gap-3 px-2">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">agriculture</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary">RAMLP Portal</div>
+<div class="font-body-sm text-xs text-outline font-medium">CBN &amp; NIBSS Regulated</div>
+</div>
+</div>
+<!-- Primary Tabs List -->
+<nav class="space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md rounded-lg px-4 py-3 hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container font-label-md rounded-lg px-4 py-3 font-semibold shadow-xs" href="#">
+<span class="material-symbols-outlined text-lg">local_shipping</span>
+<span>Waybills &amp; Dispatch</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md rounded-lg px-4 py-3 hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-lg">scale</span>
+<span>Weighbridge Telematics</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md rounded-lg px-4 py-3 hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-lg">science</span>
+<span>Moisture Lab Certs</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md rounded-lg px-4 py-3 hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-lg">gavel</span>
+<span>Escrow &amp; Disputes</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md rounded-lg px-4 py-3 hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-lg">account_balance</span>
+<span>Audit &amp; Settlement</span>
+</a>
+</nav>
+</div>
+<!-- Sidebar CTAs & Footers -->
+<div class="space-y-4 pt-4 border-t border-outline-variant">
+<button class="w-full bg-primary-container text-on-primary font-label-md py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-primary transition-all duration-150 shadow-sm active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span>Commit Escrow</span>
+</button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md rounded-lg px-4 py-2 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md rounded-lg px-4 py-2 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">headset_mic</span>
+<span>Support Desk</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Dynamic Content Workspace -->
+<main class="flex-1 flex flex-col gap-6 min-w-0">
+<!-- Hub Profile & Fleet Overview Ribbon (Bento Header) -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col lg:flex-row justify-between lg:items-center gap-6">
+<div>
+<div class="flex items-center gap-2 text-xs font-semibold text-primary uppercase tracking-wider mb-1">
+<span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            Carrier Logistics Hub
+          </div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface">Kobo360 RAMLP Dedicated Fleet Hub</h1>
+<p class="text-body-sm text-outline flex items-center gap-2 mt-0.5">
+<span class="material-symbols-outlined text-base">alt_route</span>
+            South-West Transit Corridor (Oyo - Ogun - Lagos) • Verified Tier-1 Fleet Operator
+          </p>
+</div>
+<!-- Fleet Metrics & Financial Counters -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-x divide-outline-variant/60">
+<div class="px-3 first:pl-0">
+<span class="font-label-sm text-outline block">Active Trucks</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">28</span>
+<span class="text-[11px] text-primary flex items-center gap-0.5 mt-0.5 font-medium">
+<span class="material-symbols-outlined text-xs">local_shipping</span> 100% Ready
+            </span>
+</div>
+<div class="px-3">
+<span class="font-label-sm text-outline block">In-Transit</span>
+<span class="font-headline-sm text-headline-sm font-bold text-secondary">14</span>
+<span class="text-[11px] text-outline flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-xs">navigation</span> En route
+            </span>
+</div>
+<div class="px-3">
+<span class="font-label-sm text-outline block">Farm Gate Load</span>
+<span class="font-headline-sm text-headline-sm font-bold text-tertiary-container">6</span>
+<span class="text-[11px] text-tertiary font-medium flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-xs">hourglass_top</span> Weighing in
+            </span>
+</div>
+<div class="px-3 bg-surface-container-low rounded-lg p-2 border border-outline-variant/40">
+<span class="font-label-sm text-primary font-bold block">Escrow Balance</span>
+<div class="font-headline-sm text-headline-sm font-extrabold text-primary-container">₦8,450,000</div>
+<div class="text-[10px] text-outline font-medium tracking-tight">₦3,980,000 locked in escrow</div>
+</div>
+</div>
+</section>
+<!-- Operational Filter Tabs Bar -->
+<section class="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant pb-3">
+<div class="flex flex-wrap items-center gap-2">
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-primary-container text-on-primary font-semibold shadow-xs">
+            All Haulage Orders (48)
+          </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container transition-colors">
+            Dispatched / In-Transit (14)
+          </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container transition-colors">
+            Farm Gate Loading (6)
+          </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container transition-colors">
+            Weighbridge Gate-In Pending (4)
+          </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container transition-colors">
+            Completed Deliveries (24)
+          </button>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-outline font-medium">Sync Rate: 12s ago</span>
+<button class="p-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors" title="Force Refresh">
+<span class="material-symbols-outlined text-sm">refresh</span>
+</button>
+</div>
+</section>
+<!-- BENTO GRID SECTION: Modules 1, 2, 3, 4 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- MODULE 1: Live Transit Corridor Map & Telematics (Left 7 Cols) -->
+<section class="lg:col-span-7 bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col justify-between">
+<div>
+<!-- Header with Route details & active badge -->
+<div class="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-outline-variant">
+<div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EDF7EE] text-[#14532D]">
+<span class="material-symbols-outlined text-xs mr-1">local_shipping</span> In Transit
+                  </span>
+<span class="font-label-sm font-semibold text-outline">Route AGL-COR-04 (185 km)</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1">
+                  Iseyin Bypass Hub <span class="text-outline">→</span> Ikeja Feed Processing Mill
+                </h2>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline block">Estimated Gate-in</span>
+<span class="font-headline-sm text-headline-sm font-bold text-primary">3 hrs 15 mins</span>
+</div>
+</div>
+<!-- Simulated Map Canvas Container -->
+<div class="relative w-full h-56 my-4 rounded-xl overflow-hidden border border-outline-variant bg-surface-container-high flex flex-col justify-between p-4" data-location="Oyo State" style="">
+<!-- Background Map Mockup Image -->
+<div class="absolute inset-0 z-0 opacity-40 mix-blend-multiply bg-cover bg-center" data-alt="Satellite GIS topographical road map of southwestern Nigerian agricultural transit corridor showing toll gates highways and aggregation centers under clear morning sky with vivid green topography and navigation waypoints." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCwtp3_Hxy3_IYaQ_p3AWtkxmCG6WrawYeFXlVu9kREZNOKVbSA6v_JOeeMArEst8hGIw0KJFHWql8VDnSa1k2w3_zN41dKEp9Hftp3N3vma1C6piOd2XzdoJhGYDsPl3MEHL-tixeIc9MzoqW_TB0cZweuVXCT9-Kyxx_YXgkWz30t8EZF0A0Xw5pu75eZBY5fP1H6SUg6ZPoZk0Mzwsoq8WKyFUN5AQqodqiGcBY')"></div>
+<!-- Top Telematics Pill Overlay -->
+<div class="relative z-10 flex items-center justify-between">
+<div class="bg-surface-container-lowest/95 backdrop-blur-sm border border-outline-variant px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-2 text-xs font-semibold text-on-surface">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
+                  GPS Live: Passing Ibadan Toll Gate • Speed 54 km/h
+                </div>
+<span class="bg-surface-container-lowest/90 text-outline px-2 py-1 rounded text-[11px] font-mono border border-outline-variant">
+                  GPS: 7.3775° N, 3.9470° E
+                </span>
+</div>
+<!-- Live Route Progress Graphic -->
+<div class="relative z-10 bg-surface-container-lowest/95 backdrop-blur-sm p-3 rounded-xl border border-outline-variant">
+<div class="flex justify-between text-xs font-medium text-outline mb-1">
+<span>Iseyin Aggregation (0 km)</span>
+<span class="text-primary font-bold">Ibadan Corridor (112 km)</span>
+<span>Ikeja Gate (185 km)</span>
+</div>
+<div class="w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="bg-primary-container h-full rounded-full" style="width: 62%;"></div>
+</div>
+</div>
+</div>
+<!-- Vehicle & Driver Card (Tactile micro-surfaces) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/60 flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-2xl">rv_hookup</span>
+</div>
+<div>
+<span class="text-xs font-semibold text-outline uppercase">Truck Asset Profile</span>
+<h3 class="font-label-lg font-bold text-on-surface">Mack 30-Tonne Flatbed</h3>
+<div class="text-body-sm text-outline font-mono">Reg: #TRK-LAG-488</div>
+<div class="mt-1 flex items-center gap-1 text-xs text-primary font-semibold">
+<span class="material-symbols-outlined text-xs">speed</span> Speed Governor Active (65km cap)
+                  </div>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/60 flex items-start gap-3">
+<img class="w-10 h-10 rounded-lg object-cover border border-outline-variant shrink-0" data-alt="Portrait of an experienced Nigerian commercial logistics heavy goods vehicle driver named Sikiru Alabi wearing a fluorescent high-visibility safety vest and smiling confidently in an aggregation yard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrfDSR8tw4pYQcqAIQ0AI-L5Ne6ea9DWFRvb2AOIlSsvZHbhSGkd1EwSmzVVSRhDTzM7FnwQN6RKOnv7WYVEyTSULU3yFqG0U80V_IDXM6sHm6Z5rxodyVLYUQd1WUsPZLp2WgfAcyujy2AYABcRo1fsjhZ-1dOqjQlo-KvWPBkPIDUsdT1yXCCQ5gmXKe9EfMR0856YNceaBmP0sy0F0JkgefqGTjOlQrMTibx50"/>
+<div>
+<span class="text-xs font-semibold text-outline uppercase">Assigned Carrier Driver</span>
+<h3 class="font-label-lg font-bold text-on-surface">Sikiru Alabi</h3>
+<div class="text-body-sm text-outline">+234 803 456 7890</div>
+<div class="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-[#E8F4EC] px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-xs">fingerprint</span> Biometric ID Verified
+                  </div>
+</div>
+</div>
+</div>
+<!-- Cargo Spec & Marine Insurance Footnotes -->
+<div class="mt-4 pt-3 border-t border-outline-variant/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-primary">grain</span>
+<span class="font-semibold text-on-surface">Cargo:</span>
+<span class="text-outline">45 Metric Tonnes Clean Yellow Feed Maize (Lot #AGL-TX-2025-0841)</span>
+</div>
+<div class="flex items-center gap-1 text-[#176B3A] bg-[#E8F4EC] px-2.5 py-1 rounded-full font-semibold">
+<span class="material-symbols-outlined text-sm">security</span>
+<span>Sovereign Trust PLC Policy #ST-AGR-9921 Active</span>
+</div>
+</div>
+</div>
+</section>
+<!-- MODULE 2: Electronic Waybill (e-Waybill) & Consignment Manifest Viewer (Right 5 Cols) -->
+<section class="lg:col-span-5 bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col justify-between">
+<div>
+<!-- Header & QR Verification badge -->
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant">
+<div>
+<span class="text-xs font-semibold uppercase text-outline">Consignment Document</span>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">e-Waybill #EWB-2025-0982</h2>
+</div>
+<div class="flex items-center gap-2 bg-surface-container px-2.5 py-1.5 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-xl text-primary" style="font-variation-settings: 'FILL' 1;">qr_code_2</span>
+<span class="text-[11px] font-mono font-bold text-on-surface">QR VERIFIED</span>
+</div>
+</div>
+<!-- Digital Weighbridge Slip Breakdown -->
+<div class="mt-4 bg-surface-container-low rounded-xl p-4 border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm font-bold text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-primary">scale</span>
+                  Farm Gate Weighbridge Departure Slip
+                </span>
+<span class="text-[11px] bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded font-mono font-semibold">
+                  CERTIFIED TARE
+                </span>
+</div>
+<div class="grid grid-cols-3 gap-2 text-center py-2 bg-surface-container-lowest rounded-lg border border-outline-variant/60">
+<div>
+<span class="text-[11px] text-outline block">Gross Weight</span>
+<span class="font-label-lg font-bold text-on-surface">45,280 kg</span>
+</div>
+<div class="border-x border-outline-variant/60">
+<span class="text-[11px] text-outline block">Tare Weight</span>
+<span class="font-label-lg font-bold text-on-surface">14,800 kg</span>
+</div>
+<div>
+<span class="text-[11px] text-primary font-semibold block">Net Certified</span>
+<span class="font-label-lg font-bold text-primary">30,480 kg</span>
+</div>
+</div>
+<!-- Gross Tolerance Threshold Policy -->
+<div class="mt-3 flex items-start gap-2 text-xs text-outline">
+<span class="material-symbols-outlined text-sm text-tertiary-container mt-0.5">info</span>
+<span>Destination gross tolerance threshold strictly calibrated at <strong>&lt; 1.0% variance</strong> (Max allowed shortage: 304.8 kg before automated penalty dispute lock).</span>
+</div>
+</div>
+<!-- Digital Seals Checklist -->
+<div class="mt-4">
+<div class="flex items-center justify-between text-xs font-semibold text-outline uppercase mb-2">
+<span>Tamper-Evident Seals (6 Locks Applied)</span>
+<span class="text-primary font-mono">STATUS: INTACT</span>
+</div>
+<div class="grid grid-cols-3 gap-1.5 font-mono text-[11px]">
+<div class="bg-surface-container px-2 py-1 rounded text-center border border-outline-variant text-on-surface font-semibold">#SEAL-9841A</div>
+<div class="bg-surface-container px-2 py-1 rounded text-center border border-outline-variant text-on-surface font-semibold">#SEAL-9841B</div>
+<div class="bg-surface-container px-2 py-1 rounded text-center border border-outline-variant text-on-surface font-semibold">#SEAL-9841C</div>
+<div class="bg-surface-container px-2 py-1 rounded text-center border border-outline-variant text-on-surface font-semibold">#SEAL-9841D</div>
+<div class="bg-surface-container px-2 py-1 rounded text-center border border-outline-variant text-on-surface font-semibold">#SEAL-9841E</div>
+<div class="bg-surface-container px-2 py-1 rounded text-center border border-outline-variant text-on-surface font-semibold">#SEAL-9841F</div>
+</div>
+</div>
+</div>
+<!-- Driver & Officer Action Button Stack -->
+<div class="space-y-2 mt-6 pt-4 border-t border-outline-variant">
+<button class="w-full h-11 bg-primary-container text-on-primary hover:bg-primary font-label-md rounded-lg flex items-center justify-center gap-2 transition duration-150 active:scale-[0.99] shadow-sm" type="button">
+<span class="material-symbols-outlined text-lg">cloud_upload</span>
+<span>Upload Gate-In Digital Slip</span>
+</button>
+<div class="grid grid-cols-2 gap-2">
+<button class="h-10 bg-surface-container-lowest border border-primary text-primary hover:bg-surface-container font-label-sm rounded-lg flex items-center justify-center gap-1 transition duration-150" type="button">
+<span class="material-symbols-outlined text-base">verified_user</span>
+<span>Trigger Destination Weighbridge Inspection</span>
+</button>
+<button class="h-10 bg-surface-container-lowest border border-error text-error hover:bg-error-container/30 font-label-sm rounded-lg flex items-center justify-center gap-1 transition duration-150" type="button">
+<span class="material-symbols-outlined text-base">report_problem</span>
+<span>Report Route Anomaly / Breakdown</span>
+</button>
+</div>
+</div>
+</section>
+<!-- MODULE 3: Milestone Settlement & Freight Remittance Tracker (Left 6 Cols) -->
+<section class="lg:col-span-6 bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant">
+<div>
+<span class="text-xs font-semibold uppercase text-outline">Smart Escrow Ledger</span>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Milestone Settlement Tracker</h2>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline block">Total Agreed Freight Contract</span>
+<span class="font-currency-display text-2xl font-black text-primary-container">₦385,000</span>
+</div>
+</div>
+<!-- Milestone Stages Flow -->
+<div class="space-y-4 mt-5">
+<!-- Milestone 1 -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant relative overflow-hidden">
+<div class="absolute top-0 left-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center text-xs font-bold">1</span>
+<h4 class="font-label-lg font-bold text-on-surface">30% Loading &amp; Departure Advance</h4>
+</div>
+<p class="text-body-sm text-outline pl-7">
+                      Initial disbursement cleared upon farm gate dispatch &amp; digital weighbridge slip upload.
+                    </p>
+<div class="pl-7 pt-1 flex items-center gap-2 text-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                      PAID into Providus Carrier Account (Ref #PRV-AGL-882109)
+                    </div>
+</div>
+<div class="text-right">
+<span class="font-currency-display text-xl font-bold text-on-surface">₦115,500</span>
+<span class="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-bold bg-[#E8F4EC] text-[#176B3A]">
+                      SETTLED
+                    </span>
+</div>
+</div>
+</div>
+<!-- Milestone 2 -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant relative overflow-hidden">
+<div class="absolute top-0 left-0 bottom-0 w-1.5 bg-tertiary-fixed-dim"></div>
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded-full bg-tertiary-container text-on-tertiary flex items-center justify-center text-xs font-bold">2</span>
+<h4 class="font-label-lg font-bold text-on-surface">70% Gate-In &amp; Net Weight Reconciliation</h4>
+</div>
+<p class="text-body-sm text-outline pl-7">
+                      Final payment auto-released following mill gate destination weighbridge stamp and tolerance sign-off.
+                    </p>
+<div class="pl-7 pt-1 flex items-center gap-2 text-xs font-semibold text-tertiary">
+<span class="material-symbols-outlined text-sm">lock_clock</span>
+                      Locked in CBN Escrow Vault, Auto-releases upon Weighbridge Sign-Off
+                    </div>
+</div>
+<div class="text-right">
+<span class="font-currency-display text-xl font-bold text-on-surface">₦269,500</span>
+<span class="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-bold bg-[#FEF6E7] text-[#9A6700]">
+                      IN ESCROW
+                    </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Payout Assurance Badge -->
+<div class="mt-4 pt-3 border-t border-outline-variant flex items-center justify-between text-xs text-outline">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">account_balance</span>
+              Guaranteed by Providus Bank NIBSS Settlement Gateway
+            </span>
+<span class="font-mono text-[11px]">Instant ACH API v3.2</span>
+</div>
+</section>
+<!-- MODULE 4: Smart Backhaul Request Matching (Right 6 Cols) -->
+<section class="lg:col-span-6 bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant">
+<div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold uppercase text-primary">Zero-Waste Fleet Optimization</span>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary-container text-on-secondary-container">2 Loads Matched</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Available Haulage Backhaul Requests</h2>
+</div>
+<button class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+<span>View Corridor Board</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<p class="text-body-sm text-outline mt-2">
+              Eliminate empty return legs after completing delivery at Ikeja Feed Processing Mill. Instant binding contracts with pre-funded escrow.
+            </p>
+<!-- Backhaul Opportunities List -->
+<div class="space-y-3 mt-4">
+<!-- Load 1 -->
+<div class="bg-surface-container-low hover:bg-surface-container p-4 rounded-xl border border-outline-variant transition-all">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-lg font-bold text-on-surface">Ikeja, Lagos → Ibadan / Oyo</span>
+<span class="text-xs text-outline font-medium">(130 km return)</span>
+</div>
+<div class="text-body-sm text-outline flex items-center gap-3 mt-1">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">inventory_2</span> 25 MT Bagged Fertilizer</span>
+<span>•</span>
+<span>Loading: Tomorrow 08:00 AM</span>
+</div>
+</div>
+<div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
+<span class="font-currency-display text-xl font-extrabold text-primary">₦240,000</span>
+<button class="px-4 py-2 bg-[#F4B942] hover:bg-[#e0a634] text-[#202820] font-label-md font-semibold rounded-lg shadow-xs transition duration-150 active:scale-[0.98] flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span>Accept Backhaul</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Load 2 -->
+<div class="bg-surface-container-low hover:bg-surface-container p-4 rounded-xl border border-outline-variant transition-all">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-lg font-bold text-on-surface">Sagamu, Ogun → Gboko, Benue</span>
+<span class="text-xs text-outline font-medium">(640 km outbound)</span>
+</div>
+<div class="text-body-sm text-outline flex items-center gap-3 mt-1">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">inventory_2</span> 30 MT Agricultural Lime</span>
+<span>•</span>
+<span>Loading: Immediate</span>
+</div>
+</div>
+<div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
+<span class="font-currency-display text-xl font-extrabold text-primary">₦420,000</span>
+<button class="px-4 py-2 bg-[#F4B942] hover:bg-[#e0a634] text-[#202820] font-label-md font-semibold rounded-lg shadow-xs transition duration-150 active:scale-[0.98] flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span>Accept Backhaul</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Metric Indicator -->
+<div class="mt-4 pt-3 border-t border-outline-variant flex items-center justify-between text-xs text-outline">
+<span class="flex items-center gap-1 text-primary font-medium">
+<span class="material-symbols-outlined text-sm">eco</span>
+              Estimated 32% Fleet Carbon &amp; Empty-Km Efficiency Gain
+            </span>
+<span>Pre-funded Escrow 100%</span>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- Institutional Footer (Shared Component) -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface border-t border-outline-variant dark:border-outline docked full-width bottom mt-auto">
+<div class="w-full py-8 px-margin-desktop max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed flex items-center gap-2">
+<span class="material-symbols-outlined">shield_with_heart</span>
+          RAMLP AgroLink
+        </span>
+<span class="text-on-surface-variant dark:text-outline-variant font-body-sm text-body-sm max-w-xl">
+          © 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus &amp; NIBSS Settlement Secured.
+        </span>
+</div>
+<!-- Links from JSON -->
+<nav class="flex flex-wrap justify-center gap-4">
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">CBN Compliance</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Dispute Framework</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Weighbridge Protocol</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Moisture Standards</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Developer APIs</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Privacy Notice</a>
+</nav>
+</div>
+</footer>
+</body></html>

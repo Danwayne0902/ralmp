@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroLink - Offline Rural USSD &amp; SMS Gateway</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=VT323&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-low": "#edf6e9",
+            "inverse-primary": "#88d89c",
+            "outline-variant": "#bfc9bd",
+            "on-tertiary": "#ffffff",
+            "surface-container-high": "#e2ebde",
+            "outline": "#707a6f",
+            "on-primary-fixed-variant": "#005228",
+            "on-secondary-container": "#36721f",
+            "secondary": "#306b19",
+            "background": "#f3fcef",
+            "tertiary-container": "#7b5700",
+            "on-error-container": "#93000a",
+            "secondary-container": "#b0f491",
+            "primary-fixed-dim": "#88d89c",
+            "on-background": "#161d16",
+            "error": "#ba1a1a",
+            "tertiary-fixed": "#ffdea7",
+            "surface-variant": "#dce5d9",
+            "on-secondary": "#ffffff",
+            "secondary-fixed": "#b0f491",
+            "primary-container": "#176b3a",
+            "tertiary-fixed-dim": "#f8bd45",
+            "on-primary": "#ffffff",
+            "on-error": "#ffffff",
+            "inverse-on-surface": "#eaf3e7",
+            "inverse-surface": "#2a322a",
+            "on-surface-variant": "#404940",
+            "on-tertiary-fixed": "#271900",
+            "surface-dim": "#d4ddd0",
+            "on-tertiary-container": "#ffd07c",
+            "surface-container-highest": "#dce5d9",
+            "surface": "#f3fcef",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "on-primary-container": "#98e9ab",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed": "#052100",
+            "on-surface": "#161d16",
+            "primary-fixed": "#a3f5b6",
+            "surface-bright": "#f3fcef",
+            "surface-container": "#e8f0e4",
+            "primary": "#005128",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-fixed-variant": "#175200",
+            "tertiary": "#5d4100",
+            "on-primary-fixed": "#00210d",
+            "surface-tint": "#196c3b",
+            "secondary-fixed-dim": "#95d878"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "margin-desktop": "2.5rem"
+          },
+          "fontFamily": {
+            "currency-display": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "label-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "pixel": ["VT323", "monospace"],
+            "mono-code": ["Space Mono", "monospace"]
+          },
+          "fontSize": {
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .lcd-screen {
+      background-color: #8da376;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45);
+      border: 3px solid #3d4a35;
+    }
+    .nokia-chassis {
+      background: radial-gradient(circle at 30% 20%, #3a423a 0%, #1f251f 100%);
+      box-shadow: 0 15px 35px rgba(22, 29, 22, 0.25), 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+    .phone-btn {
+      background: linear-gradient(180deg, #444d44 0%, #262c26 100%);
+      box-shadow: 0 3px 0 #121612, 0 4px 6px rgba(0,0,0,0.4);
+    }
+    .phone-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #121612;
+    }
+    /* Custom Scrollbar for Session logs */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #e2ebde;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #176b3a;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TOP APP BAR (Shared Component Anchor) -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface dark:bg-inverse-surface border-b border-outline-variant shadow-sm h-16">
+<div class="max-w-7xl mx-auto h-full px-4 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="agriculture">agriculture</span>
+<div class="flex items-baseline space-x-2">
+<span class="font-headline-sm text-headline-sm font-bold text-primary tracking-tight">AgroLink</span>
+<span class="hidden sm:inline-block px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold uppercase tracking-wider">
+            Rural Mesh GSM Gateway
+          </span>
+</div>
+</div>
+<!-- Center Operational Connectivity Indicator -->
+<div class="hidden lg:flex items-center space-x-4 bg-surface-container-lowest px-3 py-1.5 rounded-full border border-outline-variant">
+<div class="flex items-center space-x-1.5">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">Base Station: Kano-Dawanau Hub</span>
+</div>
+<span class="text-outline-variant text-xs">•</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-base" data-icon="cell_tower">cell_tower</span>
+          MTN / Airtel 34744
+        </span>
+<span class="text-outline-variant text-xs">•</span>
+<span class="font-label-sm text-label-sm text-primary font-bold">USSD Relay: Online (99.8%)</span>
+</div>
+<!-- Action Trailing Cluster -->
+<div class="flex items-center space-x-2">
+<button class="flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-surface-container-low transition-colors active:scale-95 text-xs font-semibold" onclick="toggleGlobalSimulatorMode()">
+<span class="material-symbols-outlined text-base" data-icon="swap_horiz">swap_horiz</span>
+<span class="hidden md:inline">Switch Preview Mode</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface active:scale-95 transition-transform" onclick="printSummarySheet()" title="Print/Export Dispatch Log">
+<span class="material-symbols-outlined text-xl" data-icon="print">print</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS CONTAINER -->
+<main class="flex-grow pt-20 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+<!-- SUB-NAV / VIEW SWITCHER & RURAL OVERVIEW -->
+<div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div>
+<div class="flex items-center space-x-2">
+<h1 class="font-headline-md text-headline-md font-bold text-on-background">Offline Rural Gateway</h1>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="wifi_off">wifi_off</span>
+            Zero Data / 2G GSM
+          </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Interactive telecom simulator demonstrating real-time USSD sessions (*347*44#) and asynchronous SMS push notifications for rural agro-producers.
+        </p>
+</div>
+<!-- Mode Switch Pills -->
+<div class="inline-flex p-1 bg-surface-container rounded-xl border border-outline-variant self-start md:self-auto">
+<button class="flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all bg-primary-container text-on-primary shadow-sm" id="tab-btn-ussd" onclick="switchMainTab('ussd')">
+<span class="material-symbols-outlined text-sm" data-icon="phone_android">phone_android</span>
+<span>USSD Feature Phone</span>
+</button>
+<button class="flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-primary" id="tab-btn-sms" onclick="switchMainTab('sms')">
+<span class="material-symbols-outlined text-sm" data-icon="sms">sms</span>
+<span>SMS Carrier Feed (34744)</span>
+<span class="w-2 h-2 rounded-full bg-error ml-1"></span>
+</button>
+<button class="hidden xl:flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-primary" id="tab-btn-both" onclick="switchMainTab('both')">
+<span class="material-symbols-outlined text-sm" data-icon="grid_view">grid_view</span>
+<span>Split Dual View</span>
+</button>
+</div>
+</div>
+<!-- AUDIO IVR TOLL-FREE BANNER -->
+<div class="mb-6 rounded-xl bg-gradient-to-r from-surface-container-lowest via-surface-container-low to-surface-container border border-outline-variant p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-primary-fixed/30 pointer-events-none blur-xl"></div>
+<div class="flex items-center space-x-4 z-10">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-2xl" data-icon="record_voice_over">record_voice_over</span>
+</div>
+<div>
+<div class="flex items-center space-x-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Toll-Free Voice IVR Hotline: 0800-AGROLINK</h3>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold uppercase tracking-wider">Toll-Free (0800 247 6546)</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Low-literacy and vernacular audio assistance available 24/7 in <strong class="text-on-surface">Hausa</strong>, <strong class="text-on-surface">Yorùbá</strong>, <strong class="text-on-surface">Igbo</strong>, and <strong class="text-on-surface">Nigerian Pidgin</strong>.
+          </p>
+</div>
+</div>
+<div class="flex items-center space-x-3 w-full md:w-auto z-10 shrink-0">
+<button class="flex-1 md:flex-initial flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg bg-surface-container-lowest border-2 border-primary text-primary font-label-md text-label-md hover:bg-surface-container transition-colors active:scale-95 shadow-sm" onclick="simulateAudioIVR()">
+<span class="material-symbols-outlined text-base" data-icon="volume_up">volume_up</span>
+<span>Listen to IVR Voice Prompt</span>
+</button>
+<a class="flex items-center justify-center p-2.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary transition-colors active:scale-95" href="tel:08002476546" title="Initiate Simulated Call">
+<span class="material-symbols-outlined text-lg" data-icon="call">call</span>
+</a>
+</div>
+</div>
+<!-- MAIN BENTO GRID / WORKFLOW DECK -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" id="unified-layout-grid">
+<!-- LEFT COLUMN: AUTHENTIC FEATURE PHONE USSD SIMULATOR (5 COLUMNS ON DESKTOP) -->
+<section class="lg:col-span-5 flex flex-col items-center" id="pane-ussd-phone">
+<div class="w-full bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 mb-4 shadow-sm flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<span class="material-symbols-outlined text-primary" data-icon="dialpad">dialpad</span>
+<div>
+<h2 class="font-label-lg text-label-lg font-bold text-on-surface">KaiOS / GSM USSD Engine</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Live Gateway Session: <code class="bg-surface-container px-1 rounded text-primary font-mono-code font-bold">*347*44#</code></p>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container text-xs font-mono-code font-bold">2G / GPRS</span>
+</div>
+<!-- AUTHENTIC FEATURE PHONE BODY -->
+<div class="nokia-chassis w-full max-w-[340px] rounded-[44px] p-5 border-4 border-[#181d18] flex flex-col items-center relative select-none">
+<!-- Speaker Earpiece Grille -->
+<div class="w-16 h-1.5 bg-[#121612] rounded-full mb-3 shadow-inner"></div>
+<!-- Phone Brand Badge -->
+<div class="text-[11px] font-bold tracking-widest text-[#889988] uppercase mb-2">AgroLink • KAI-3310</div>
+<!-- THE RETRO LCD SCREEN -->
+<div class="lcd-screen w-full rounded-lg p-3 text-[#121a0f] font-mono-code relative flex flex-col justify-between h-[280px]">
+<!-- Status Header Bar -->
+<div class="flex items-center justify-between text-xs border-b border-[#3d4a35]/40 pb-1 mb-1 font-bold">
+<span class="flex items-center gap-0.5">
+<span class="text-[10px]">■■■■</span>
+<span class="text-[10px]">MTN-NG</span>
+</span>
+<span class="text-[11px]" id="phone-clock">14:32</span>
+<span class="flex items-center">
+<span class="text-[10px]">BAT [98%]</span>
+</span>
+</div>
+<!-- USSD Interactive Content Screen -->
+<div class="flex-grow flex flex-col justify-between py-1 text-xs leading-snug overflow-y-auto" id="ussd-screen-content">
+<div>
+<p class="font-bold underline mb-1">-- AGROLINK ESCROW V4.2 --</p>
+<p>1. Check Escrow Balance</p>
+<p>2. Authorize Haulier Gate-Pass</p>
+<p>3. Review Off-taker Bid (Grand Cereals)</p>
+<p>4. Produce Lab Quality (Maize Lot)</p>
+<p>5. Dial AgroVoice Voice IVR</p>
+</div>
+<div class="mt-2 pt-1 border-t border-[#3d4a35]/30">
+<div class="flex items-center justify-between text-[11px]">
+<span>Reply option [1-5]:</span>
+<span class="font-bold bg-[#7b9165] px-1.5 py-0.5 rounded min-w-[20px] text-center border border-[#3d4a35]" id="ussd-input-display"></span>
+</div>
+</div>
+</div>
+<!-- Softkey Actions Footbar -->
+<div class="flex items-center justify-between text-[11px] font-bold border-t border-[#3d4a35]/40 pt-1 mt-1">
+<span class="uppercase" id="softkey-left">SELECT</span>
+<span class="text-[9px] text-[#2c3626] font-normal">● SESSION ACTIVE ●</span>
+<span class="uppercase" id="softkey-right">CANCEL</span>
+</div>
+</div>
+<!-- D-PAD & FUNCTION KEYS CLUSTER -->
+<div class="w-full mt-4 grid grid-cols-3 gap-2 px-1">
+<button class="phone-btn text-white text-xs font-semibold py-2 rounded-lg flex flex-col items-center justify-center" onclick="phoneSoftkeyLeft()">
+<span class="w-6 h-0.5 bg-[#8da376] mb-1"></span>
+<span class="text-[10px]">MENU / SEND</span>
+</button>
+<div class="flex items-center justify-center">
+<button class="w-10 h-10 rounded-full border-2 border-[#176b3a] bg-[#2a322a] flex items-center justify-center text-primary-fixed shadow-md active:scale-90 transition-transform" onclick="phoneNavClick()">
+<span class="material-symbols-outlined text-lg" data-icon="keyboard_arrow_up">keyboard_arrow_up</span>
+</button>
+</div>
+<button class="phone-btn text-error-container text-xs font-semibold py-2 rounded-lg flex flex-col items-center justify-center" onclick="phoneSoftkeyRight()">
+<span class="w-6 h-0.5 bg-[#ba1a1a] mb-1"></span>
+<span class="text-[10px]">END / BACK</span>
+</button>
+</div>
+<!-- NUMERIC KEYPAD -->
+<div class="w-full mt-3 grid grid-cols-3 gap-2 px-1 text-white">
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('1')">
+<span class="font-bold text-sm leading-none">1</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">. @</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('2')">
+<span class="font-bold text-sm leading-none">2</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">A B C</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('3')">
+<span class="font-bold text-sm leading-none">3</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">D E F</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('4')">
+<span class="font-bold text-sm leading-none">4</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">G H I</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('5')">
+<span class="font-bold text-sm leading-none">5</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">J K L</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('6')">
+<span class="font-bold text-sm leading-none">6</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">M N O</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('7')">
+<span class="font-bold text-sm leading-none">7</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">P Q R S</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('8')">
+<span class="font-bold text-sm leading-none">8</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">T U V</span>
+</button>
+<button class="phone-btn py-2.5 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('9')">
+<span class="font-bold text-sm leading-none">9</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">W X Y Z</span>
+</button>
+<button class="phone-btn py-2 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('*')">
+<span class="font-bold text-sm leading-none">*</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">USSD</span>
+</button>
+<button class="phone-btn py-2 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('0')">
+<span class="font-bold text-sm leading-none">0</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">+ SPACE</span>
+</button>
+<button class="phone-btn py-2 rounded-lg flex flex-col items-center justify-center" onclick="phoneTypeKey('#')">
+<span class="font-bold text-sm leading-none">#</span>
+<span class="text-[8px] text-[#889988] leading-none mt-0.5">SEND</span>
+</button>
+</div>
+<div class="text-[10px] text-outline mt-3 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim"></span>
+            Tap keys or use on-screen presets below
+          </div>
+</div>
+<!-- Real-time Session Status Output Box -->
+<div class="w-full mt-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm text-xs">
+<div class="flex items-center justify-between pb-2 border-b border-surface-container-high">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Active Session Log</span>
+<span class="font-mono-code text-on-surface-variant" id="session-timer">Session TTL: 48s</span>
+</div>
+<div class="mt-2 space-y-1 font-mono-code text-[11px] text-on-surface-variant max-h-24 overflow-y-auto" id="ussd-audit-log">
+<div class="text-primary font-medium">&gt; Connected to Gateway 34744 [Session 0x7FA91]</div>
+<div>&gt; Root Menu Prompt served via Dawanau Base node.</div>
+</div>
+</div>
+</section>
+<!-- RIGHT COLUMN: SMS PUSH NOTIFICATION FEED & LEDGERS (7 COLUMNS ON DESKTOP) -->
+<section class="lg:col-span-7 flex flex-col space-y-6" id="pane-sms-feed">
+<!-- Feed Controller & Shortcode Badge Deck -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-surface-container">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl" data-icon="textsms">textsms</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Carrier SMS Notification Stream</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Delivered via Telco Aggregator Shortcodes: <strong>34744</strong> &amp; <strong>AGROLINK-CBN</strong></p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-low border border-primary text-primary hover:bg-surface-container font-label-md text-label-md flex items-center space-x-1.5 transition-colors active:scale-95" onclick="triggerSimulatedSMS()">
+<span class="material-symbols-outlined text-base" data-icon="sync">sync</span>
+<span>Push Test SMS</span>
+</button>
+</div>
+</div>
+<!-- Quick Code Cards (Horizontal Ribbon) -->
+<div class="pt-4">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm font-bold text-on-surface uppercase tracking-wider">Dial Quick-Action Strings</span>
+<span class="text-xs text-primary font-semibold">Offline Accessible</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+<button class="text-left p-2.5 rounded-xl bg-surface hover:bg-surface-container transition-colors border border-outline-variant group" onclick="quickDialUSSD('*347*44*1#')">
+<span class="block font-mono-code font-bold text-xs text-primary group-hover:underline">*347*44*1#</span>
+<span class="text-[11px] text-on-surface-variant font-medium">Check Escrow Vault</span>
+</button>
+<button class="text-left p-2.5 rounded-xl bg-surface hover:bg-surface-container transition-colors border border-outline-variant group" onclick="quickDialUSSD('*347*44*2#')">
+<span class="block font-mono-code font-bold text-xs text-primary group-hover:underline">*347*44*2#</span>
+<span class="text-[11px] text-on-surface-variant font-medium">Authorize Haulage Pass</span>
+</button>
+<button class="text-left p-2.5 rounded-xl bg-surface hover:bg-surface-container transition-colors border border-outline-variant group" onclick="quickDialUSSD('*347*44*3#')">
+<span class="block font-mono-code font-bold text-xs text-primary group-hover:underline">*347*44*3#</span>
+<span class="text-[11px] text-on-surface-variant font-medium">Vernacular IVR Agent</span>
+</button>
+</div>
+</div>
+</div>
+<!-- SMS MESSAGE FEED (CHRONOLOGICAL CARDS) -->
+<div class="space-y-4" id="sms-stream">
+<!-- SMS 1: MILESTONE ESCROW PAYOUT ALERT -->
+<article class="bg-surface-container-lowest border-l-4 border-l-primary border-y border-r border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative">
+<div class="flex items-start justify-between gap-3 mb-2">
+<div class="flex items-center space-x-2">
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-mono-code text-xs font-bold">AGROLINK-CBN</span>
+<span class="text-xs text-on-surface-variant">via MTN Nigeria • SIM 1</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline font-medium">Today 13:42</span>
+</div>
+<!-- SMS Content Body -->
+<div class="bg-surface-container-low rounded-lg p-3.5 border border-outline-variant/60 font-mono-code text-xs sm:text-sm text-on-surface leading-relaxed">
+<span class="font-bold text-primary block mb-1">CREDIT ALERT: Providus Escrow Vault Disbursed</span>
+              Acct: 5409****88 (Musa Agro Enterprises).<br/>
+              AMT: <strong class="text-primary font-extrabold text-base">₦6,216,000.00</strong><br/>
+              DESC: Settlement 45 MT Yellow Maize (Lot #MZ-KAN-088) post-lab clearance.<br/>
+              NIBSS REF: <span class="bg-surface-container px-1 py-0.5 rounded text-on-surface">NGN-NIBSS-993847291-AGRO</span><br/>
+              TAX NOTE: 0% Withholding Tax (Agricultural Primary Produce Exemption Act 2020).<br/>
+              Avail Bal: ₦7,942,500.00
+            </div>
+<!-- Event Ledger Footprint -->
+<div class="mt-3 flex flex-wrap items-center justify-between text-xs pt-2 border-t border-surface-container gap-2">
+<div class="flex items-center space-x-2 text-on-surface-variant">
+<span class="inline-flex items-center text-primary font-semibold">
+<span class="material-symbols-outlined text-sm mr-1" data-icon="verified">verified</span>
+                  NIBSS Instant Payment Confirmed
+                </span>
+</div>
+<button class="text-primary hover:underline font-semibold flex items-center gap-1" onclick="forwardSMSPrompt('Payout ₦6,216,000 Lot MZ-KAN-088')">
+<span class="material-symbols-outlined text-sm" data-icon="forward_to_inbox">forward_to_inbox</span>
+                Dispatch Receipt to Aggregator
+              </button>
+</div>
+</article>
+<!-- SMS 2: ESCROW LOCK CONFIRMATION & COUNTER-OFFER -->
+<article class="bg-surface-container-lowest border-l-4 border-l-tertiary-fixed-dim border-y border-r border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative">
+<div class="flex items-start justify-between gap-3 mb-2">
+<div class="flex items-center space-x-2">
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-mono-code text-xs font-bold">34744</span>
+<span class="text-xs text-on-surface-variant">Priority Deal Lock</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline font-medium">Today 11:15</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3.5 border border-outline-variant/60 font-mono-code text-xs sm:text-sm text-on-surface leading-relaxed">
+<span class="font-bold text-tertiary block mb-1">ESCROW FUNDED: Deal #YM-EXP-402</span>
+              Buyer: <span class="font-bold">Grand Cereals &amp; Feeds PLC</span> locked <strong class="text-on-surface font-extrabold text-base">₦1,750,000.00</strong> in Providus vault for 500 tubers White Export Yam.<br/><br/>
+              Assigned Haulier: Sikuru Alabi (Bedford 8-Ton, Plate: <span class="bg-surface-container px-1 py-0.5 rounded font-bold text-primary">TRK-LAG-488</span>).<br/><br/>
+              Action Required:<br/>
+<strong class="text-primary">Reply 1</strong> to Accept Haulier &amp; Issue Pickup Gate-Pass.<br/>
+<strong class="text-error">Reply 2</strong> to Reject Truck or Request Warehouse Re-inspection.
+            </div>
+<!-- Interactive Reply Simulation Action Bar -->
+<div class="mt-3 bg-surface-container p-2.5 rounded-lg flex flex-wrap items-center justify-between gap-2">
+<span class="text-xs font-semibold text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="quickreply">quickreply</span>
+                Quick SMS Response:
+              </span>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-1 rounded bg-primary-container text-on-primary text-xs font-bold active:scale-95 transition-transform shadow-xs" onclick="simulateSMSReply('1 (Accept Haulier)')">
+                  Send '1' (Accept TRK-LAG-488)
+                </button>
+<button class="px-3 py-1 rounded bg-surface-container-lowest border border-outline-variant text-error text-xs font-bold active:scale-95 transition-transform" onclick="simulateSMSReply('2 (Reject Truck)')">
+                  Send '2' (Reject)
+                </button>
+</div>
+</div>
+</article>
+<!-- SMS 3: MOISTURE LAB QUALITY CLEARANCE ALERT -->
+<article class="bg-surface-container-lowest border-l-4 border-l-secondary border-y border-r border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative">
+<div class="flex items-start justify-between gap-3 mb-2">
+<div class="flex items-center space-x-2">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-mono-code text-xs font-bold">34744-LAB</span>
+<span class="text-xs text-on-surface-variant">AgroHub Weighbridge Lab</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline font-medium">Yesterday 16:50</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3.5 border border-outline-variant/60 font-mono-code text-xs sm:text-sm text-on-surface leading-relaxed">
+<span class="font-bold text-secondary block mb-1">LAB INSPECTION PASSED: Grade A Certified</span>
+              Lot: MZ-KAN-088 (Yellow Maize) at Ikeja Consolidation Hub weighbridge.<br/>
+              Moisture: <strong class="text-secondary font-bold">11.8%</strong> (Max Threshold: 13.0%).<br/>
+              Foreign Matter: 0.6% | Aflatoxin: &lt;4 ppb (Export Premium Compliant).<br/>
+              Status: Grain certified ready for off-taker intake silo discharge.
+            </div>
+<div class="mt-3 flex items-center justify-between text-xs pt-2 border-t border-surface-container">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="science">science</span>
+                Certified by SGS / NAFDAC Field Inspector #882
+              </span>
+<span class="font-mono-code text-primary font-bold">Grade A Quality Locked</span>
+</div>
+</article>
+</div>
+<!-- ESCROW TRANSACTION BREAKDOWN SHEET (Agro-Specific) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 shadow-sm">
+<div class="flex items-center justify-between pb-3 border-b border-surface-container">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Providus Bank Escrow Vault Ledger</h3>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold">Secured &amp; Bonded</span>
+</div>
+<div class="py-4 space-y-2.5 text-xs sm:text-sm font-body-sm">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Base Commodity Gross Value (45 MT Maize @ ₦142,000/MT)</span>
+<span class="font-mono-code font-semibold text-on-surface">₦6,390,000.00</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Platform Escrow Security &amp; Insurance (0.75%)</span>
+<span class="font-mono-code font-semibold text-error">- ₦47,925.00</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Transit Haulage Escrow Deductible (Paid to Haulier)</span>
+<span class="font-mono-code font-semibold text-error">- ₦126,075.00</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Federal Agricultural Produce Tax Exemption</span>
+<span class="font-mono-code font-semibold text-secondary">0.00 (EXEMPT)</span>
+</div>
+<div class="pt-3 border-t border-outline-variant/60 flex justify-between items-baseline">
+<div>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface block">Net Farmer Payout</span>
+<span class="text-xs text-outline">Credited via NIBSS Direct RTGS</span>
+</div>
+<span class="font-currency-display text-currency-display text-primary">₦6,216,000.00</span>
+</div>
+</div>
+</div>
+<!-- EXPORT AND PRINT SESSION SUMMARY COMPONENT -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-surface-container border border-outline-variant">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary" data-icon="history_edu">history_edu</span>
+<span class="text-xs text-on-surface font-medium">Export physical transaction audit slip for rural cooperative records</span>
+</div>
+<div class="flex items-center space-x-2 w-full sm:w-auto">
+<button class="flex-1 sm:flex-initial px-4 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface text-xs font-bold active:scale-95 transition-transform flex items-center justify-center space-x-1.5" onclick="downloadAuditLog()">
+<span class="material-symbols-outlined text-base" data-icon="download">download</span>
+<span>Save Log (.txt)</span>
+</button>
+<button class="flex-1 sm:flex-initial px-4 py-2 rounded-lg bg-primary-container text-on-primary hover:bg-primary text-xs font-bold active:scale-95 transition-transform flex items-center justify-center space-x-1.5 shadow-sm" onclick="printSummarySheet()">
+<span class="material-symbols-outlined text-base" data-icon="print">print</span>
+<span>Print Farmer Slip</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BOTTOM NAV BAR (Shared Component Anchor - Semantic Destination: Orders / Transactions) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-2 bg-surface-container-lowest border-t border-outline-variant shadow-md">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="storefront">storefront</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<!-- Products -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-sm text-label-sm">Products</span>
+</a>
+<!-- Orders (Active: maps to Offline SMS & Escrow settlement feed) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary rounded-xl px-3 py-1.5 font-semibold active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="receipt_long" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+<span class="font-label-sm text-label-sm">Orders</span>
+</a>
+<!-- Prices -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="trending_up">trending_up</span>
+<span class="font-label-sm text-label-sm">Prices</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<!-- MODAL / TOAST SIMULATION FOR AUDIO IVR -->
+<div class="fixed inset-0 bg-inverse-surface/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4" id="ivr-modal">
+<div class="bg-surface-container-lowest max-w-md w-full rounded-2xl p-6 border border-outline-variant shadow-xl">
+<div class="flex items-center justify-between pb-3 border-b border-surface-container">
+<div class="flex items-center space-x-2">
+<span class="w-3 h-3 rounded-full bg-error animate-ping"></span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">AgroVoice IVR Live Call</span>
+</div>
+<button class="text-outline hover:text-on-surface" onclick="closeAudioIVR()">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="py-5 text-center">
+<div class="w-20 h-20 rounded-full bg-surface-container-high mx-auto flex items-center justify-center text-primary mb-3">
+<span class="material-symbols-outlined text-4xl animate-bounce" data-icon="support_agent">support_agent</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface">Dialing 0800-AGROLINK...</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Connecting to Dawanau AgroVoice Vernacular Station</p>
+<!-- Simulated Voice Visualizer -->
+<div class="flex items-center justify-center space-x-1 my-4 h-8">
+<span class="w-1.5 h-3 bg-primary rounded-full animate-pulse"></span>
+<span class="w-1.5 h-6 bg-primary rounded-full animate-pulse delay-75"></span>
+<span class="w-1.5 h-8 bg-primary rounded-full animate-pulse delay-150"></span>
+<span class="w-1.5 h-4 bg-primary rounded-full animate-pulse delay-100"></span>
+<span class="w-1.5 h-7 bg-primary rounded-full animate-pulse delay-200"></span>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg text-left text-xs font-mono-code text-on-surface border border-outline-variant">
+<p class="text-primary font-bold mb-1">[Audio Playing]:</p>
+<p>"Sannu! Don Hausa, danna daya (1). Fún Èdè Yorùbá, tẹ méjì (2). Maka Igbo, pịa atọ (3). For Nigerian Pidgin, press four (4)..."</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="p-2.5 rounded-lg bg-surface hover:bg-surface-container-high border border-outline-variant font-label-md text-label-md font-semibold text-center" onclick="ivrLanguageSelected('Hausa')">
+          1. Hausa (Danna 1)
+        </button>
+<button class="p-2.5 rounded-lg bg-surface hover:bg-surface-container-high border border-outline-variant font-label-md text-label-md font-semibold text-center" onclick="ivrLanguageSelected('Yoruba')">
+          2. Yorùbá (Tẹ 2)
+        </button>
+<button class="p-2.5 rounded-lg bg-surface hover:bg-surface-container-high border border-outline-variant font-label-md text-label-md font-semibold text-center" onclick="ivrLanguageSelected('Igbo')">
+          3. Igbo (Pịa 3)
+        </button>
+<button class="p-2.5 rounded-lg bg-surface hover:bg-surface-container-high border border-outline-variant font-label-md text-label-md font-semibold text-center" onclick="ivrLanguageSelected('Pidgin')">
+          4. Pidgin English
+        </button>
+</div>
+<button class="w-full mt-4 py-2.5 rounded-lg bg-error-container text-on-error-container font-bold text-xs uppercase tracking-wider hover:bg-error hover:text-on-error transition-colors" onclick="closeAudioIVR()">
+        End Call
+      </button>
+</div>
+</div>
+<!-- INTERACTIVE INLINE JAVASCRIPT FOR PHONE & SIMULATION LOGIC -->
+<script>
+    // State management for retro USSD phone session
+    let currentInput = "";
+    let currentSessionStep = "root"; // 'root', 'escrow_view', 'gatepass_view', 'bid_view', 'lab_view', 'ivr_view'
+    let sessionTimeoutSec = 48;
+    let timerInterval = null;
+
+    // USSD Screen Data dictionary
+    const ussdMenus = {
+      root: {
+        title: "-- AGROLINK ESCROW V4.2 --",
+        body: "1. Check Escrow Balance\n2. Authorize Haulier Gate-Pass\n3. Review Off-taker Bid\n4. Produce Lab Quality\n5. Dial AgroVoice IVR",
+        prompt: "Reply option [1-5]:",
+        softLeft: "SELECT",
+        softRight: "CANCEL"
+      },
+      escrow_view: {
+        title: "-- ESCROW VAULT BAL --",
+        body: "Providus Vault #5409\nLot MZ-KAN-088 Disbursed:\n+NGN 6,216,000.00\nTotal Bal: NGN 7,942,500\nPending in Escrow: NGN 1,750,000",
+        prompt: "0. Back to Main",
+        softLeft: "PRINT",
+        softRight: "BACK"
+      },
+      gatepass_view: {
+        title: "-- HAULAGE GATE-PASS --",
+        body: "Truck: TRK-LAG-488\nDriver: Sikuru Alabi\nPayload: 500 Tubers Yam\nWarehouse: Ikeja Hub\nReply 1: AUTHORIZE EXIT\nReply 2: DENY GATE-PASS",
+        prompt: "Choose [1 or 2]:",
+        softLeft: "SEND",
+        softRight: "BACK"
+      },
+      bid_view: {
+        title: "-- OFF-TAKER COUNTER --",
+        body: "Grand Cereals PLC\nBid: NGN 1,750,000\nYam Grade A Export (500 tubers)\nEscrow Locked: YES\nReply 1 to Confirm Order",
+        prompt: "Reply 1 to Accept:",
+        softLeft: "ACCEPT",
+        softRight: "BACK"
+      },
+      lab_view: {
+        title: "-- GRAIN LAB STATUS --",
+        body: "Lot MZ-KAN-088\nMoisture: 11.8% (PASS)\nAflatoxin: <4 ppb\nGrade: A Premium Maize\nWeighbridge: 45.12 MT",
+        prompt: "0. Back to Menu",
+        softLeft: "OK",
+        softRight: "BACK"
+      },
+      action_complete: {
+        title: "-- GATE-PASS ISSUED --",
+        body: "PASS CODE: #GP-8839-LAG\nAuthorized for Sikuru Alabi\nTRK-LAG-488 verified at Ikeja barrier.\nSMS confirmation sent.",
+        prompt: "0. Return to Root",
+        softLeft: "DONE",
+        softRight: "EXIT"
+      }
+    };
+
+    function updateUSSDDisplay(menuKey) {
+      currentSessionStep = menuKey;
+      const data = ussdMenus[menuKey];
+      const screen = document.getElementById("ussd-screen-content");
+      const leftBtn = document.getElementById("softkey-left");
+      const rightBtn = document.getElementById("softkey-right");
+
+      let formattedBody = data.body.split("\n").map(line => `<p>${line}</p>`).join("");
+
+      screen.innerHTML = `
+        <div>
+          <p class="font-bold underline mb-1">${data.title}</p>
+          ${formattedBody}
+        </div>
+        <div class="mt-2 pt-1 border-t border-[#3d4a35]/30">
+          <div class="flex items-center justify-between text-[11px]">
+            <span>${data.prompt}</span>
+            <span id="ussd-input-display" class="font-bold bg-[#7b9165] px-1.5 py-0.5 rounded min-w-[20px] text-center border border-[#3d4a35]">${currentInput}</span>
+          </div>
+        </div>
+      `;
+
+      leftBtn.textContent = data.softLeft;
+      rightBtn.textContent = data.softRight;
+      logAudit(`USSD screen transition: ${data.title}`);
+    }
+
+    function phoneTypeKey(char) {
+      currentInput += char;
+      const inputEl = document.getElementById("ussd-input-display");
+      if (inputEl) {
+        inputEl.textContent = currentInput;
+      }
+      // Audio click tone simulation
+      playKeyClick();
+    }
+
+    function phoneSoftkeyLeft() {
+      // Process submission
+      playKeyClick();
+      const val = currentInput.trim();
+      currentInput = "";
+
+      if (currentSessionStep === "root") {
+        if (val === "1") updateUSSDDisplay("escrow_view");
+        else if (val === "2") updateUSSDDisplay("gatepass_view");
+        else if (val === "3") updateUSSDDisplay("bid_view");
+        else if (val === "4") updateUSSDDisplay("lab_view");
+        else if (val === "5") simulateAudioIVR();
+        else updateUSSDDisplay("root");
+      } else if (currentSessionStep === "gatepass_view") {
+        if (val === "1") {
+          updateUSSDDisplay("action_complete");
+          appendLiveSMS("GATE-PASS AUTH: Gate-Pass #GP-8839-LAG issued for Driver Sikuru Alabi (TRK-LAG-488). Authorized to depart Ikeja hub.");
+        } else {
+          updateUSSDDisplay("root");
+        }
+      } else if (currentSessionStep === "bid_view") {
+        if (val === "1") {
+          updateUSSDDisplay("action_complete");
+          appendLiveSMS("BID ACCEPTED: Grand Cereals offer locked at ₦1,750,000. Funds held in Providus Escrow Vault.");
+        } else {
+          updateUSSDDisplay("root");
+        }
+      } else {
+        updateUSSDDisplay("root");
+      }
+    }
+
+    function phoneSoftkeyRight() {
+      playKeyClick();
+      currentInput = "";
+      if (currentSessionStep === "root") {
+        logAudit("USSD Session canceled by subscriber.");
+        updateUSSDDisplay("root");
+      } else {
+        updateUSSDDisplay("root");
+      }
+    }
+
+    function phoneNavClick() {
+      playKeyClick();
+      phoneSoftkeyLeft();
+    }
+
+    function quickDialUSSD(code) {
+      logAudit(`Quick Dial Triggered: ${code}`);
+      if (code === "*347*44*1#") {
+        updateUSSDDisplay("escrow_view");
+      } else if (code === "*347*44*2#") {
+        updateUSSDDisplay("gatepass_view");
+      } else if (code === "*347*44*3#") {
+        simulateAudioIVR();
+      }
+    }
+
+    function logAudit(msg) {
+      const logBox = document.getElementById("ussd-audit-log");
+      if (logBox) {
+        const item = document.createElement("div");
+        item.textContent = `> ${msg}`;
+        logBox.appendChild(item);
+        logBox.scrollTop = logBox.scrollHeight;
+      }
+    }
+
+    function simulateSMSReply(replyText) {
+      logAudit(`SMS Shortcode Reply dispatched: ${replyText}`);
+      alert(`Carrier 34744 received SMS reply: '${replyText}'. Escrow Gateway status updated.`);
+    }
+
+    function appendLiveSMS(content) {
+      const stream = document.getElementById("sms-stream");
+      if (!stream) return;
+
+      const card = document.createElement("article");
+      card.className = "bg-surface-container-lowest border-l-4 border-l-primary border-y border-r border-outline-variant rounded-xl p-5 shadow-sm animate-pulse";
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <div class="flex items-center space-x-2">
+            <span class="px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-mono-code text-xs font-bold">34744-INSTANT</span>
+            <span class="text-xs text-on-surface-variant">GSM Push Notification</span>
+          </div>
+          <span class="font-label-sm text-label-sm text-outline font-medium">Just now</span>
+        </div>
+        <div class="bg-surface-container-low rounded-lg p-3.5 border border-outline-variant/60 font-mono-code text-xs sm:text-sm text-on-surface leading-relaxed">
+          ${content}
+        </div>
+      `;
+      stream.prepend(card);
+      setTimeout(() => card.classList.remove("animate-pulse"), 1000);
+    }
+
+    function triggerSimulatedSMS() {
+      const messages = [
+        "AGROLINK ESCROW: Grain transit insurance confirmed with Sovereign Trust PLC for 45 MT Maize lot.",
+        "DISPATCH ALERT: Truck TRK-KNO-112 arrived at Dawanau Consolidation Gate 4.",
+        "MARKET INTELLIGENCE: Dawanau Maize spot price +3.4% today at ₦145,000/MT."
+      ];
+      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+      appendLiveSMS(randomMsg);
+      logAudit(`Inbound SMS from carrier gateway 34744: "${randomMsg}"`);
+    }
+
+    function forwardSMSPrompt(title) {
+      alert(`Forwarding agro-escrow settlement certificate: "${title}" via SMS bridge to registered cooperative chairman.`);
+    }
+
+    function toggleGlobalSimulatorMode() {
+      const phonePane = document.getElementById("pane-ussd-phone");
+      const smsPane = document.getElementById("pane-sms-feed");
+      if (phonePane.classList.contains("hidden")) {
+        switchMainTab("ussd");
+      } else {
+        switchMainTab("sms");
+      }
+    }
+
+    function switchMainTab(mode) {
+      const phonePane = document.getElementById("pane-ussd-phone");
+      const smsPane = document.getElementById("pane-sms-feed");
+      const btnUssd = document.getElementById("tab-btn-ussd");
+      const btnSms = document.getElementById("tab-btn-sms");
+      const btnBoth = document.getElementById("tab-btn-both");
+
+      const activeClass = "bg-primary-container text-on-primary shadow-sm";
+      const inactiveClass = "text-on-surface-variant hover:text-primary";
+
+      btnUssd.className = `flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${mode === 'ussd' ? activeClass : inactiveClass}`;
+      btnSms.className = `flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${mode === 'sms' ? activeClass : inactiveClass}`;
+      if (btnBoth) {
+        btnBoth.className = `hidden xl:flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${mode === 'both' ? activeClass : inactiveClass}`;
+      }
+
+      if (mode === "ussd") {
+        phonePane.classList.remove("hidden");
+        phonePane.classList.remove("lg:col-span-5");
+        phonePane.classList.add("lg:col-span-12");
+        smsPane.classList.add("hidden");
+      } else if (mode === "sms") {
+        phonePane.classList.add("hidden");
+        smsPane.classList.remove("hidden");
+        smsPane.classList.remove("lg:col-span-7");
+        smsPane.classList.add("lg:col-span-12");
+      } else {
+        // Both / Split
+        phonePane.classList.remove("hidden", "lg:col-span-12");
+        phonePane.classList.add("lg:col-span-5");
+        smsPane.classList.remove("hidden", "lg:col-span-12");
+        smsPane.classList.add("lg:col-span-7");
+      }
+    }
+
+    // IVR Modal handlers
+    function simulateAudioIVR() {
+      document.getElementById("ivr-modal").classList.remove("hidden");
+      logAudit("Voice IVR Session initiated to 0800-AGROLINK");
+    }
+
+    function closeAudioIVR() {
+      document.getElementById("ivr-modal").classList.add("hidden");
+      logAudit("Voice IVR call ended.");
+    }
+
+    function ivrLanguageSelected(lang) {
+      alert(`Vernacular language selected: ${lang}. An automated Hausa/Yoruba/Igbo voice agent is narrating current escrow balance and haulage dispatch code.`);
+      closeAudioIVR();
+    }
+
+    // Printing / Exporting functionality
+    function printSummarySheet() {
+      window.print();
+    }
+
+    function downloadAuditLog() {
+      const content = `AGROLINK RURAL OFFLINE GATEWAY - AUDIT DISPATCH LOG
+Generated: ${new Date().toISOString()}
+Gateway: MTN/Airtel Shortcode 34744 / USSD *347*44#
+Farmer Acct: Musa Agro Enterprises (Providus 5409****88)
+Milestone Settlement: NGN 6,216,000.00 (Lot MZ-KAN-088, 45 MT Maize)
+Lab Inspection: 11.8% Moisture Pass (Grade A)
+Escrow Vault Balance: NGN 7,942,500.00
+Haulage Authorized: TRK-LAG-488 (Sikuru Alabi)`;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `AgroLink-Audit-Summary-${Date.now()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Lightweight Keypad Audio Synthetic Click
+    function playKeyClick() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+      } catch (e) {
+        // Fallback for browsers with locked AudioContext
+      }
+    }
+
+    // Session TTL countdown
+    setInterval(() => {
+      sessionTimeoutSec--;
+      if (sessionTimeoutSec <= 0) sessionTimeoutSec = 60;
+      const el = document.getElementById("session-timer");
+      if (el) el.textContent = `Session TTL: ${sessionTimeoutSec}s`;
+    }, 1000);
+
+    // Initial render
+    updateUSSDDisplay("root");
+  </script>
+</body></html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RAMLP AgroLink - Quality Inspection & Moisture Lab Sign-off</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#98e9ab",
+            "inverse-surface": "#2a322a",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#a3f5b6",
+            "tertiary-fixed": "#ffdea7",
+            "secondary": "#306b19",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "error": "#ba1a1a",
+            "outline": "#707a6f",
+            "primary-container": "#176b3a",
+            "surface": "#f3fcef",
+            "secondary-container": "#b0f491",
+            "tertiary-container": "#7b5700",
+            "surface-dim": "#d4ddd0",
+            "on-surface-variant": "#404940",
+            "surface-container": "#e8f0e4",
+            "on-secondary-fixed": "#052100",
+            "on-tertiary": "#ffffff",
+            "primary": "#005128",
+            "surface-container-low": "#edf6e9",
+            "surface-container-highest": "#dce5d9",
+            "on-tertiary-fixed": "#271900",
+            "background": "#f3fcef",
+            "surface-tint": "#196c3b",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#95d878",
+            "on-background": "#161d16",
+            "surface-bright": "#f3fcef",
+            "tertiary": "#5d4100",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "outline-variant": "#bfc9bd",
+            "secondary-fixed": "#b0f491",
+            "on-primary-fixed": "#00210d",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#175200",
+            "inverse-on-surface": "#eaf3e7",
+            "on-surface": "#161d16",
+            "surface-container-high": "#e2ebde",
+            "on-primary-fixed-variant": "#005228",
+            "surface-variant": "#dce5d9",
+            "tertiary-fixed-dim": "#f8bd45",
+            "inverse-primary": "#88d89c",
+            "on-secondary-container": "#36721f",
+            "on-tertiary-container": "#ffd07c",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#88d89c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "label-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "currency-display": ["Manrope"],
+            "label-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "headline-md": ["Manrope"]
+          },
+          "fontSize": {
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .gauge-dial {
+      stroke-dasharray: 283;
+      stroke-dashoffset: 75;
+      transition: stroke-dashoffset 0.8s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+<!-- TOP APP BAR (Shared Component Anchor) -->
+<header class="bg-surface-container-lowest border-b border-outline-variant shadow-sm docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-7xl mx-auto h-16">
+<!-- Brand Anchor -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">AgroLink RAMLP</span>
+</div>
+<span class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-label-sm bg-surface-container text-on-surface-variant border border-outline-variant">
+<span class="material-symbols-outlined text-sm text-secondary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span>CBN & NIBSS Regulated Escrow</span>
+</span>
+</div>
+<!-- Navigation Links: Quality Lab active -->
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#">Marketplace</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#">Waybill & Haulage</a>
+<a class="border-b-2 border-primary text-primary font-label-md text-label-md pb-1 font-semibold" href="#">Quality Lab</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#">Disputes & Escrow</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#">Settlements</a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors">
+<span class="material-symbols-outlined">support_agent</span>
+</button>
+<div class="h-6 w-px bg-outline-variant mx-1 hidden sm:block"></div>
+<button class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-primary text-primary text-label-sm font-label-sm hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-base">verified</span>
+<span>CBN Verification</span>
+</button>
+<button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg text-label-sm font-label-sm font-semibold hover:bg-primary-container transition-all shadow-sm">
+<span>Launch Portal</span>
+<span class="material-symbols-outlined text-sm">open_in_new</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS WITH SIDE DRAWER LAYOUT -->
+<div class="flex-1 flex max-w-7xl w-full mx-auto px-4 md:px-margin-desktop py-6 gap-6">
+<!-- SUB-NAV / PORTAL DRAWER (Integrated Shared Component) -->
+<aside class="hidden lg:flex flex-col w-64 shrink-0 bg-surface-container-low rounded-xl border border-outline-variant p-4 h-fit sticky top-20 space-y-6">
+<div class="border-b border-outline-variant pb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary">RAMLP Portal</h2>
+</div>
+<p class="text-xs font-label-sm text-on-surface-variant">CBN & NIBSS Regulated</p>
+</div>
+<nav class="space-y-1.5">
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high rounded-lg px-3 py-2.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high rounded-lg px-3 py-2.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">local_shipping</span>
+<span>Waybills & Dispatch</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high rounded-lg px-3 py-2.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">scale</span>
+<span>Weighbridge Telematics</span>
+</a>
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container font-label-md text-label-md font-semibold rounded-lg px-3 py-2.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg text-primary" style="font-variation-settings: 'FILL' 1;">science</span>
+<span>Moisture Lab Certs</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high rounded-lg px-3 py-2.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">gavel</span>
+<span>Escrow & Disputes</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high rounded-lg px-3 py-2.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">account_balance</span>
+<span>Audit & Settlement</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-outline-variant space-y-2">
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-outline-variant">
+<p class="text-xs text-on-surface-variant font-medium">Escrow Hold Balance</p>
+<p class="font-currency-display text-xl font-bold text-primary mt-0.5">₦6,216,000</p>
+<span class="text-[11px] text-secondary font-semibold flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-xs">lock</span> Milestone 2 Pending
+          </span>
+</div>
+<a class="flex items-center gap-2 text-on-surface-variant font-label-sm text-xs px-2 py-1.5 hover:text-primary" href="#">
+<span class="material-symbols-outlined text-base">settings</span> Settings
+        </a>
+<a class="flex items-center gap-2 text-on-surface-variant font-label-sm text-xs px-2 py-1.5 hover:text-primary" href="#">
+<span class="material-symbols-outlined text-base">headset_mic</span> Support Desk
+        </a>
+</div>
+</aside>
+<!-- MAIN INSPECTION CANVAS -->
+<main class="flex-1 min-w-0 space-y-6">
+<!-- INSTITUTIONAL AUDIT HEADER BAR -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 md:p-6 shadow-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-outline-variant pb-4 mb-4">
+<div>
+<div class="flex items-center gap-2 mb-1 flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container text-primary border border-outline-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">biotech</span>
+                RAMLP Certified Agro-Inspection Unit #14
+              </span>
+<span class="text-xs text-on-surface-variant font-medium">Ikeja Receiving & Processing Hub</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">
+              Quality Inspection & Moisture Lab Sign-off
+            </h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              Certifying Officer: <strong class="text-on-surface font-semibold">Engr. Folake Adeleke</strong> (NIS/NAFDAC Certified Agro-Analyst #CERT-8841)
+            </p>
+</div>
+<!-- Audit Lot Pill Badge -->
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-3 text-right shrink-0">
+<span class="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider block">Consignment Reference</span>
+<span class="font-headline-sm text-base font-bold text-primary block mt-0.5">#AGL-TX-2025-0841</span>
+<span class="text-xs font-label-sm text-secondary font-medium">45 Metric Tonnes Yellow Maize</span>
+</div>
+</div>
+<!-- Counterparty & Commodity Meta Ribbon -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-label-sm">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">agriculture</span>
+<div>
+<span class="text-on-surface-variant block">Origin Producer</span>
+<strong class="text-on-surface font-semibold text-sm">Musa Agro Farms</strong>
+<span class="text-on-surface-variant block">Iseyin, Oyo State</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5">factory</span>
+<div>
+<span class="text-on-surface-variant block">Buyer / Off-taker</span>
+<strong class="text-on-surface font-semibold text-sm">Flour Mills Nigeria PLC</strong>
+<span class="text-on-surface-variant block">Grand Cereals Division</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-secondary text-lg mt-0.5">verified_user</span>
+<div>
+<span class="text-on-surface-variant block">Milestone Trigger</span>
+<strong class="text-secondary font-semibold text-sm">Milestone 2 (60% Release)</strong>
+<span class="text-on-surface-variant block">₦6,216,000 in Escrow</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-on-surface-variant text-lg mt-0.5">schedule</span>
+<div>
+<span class="text-on-surface-variant block">Sampling Timestamp</span>
+<strong class="text-on-surface font-semibold text-sm">Today, 10:42 AM WAT</strong>
+<span class="text-on-surface-variant block">In-line NIR Spectrometer</span>
+</div>
+</div>
+</div>
+</section>
+<!-- BENTO GRID SECTION: DIAGNOSTIC MODULES -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- MODULE 1: MOISTURE CONTENT SPECTROMETRY & SENSOR AUDIT (8 Cols) -->
+<section class="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl p-5 md:p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-3 mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary font-bold">water_drop</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Moisture Spectrometry & Multi-Sensor Audit</h3>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#E8F4EC] text-[#176B3A]">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                PASSED (Safe Milling)
+              </span>
+</div>
+<!-- Digital Moisture Gauge Readout & Visual Ring -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-6 mb-5">
+<div class="space-y-1 text-center sm:text-left">
+<span class="text-xs uppercase font-label-sm text-on-surface-variant tracking-wider font-semibold">Moisture Reading (ISO 6540 NIR)</span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-4xl sm:text-5xl font-extrabold text-primary">11.8%</span>
+<span class="text-xs font-label-md text-on-surface-variant">Measured H₂O</span>
+</div>
+<div class="flex items-center gap-2 text-xs font-label-sm text-on-surface-variant">
+<span>Contract Ceiling:</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest font-bold text-on-surface">12.5% Max</span>
+<span class="text-secondary font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">south</span> -0.7% Delta Safe
+                  </span>
+</div>
+</div>
+<!-- Gauge Visualization -->
+<div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="transparent" r="42" stroke="#dce5d9" stroke-width="9"></circle>
+<!-- Green Safe Arc (0% - 12.5% safe baseline) -->
+<circle cx="50" cy="50" fill="transparent" r="42" stroke="#176B3A" stroke-dasharray="264" stroke-dashoffset="85" stroke-linecap="round" stroke-width="9"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">done_all</span>
+<span class="text-[10px] font-bold text-primary uppercase">Safe Zone</span>
+</div>
+</div>
+</div>
+<!-- Safe/Cautionary/Rejection Bands Reference Legend -->
+<div class="mb-5">
+<div class="flex justify-between text-[11px] font-label-sm text-on-surface-variant mb-1">
+<span class="text-primary font-semibold">● Safe Storage (<12.5%)</span>
+<span class="text-tertiary-container font-semibold">▲ Cautionary (12.5% - 13.5%)</span>
+<span class="text-error font-semibold">✕ Rejection (>13.5%)</span>
+</div>
+<div class="h-2.5 w-full rounded-full bg-surface-container-highest overflow-hidden flex">
+<div class="h-full bg-primary" style="width: 60%"></div>
+<div class="h-full bg-tertiary-fixed-dim" style="width: 25%"></div>
+<div class="h-full bg-error" style="width: 15%"></div>
+</div>
+</div>
+<!-- Secondary Diagnostic Laboratory Matrix -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+<div class="p-3 bg-surface-container-lowest border border-outline-variant rounded-lg">
+<span class="text-[11px] font-label-sm text-on-surface-variant block">Foreign Chaff</span>
+<span class="font-headline-sm text-base font-bold text-on-surface">1.1%</span>
+<span class="text-[10px] font-label-sm text-secondary block mt-0.5">Ceil: <1.5% · PASS</span>
+</div>
+<div class="p-3 bg-surface-container-lowest border border-outline-variant rounded-lg">
+<span class="text-[11px] font-label-sm text-on-surface-variant block">Aflatoxin B1</span>
+<span class="font-headline-sm text-base font-bold text-on-surface">4.8 <span class="text-xs font-normal">ppb</span></span>
+<span class="text-[10px] font-label-sm text-secondary block mt-0.5">Ceil: <10 ppb · PASS</span>
+</div>
+<div class="p-3 bg-surface-container-lowest border border-outline-variant rounded-lg">
+<span class="text-[11px] font-label-sm text-on-surface-variant block">Broken Kernels</span>
+<span class="font-headline-sm text-base font-bold text-on-surface">2.3%</span>
+<span class="text-[10px] font-label-sm text-secondary block mt-0.5">Ceil: <3.0% · PASS</span>
+</div>
+<div class="p-3 bg-surface-container-lowest border border-outline-variant rounded-lg">
+<span class="text-[11px] font-label-sm text-on-surface-variant block">Live Insects</span>
+<span class="font-headline-sm text-base font-bold text-secondary">0 Found</span>
+<span class="text-[10px] font-label-sm text-secondary block mt-0.5">Clean Grain · PASS</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant flex items-center justify-between text-xs text-on-surface-variant">
+<span class="flex items-center gap-1 font-label-sm">
+<span class="material-symbols-outlined text-sm text-primary">qr_code_scanner</span> Spectrometer SN: #NIR-IKJ-0442B
+            </span>
+<span class="font-mono text-[11px]">Hash: 0x8a9...4f21</span>
+</div>
+</section>
+<!-- MODULE 2: DUAL-WEIGHBRIDGE RECONCILIATION (5 Cols) -->
+<section class="lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-xl p-5 md:p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-3 mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary font-bold">scale</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Dual Weighbridge Audit</h3>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#E8F4EC] text-[#176B3A]">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                Reconciled
+              </span>
+</div>
+<!-- Weighbridge Readings Comparison -->
+<div class="space-y-3 mb-4">
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between">
+<div>
+<span class="text-xs font-label-sm text-on-surface-variant block">1. Origin Farm Gate (Iseyin Scale #02)</span>
+<span class="font-currency-display text-lg font-bold text-on-surface">45,280 kg</span>
+</div>
+<span class="text-xs text-on-surface-variant font-mono bg-surface-container px-2 py-1 rounded">Gross Weight</span>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-between">
+<div>
+<span class="text-xs font-label-sm text-on-surface-variant block">2. Ikeja Off-taker Scale (Hub Gross #14)</span>
+<span class="font-currency-display text-lg font-bold text-primary">45,190 kg</span>
+</div>
+<span class="text-xs text-on-surface-variant font-mono bg-surface-container px-2 py-1 rounded">Gross Weight</span>
+</div>
+</div>
+<!-- Reconciliation Telematics Metric Bar -->
+<div class="bg-surface-container p-3.5 rounded-lg border border-outline-variant space-y-2">
+<div class="flex justify-between items-center text-xs font-label-sm">
+<span class="text-on-surface-variant font-medium">Transit Net Variance:</span>
+<span class="font-bold text-secondary text-sm">-90 kg (-0.19%)</span>
+</div>
+<div class="flex justify-between items-center text-xs font-label-sm">
+<span class="text-on-surface-variant font-medium">Statutory Tolerance Ceiling:</span>
+<span class="font-bold text-on-surface">± 1.00% Max (450 kg)</span>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 19%;"></div>
+</div>
+<p class="text-[11px] text-on-surface-variant italic">
+                Variance within standard permissible natural moisture loss during inter-state haulage.
+              </p>
+</div>
+<!-- Digital Telematics Slip Attachment Card -->
+<div class="mt-4 p-3 border border-dashed border-outline-variant rounded-lg flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">receipt_long</span>
+<div>
+<span class="text-xs font-semibold text-on-surface block">Weighbridge_Slip_#45190_Ikeja.pdf</span>
+<span class="text-[11px] text-on-surface-variant font-mono">Calibrated: 14/10/2025 · Verified</span>
+</div>
+</div>
+<button class="px-2.5 py-1.5 rounded text-xs font-semibold text-primary hover:bg-surface-container border border-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">download</span> View
+              </button>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant flex items-center justify-between text-xs text-on-surface-variant">
+<span class="font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">videocam</span> Scale Camera #02 Live Feed
+            </span>
+<span class="text-secondary font-semibold">Telematics Locked</span>
+</div>
+</section>
+<!-- MODULE 3: PHYSICAL GRAIN EVIDENCE & BAG SAMPLING (12 Cols) -->
+<section class="lg:col-span-12 bg-surface-container-lowest border border-outline-variant rounded-xl p-5 md:p-6 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-outline-variant pb-3 mb-4 gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary font-bold">photo_library</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Physical Grain Photo & Bag Sampling Evidence</h3>
+</div>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary text-primary font-label-sm text-xs font-semibold hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-sm">add_a_photo</span>
+<span>Add High-Res Evidence Photo</span>
+</button>
+</div>
+<!-- Sampling Thumbnail Deck with Data-Alts -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<!-- Sample 1 -->
+<div class="group border border-outline-variant rounded-xl overflow-hidden bg-surface-container-low hover:border-primary transition-all">
+<div class="relative h-36 bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="A clean close-up high-resolution photograph of yellow maize corn kernels sampled during an agro-laboratory inspection. The grain shows spotless surfaces with minimal foreign chaff and healthy golden hues under crisp industrial laboratory lighting. The surrounding context reflects an institutional agricultural certification process with high visual clarity and natural fertile tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVR93ykTyQQGpD0CKKdQbIAVnU_Tg5gBnuhRtfb2n6_-dQrVGxbG-yp6alwzjlfHgDTUvA45GYCVe1_j7wDBDvn3jzzqopPtr7dAx6FSCLMsiJu9MlE3kkIBbG18trm6daFVrbMJJFjpfb35xTEKCPGNjcyU3iUqR7hPbo77-tf8wXzKfsbrhnT_y6FY8h7-_8dtybEBQ7fGB5HrdE1oiqTBcXmcT34ACGFsJ3sXg"/>
+<span class="absolute top-2 right-2 bg-inverse-surface/80 text-surface text-[10px] px-2 py-0.5 rounded font-mono">09:54 AM</span>
+</div>
+<div class="p-3">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-label-sm text-xs font-bold text-on-surface">1. Cross-Section Grain Cut</h4>
+<span class="text-secondary text-[11px] font-semibold">Purity: 98.9%</span>
+</div>
+<p class="text-[11px] text-on-surface-variant">Core endosperm audit free of mold or internal dark spots.</p>
+</div>
+</div>
+<!-- Sample 2 -->
+<div class="group border border-outline-variant rounded-xl overflow-hidden bg-surface-container-low hover:border-primary transition-all">
+<div class="relative h-36 bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="A field technician inserting an electronic moisture probe needle into an open polypropylene burlap bag filled with dried maize grain inside an agribusiness warehouse. The digital readout screen is illuminated under daylight conditions showing accurate analytical testing. The environment projects institutional credibility and grounded agricultural logistics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSgbjyUplJb42eKBBVpXtQMCDFOdi7b4sAbDg6jmOcy0d7MCm4iCmTb1bu1CXp8gdknYdvn2yW2lG64DVAHPr0DRY89JVlfH8i0j2sBCahItypx-g8AtmsdiW5QEDt8VDYREHew7kLln9NLzL5Zqv7e3AfdBXebBlLWeCcpM39_7AWX7p3bzt5UCOa19kwLyPFNiGUA4TzuBZVjjMXXtBSsCK_B3orqUl9XYwawY4"/>
+<span class="absolute top-2 right-2 bg-inverse-surface/80 text-surface text-[10px] px-2 py-0.5 rounded font-mono">10:08 AM</span>
+</div>
+<div class="p-3">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-label-sm text-xs font-bold text-on-surface">2. Moisture Probe Reading</h4>
+<span class="text-secondary text-[11px] font-semibold">11.8% Target</span>
+</div>
+<p class="text-[11px] text-on-surface-variant">Five-point probe insertion across truck front, center, and tail.</p>
+</div>
+</div>
+<!-- Sample 3 -->
+<div class="group border border-outline-variant rounded-xl overflow-hidden bg-surface-container-low hover:border-primary transition-all">
+<div class="relative h-36 bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="A macro detail shot of a heavy-duty tamper-evident green security cable seal attached to the locked rear tailgate latch of a 45-tonne commercial haulage cargo truck. Clear numeric serial codes stamped on the metal casing are sharp and legible, embodying secure regulated escrow logistics in Nigeria." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2Wuftg8EXrnslWe4p5c3x-7Fi2qxBDX6i4GnHcr2ZD3qWRsdXA9wKlyolA4YxsYUMSgWJvR1Y7hLezSElK1SJLeMReaVAXTIUnx4u0pR0IRI6VrYsVe35wJgCAp37Qjwve24rcnfm9cVNTB1IOtzZN0nnQT6z6XjSJFlH00PtgclVNu3tLDnhF3EAtJUmVyQWJYwMfExzpGIekj9Of1xkuTmE4Nkm-FkCAkrMTYY"/>
+<span class="absolute top-2 right-2 bg-inverse-surface/80 text-surface text-[10px] px-2 py-0.5 rounded font-mono">10:22 AM</span>
+</div>
+<div class="p-3">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-label-sm text-xs font-bold text-on-surface">3. Tamper-Evident Seal</h4>
+<span class="text-secondary text-[11px] font-semibold">Seal #NG-8891-B</span>
+</div>
+<p class="text-[11px] text-on-surface-variant">Transit seal intact with unbroken barcode matching waybill.</p>
+</div>
+</div>
+<!-- Sample 4 -->
+<div class="group border border-outline-variant rounded-xl overflow-hidden bg-surface-container-low hover:border-primary transition-all">
+<div class="relative h-36 bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="An industrial weighbridge telematic camera snapshot showing a large green articulated flatbed haulage truck stationed on steel weigh scales outside an Ikeja receiving depot. Sunlight casts bright highlights on the truck cabin, capturing official timestamping and verified registration plate numbers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkKMuGqNIC0nmTuPBuBVGzNBM5ltuIqL-5QGnLVdVeSh7ZQEAlIOOOCr2E4RTpv692_O_AtVIJR2kvLJP4Ul016Ieyq-MbOAaSxWxaBu1zX_ApNiCiGk9_25uWZyEn-EusIDcmI5waaIb2M55NKLdICR3u9cVwSH0p3Hkh8CMclyk0bDXWZjwiIRxj8CvI6gbQLuQIqiwWIj35pxAwXUNmEYu_nFNedlNVii6wwRw"/>
+<span class="absolute top-2 right-2 bg-inverse-surface/80 text-surface text-[10px] px-2 py-0.5 rounded font-mono">10:35 AM</span>
+</div>
+<div class="p-3">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-label-sm text-xs font-bold text-on-surface">4. Scale Incline Timestamp</h4>
+<span class="text-secondary text-[11px] font-semibold">Plate: KJA-482-XA</span>
+</div>
+<p class="text-[11px] text-on-surface-variant">Automated ANPR camera match with registered driver profile.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- MODULE 4: OFFICIAL CERTIFICATION SIGN-OFF & MILESTONE ESCROW TRIGGER (12 Cols) -->
+<section class="lg:col-span-12 bg-surface-container-lowest border-2 border-primary/20 rounded-xl p-5 md:p-6 shadow-sm">
+<div class="border-b border-outline-variant pb-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-2xl font-bold">verified</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Official Certification Sign-off & Escrow Settlement Trigger</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Regulated under Central Bank of Nigeria Agricultural Trade Framework & NIBSS Instant Clearing Protocol.
+              </p>
+</div>
+<!-- Official Certification Stamp Badge -->
+<div class="border-2 border-dashed border-primary bg-surface-container-low px-4 py-2 rounded-xl flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<div>
+<span class="text-[10px] uppercase font-bold tracking-widest text-primary block">Official Certification Stamp</span>
+<span class="text-xs font-bold text-on-surface font-mono">RAMLP Grade A Verified #CRT-2025-0982</span>
+</div>
+</div>
+</div>
+<!-- Inspection Verdict Selector Cards -->
+<div class="space-y-3 mb-6">
+<label class="text-xs font-label-sm font-bold uppercase tracking-wider text-on-surface-variant block">Select Final Quality Verdict</label>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Verdict 1: Full Approval (Selected) -->
+<label class="relative flex flex-col p-4 rounded-xl border-2 border-primary bg-surface-container-low cursor-pointer shadow-sm transition-all">
+<input checked="" class="sr-only" name="verdict" type="radio"/>
+<div class="flex items-center justify-between mb-2">
+<span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">
+<span class="material-symbols-outlined text-xs">done</span> Recommended
+                  </span>
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+</div>
+<h4 class="font-label-lg text-sm font-bold text-on-surface mb-1">Full Approval & Release Milestone 2</h4>
+<p class="text-xs text-on-surface-variant mb-2">All moisture, foreign matter, and weighbridge parameters satisfy contract thresholds.</p>
+<span class="font-currency-display text-base font-bold text-primary mt-auto">Release: ₦6,216,000 (60%)</span>
+</label>
+<!-- Verdict 2: Conditional Clearance -->
+<label class="relative flex flex-col p-4 rounded-xl border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low cursor-pointer transition-all">
+<input class="sr-only" name="verdict" type="radio"/>
+<div class="flex items-center justify-between mb-2">
+<span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">
+                    Adjustment
+                  </span>
+<span class="material-symbols-outlined text-outline text-xl">radio_button_unchecked</span>
+</div>
+<h4 class="font-label-lg text-sm font-bold text-on-surface mb-1">Conditional Clearance with Discount</h4>
+<p class="text-xs text-on-surface-variant mb-2">Trigger automated 2.5% moisture drying penalty deduction before releasing funds.</p>
+<span class="font-currency-display text-base font-bold text-tertiary-container mt-auto">Adjusted: ₦6,060,600</span>
+</label>
+<!-- Verdict 3: Escrow Freeze -->
+<label class="relative flex flex-col p-4 rounded-xl border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low cursor-pointer transition-all">
+<input class="sr-only" name="verdict" type="radio"/>
+<div class="flex items-center justify-between mb-2">
+<span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-error-container text-on-error-container">
+                    Critical Alert
+                  </span>
+<span class="material-symbols-outlined text-outline text-xl">radio_button_unchecked</span>
+</div>
+<h4 class="font-label-lg text-sm font-bold text-on-surface mb-1">Escrow Freeze & Quality Dispute</h4>
+<p class="text-xs text-on-surface-variant mb-2">Halt release immediately. Lock 100% of escrow in neutral vault for arbitration.</p>
+<span class="font-currency-display text-base font-bold text-error mt-auto">Escrow Hold Locked</span>
+</label>
+</div>
+</div>
+<!-- Inspector E-Signature & Certifier Validation Pad -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 bg-surface-container-low p-4 rounded-xl border border-outline-variant mb-6">
+<div class="md:col-span-7 space-y-2">
+<label class="text-xs font-label-sm font-bold text-on-surface flex items-center justify-between">
+<span>Inspector Digital Signature & Accreditation Proof</span>
+<span class="text-secondary font-medium text-xs flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">verified</span> Tokenized Cryptographic E-Sign
+                </span>
+</label>
+<!-- Signature Canvas Mockup -->
+<div class="h-28 bg-surface-container-lowest border border-outline-variant rounded-lg p-3 flex flex-col justify-between relative overflow-hidden">
+<div class="text-[10px] text-on-surface-variant font-mono">Signatory: Engr. Folake Adeleke | PKI: RSA-4096-SHA256</div>
+<div class="flex items-center justify-center">
+<span class="font-serif italic text-2xl text-primary font-bold tracking-wider select-none">F. Adeleke (NAFDAC/NIS-8841)</span>
+</div>
+<div class="flex items-center justify-between text-[10px] text-on-surface-variant border-t border-outline-variant pt-1">
+<span>Sign Date: 14 Oct 2025 · 10:48 WAT</span>
+<button class="text-primary hover:underline font-semibold">Re-sign Pad</button>
+</div>
+</div>
+</div>
+<!-- Biometric Verification Card -->
+<div class="md:col-span-5 flex flex-col justify-between border-t md:border-t-0 md:border-l border-outline-variant pt-3 md:pt-0 md:pl-4">
+<div>
+<span class="text-xs font-label-sm font-bold text-on-surface block mb-1">Certifier Device Identity</span>
+<div class="text-xs text-on-surface-variant space-y-1">
+<p class="flex items-center justify-between">
+<span>Hardware Token:</span>
+<span class="font-mono text-on-surface font-semibold">YubiKey Bio #0941</span>
+</p>
+<p class="flex items-center justify-between">
+<span>GPS Coordinates:</span>
+<span class="font-mono text-on-surface">6.5954° N, 3.3364° E</span>
+</p>
+<p class="flex items-center justify-between">
+<span>Geofence Status:</span>
+<span class="text-secondary font-semibold">Inside Ikeja Hub Zone</span>
+</p>
+</div>
+</div>
+<div class="mt-3 bg-secondary-container/40 p-2 rounded-lg flex items-center gap-2 border border-secondary-container">
+<span class="material-symbols-outlined text-secondary text-lg">lock_clock</span>
+<span class="text-[11px] text-on-secondary-container leading-tight">
+                  Disbursement is executed through NIBSS instantly upon submission.
+                </span>
+</div>
+</div>
+</div>
+<!-- Action Buttons Deck -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm">shield</span>
+<span>All signatures legally binding under the Nigerian Evidence Act 2011.</span>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<!-- Secondary CTA -->
+<button class="w-full sm:w-auto px-4 py-3 rounded-lg border border-error text-error font-label-md text-label-md font-semibold hover:bg-error-container/20 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">report</span>
+<span>Flag for Admin Dispute Review</span>
+</button>
+<!-- Primary CTA -->
+<button class="w-full sm:w-auto px-6 py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 active:scale-[0.99]">
+<span class="material-symbols-outlined text-lg">fingerprint</span>
+<span>Approve & Release Milestone 2 Escrow (₦6,216,000)</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- INSTITUTIONAL FOOTER (Shared Component Anchor) -->
+<footer class="bg-surface-container-highest border-t border-outline-variant mt-12 w-full docked full-width bottom">
+<div class="w-full py-8 px-margin-desktop max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-label-sm">
+<div class="flex items-center gap-2 text-on-surface-variant text-center md:text-left">
+<span class="material-symbols-outlined text-primary text-base">verified_user</span>
+<span>© 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus & NIBSS Settlement Secured.</span>
+</div>
+<!-- Footer Anchor Links -->
+<div class="flex flex-wrap items-center justify-center gap-4 text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">CBN Compliance</a>
+<a class="hover:text-primary transition-colors" href="#">Dispute Framework</a>
+<a class="hover:text-primary transition-colors" href="#">Weighbridge Protocol</a>
+<a class="hover:text-primary transition-colors" href="#">Moisture Standards</a>
+<a class="hover:text-primary transition-colors" href="#">Developer APIs</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Notice</a>
+</div>
+</div>
+</footer>
+</body></html>

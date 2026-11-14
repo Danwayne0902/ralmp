@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RAMLP AgroLink — Rural Agricultural Market Linkage Platform | Nigeria</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Manrope:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#98e9ab",
+            "inverse-surface": "#2a322a",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#a3f5b6",
+            "tertiary-fixed": "#ffdea7",
+            "secondary": "#306b19",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "error": "#ba1a1a",
+            "outline": "#707a6f",
+            "primary-container": "#176b3a",
+            "surface": "#f3fcef",
+            "secondary-container": "#b0f491",
+            "tertiary-container": "#7b5700",
+            "surface-dim": "#d4ddd0",
+            "on-surface-variant": "#404940",
+            "surface-container": "#e8f0e4",
+            "on-secondary-fixed": "#052100",
+            "on-tertiary": "#ffffff",
+            "primary": "#005128",
+            "surface-container-low": "#edf6e9",
+            "surface-container-highest": "#dce5d9",
+            "on-tertiary-fixed": "#271900",
+            "background": "#f3fcef",
+            "surface-tint": "#196c3b",
+            "on-secondary": "#ffffff",
+            "secondary-fixed-dim": "#95d878",
+            "on-background": "#161d16",
+            "surface-bright": "#f3fcef",
+            "tertiary": "#5d4100",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "outline-variant": "#bfc9bd",
+            "secondary-fixed": "#b0f491",
+            "on-primary-fixed": "#00210d",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#175200",
+            "inverse-on-surface": "#eaf3e7",
+            "on-surface": "#161d16",
+            "surface-container-high": "#e2ebde",
+            "on-primary-fixed-variant": "#005228",
+            "surface-variant": "#dce5d9",
+            "tertiary-fixed-dim": "#f8bd45",
+            "inverse-primary": "#88d89c",
+            "on-secondary-container": "#36721f",
+            "on-tertiary-container": "#ffd07c",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#88d89c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "label-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "currency-display": ["Manrope"],
+            "label-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Manrope"],
+            "label-md": ["Inter"],
+            "headline-md": ["Manrope"]
+          },
+          "fontSize": {
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined[style*="FILL: 1"],
+    .material-symbols-outlined[style*="'FILL' 1"] {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Top Regulatory Utility Header -->
+<aside class="bg-primary text-on-primary py-2 px-margin-desktop text-xs">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-block w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+<span class="font-label-sm text-label-sm tracking-wide">RAMLP: Rural Agricultural Market Linkage Platform | Federal Republic of Nigeria Agro Trade Framework</span>
+</div>
+<div class="flex items-center gap-4 text-primary-fixed font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">verified_user</span> CBN Licensed Escrow Custodians</span>
+<span class="hidden lg:inline text-outline-variant">|</span>
+<span class="hidden lg:flex items-center gap-1"><span class="material-symbols-outlined text-xs">support_agent</span> Desk: 0800-AGROLINK-HQ</span>
+</div>
+</div>
+</aside>
+<!-- Shared Component: TopNavBar -->
+<header class="bg-surface-container-lowest shadow-sm docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-7xl mx-auto h-16">
+<!-- Brand Logo -->
+<a class="flex items-center gap-3 group" href="#">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary shadow-sm group-hover:scale-105 transition duration-150">
+<span class="material-symbols-outlined text-2xl">eco</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-sm md:text-headline-md font-bold text-primary tracking-tight">AgroLink <span class="text-tertiary-container font-medium text-xs border border-tertiary-container/30 rounded px-1.5 py-0.5 ml-1">RAMLP</span></span>
+<span class="text-[10px] text-on-surface-variant font-label-sm uppercase tracking-wider hidden sm:block">National Rural Commodity Exchange</span>
+</div>
+</a>
+<!-- Desktop Nav Links -->
+<nav class="hidden lg:flex items-center gap-6">
+<a class="border-b-2 border-primary text-primary font-label-md text-label-md pb-1 font-semibold" href="#marketplace">Marketplace</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#how-it-works">How It Works</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#logistics">Waybill & Haulage</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#quality-lab">Quality Lab</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#escrow">Disputes & Escrow</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary pb-1 transition duration-150" href="#settlements">Settlements</a>
+</nav>
+<!-- Right Actions -->
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-2 border border-outline-variant rounded-lg px-2.5 py-1 text-on-surface-variant hover:border-primary transition">
+<span class="material-symbols-outlined text-sm text-primary">verified</span>
+<span class="font-label-sm text-label-sm font-medium">CBN Verification</span>
+</div>
+<a class="font-label-md text-label-md text-primary font-semibold hover:bg-surface-container px-3 py-2 rounded-lg transition" href="#signin">Sign In</a>
+<a class="bg-primary-container text-on-primary hover:bg-primary font-label-md text-label-md font-semibold px-4 py-2.5 rounded-lg shadow-sm transition active:scale-[0.98] flex items-center gap-1.5" href="#register">
+<span>Launch Portal</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</header>
+<!-- Live Market Ticker Sub-Bar -->
+<section class="bg-surface-container-high border-y border-outline-variant py-2 overflow-hidden">
+<div class="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4 text-xs font-medium">
+<div class="flex items-center gap-2 shrink-0 text-primary font-semibold font-label-sm">
+<span class="material-symbols-outlined text-sm text-primary animate-pulse">broadcast_on_personal</span>
+<span>REAL-TIME SPOT PRICES:</span>
+</div>
+<div class="flex items-center gap-8 overflow-x-auto whitespace-nowrap py-0.5 no-scrollbar text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-on-surface">White Maize (Dawanau, Kano):</span>
+<span class="font-bold text-primary">₦760,000 / MT</span>
+<span class="text-secondary flex items-center text-[10px] font-bold"><span class="material-symbols-outlined text-xs">arrow_drop_up</span>+2.4%</span>
+</div>
+<span class="text-outline-variant">•</span>
+<div class="flex items-center gap-2">
+<span class="font-semibold text-on-surface">Cassava Tubers (Gboko, Benue):</span>
+<span class="font-bold text-primary">₦145,000 / MT</span>
+<span class="text-error flex items-center text-[10px] font-bold"><span class="material-symbols-outlined text-xs">arrow_drop_down</span>-0.8%</span>
+</div>
+<span class="text-outline-variant">•</span>
+<div class="flex items-center gap-2">
+<span class="font-semibold text-on-surface">Yellow Feed Maize (Bodija, Oyo):</span>
+<span class="font-bold text-primary">₦740,000 / MT</span>
+<span class="text-secondary flex items-center text-[10px] font-bold"><span class="material-symbols-outlined text-xs">arrow_drop_up</span>+1.1%</span>
+</div>
+<span class="text-outline-variant">•</span>
+<div class="flex items-center gap-2">
+<span class="font-semibold text-on-surface">Soybeans (Giwa, Kaduna):</span>
+<span class="font-bold text-primary">₦890,000 / MT</span>
+<span class="text-secondary flex items-center text-[10px] font-bold"><span class="material-symbols-outlined text-xs">arrow_drop_up</span>+3.2%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Hero Section -->
+<main>
+<section class="relative pt-10 pb-16 md:pt-16 md:pb-24 overflow-hidden bg-gradient-to-b from-surface-container-lowest via-surface to-background">
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+<!-- Left Column: Copy & Actions -->
+<div class="lg:col-span-7 space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-container/60 border border-secondary text-on-secondary-container">
+<span class="material-symbols-outlined text-base">verified</span>
+<span class="font-label-sm text-label-sm font-semibold tracking-wide">Federal Ministry of Agriculture & Food Security Endorsed</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight font-extrabold max-w-2xl leading-tight">
+              Connecting Farmers to Markets. <br class="hidden sm:inline"/>
+<span class="text-on-surface">Empowering Agriculture.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl leading-relaxed">
+              RAMLP is building a smarter agricultural marketplace that connects farmers, buyers, and logistics providers, making agricultural trade more accessible, transparent, and efficient across Nigeria.
+            </p>
+<!-- Dual Action CTAs -->
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+<a class="bg-primary-container text-on-primary hover:bg-primary font-label-lg text-label-lg font-bold px-8 py-3.5 rounded-lg shadow-sm transition active:scale-[0.98] flex items-center justify-center gap-2" href="#register">
+<span>Get Started</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</a>
+<a class="bg-surface-container-lowest border-2 border-primary-container text-primary-container hover:bg-surface-container font-label-lg text-label-lg font-bold px-6 py-3 rounded-lg transition flex items-center justify-center gap-3" href="#marketplace">
+<span class="material-symbols-outlined text-lg">storefront</span>
+<span>Explore Marketplace</span>
+<span class="text-xs bg-tertiary-fixed-dim text-on-tertiary-fixed px-2 py-0.5 rounded-full font-bold">1,840 MT Active</span>
+</a>
+</div>
+<!-- Trust Badges Strip -->
+<div class="pt-6 border-t border-outline-variant/60">
+<p class="text-xs font-semibold text-outline uppercase tracking-wider mb-3">Institutional Infrastructure & Guarantees</p>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary text-base">account_balance</span>
+<span class="font-medium">CBN Regulated Escrow</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary text-base">scale</span>
+<span class="font-medium">Dual Weighbridge Telematics</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary text-base">science</span>
+<span class="font-medium">Certified Lab Moisture Check</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Interactive Field Showcase (Bento Tile Ensemble) -->
+<div class="lg:col-span-5 relative space-y-4">
+<!-- Bento Card 1: SafeTrade Escrow Lock Active -->
+<div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-secondary-container/30 rounded-bl-full pointer-events-none"></div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<span class="p-1.5 bg-secondary-container rounded-md text-on-secondary-container">
+<span class="material-symbols-outlined text-base">lock</span>
+</span>
+<div>
+<h2 class="font-headline-sm text-sm font-bold text-on-surface">SafeTrade™ Escrow Custody</h2>
+<p class="text-[11px] text-on-surface-variant">Transaction ID: #RAMLP-NG-94821</p>
+</div>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold flex items-center gap-1">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                  LOCKED IN ESCROW
+                </span>
+</div>
+<div class="py-3 flex justify-between items-baseline">
+<div>
+<span class="text-xs text-outline uppercase font-semibold">Total Consignment Escrow</span>
+<div class="font-currency-display text-2xl font-extrabold text-primary">₦10,350,000.00</div>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline">Lot Size</span>
+<div class="font-bold text-on-surface text-sm">30 Metric Tons</div>
+</div>
+</div>
+<!-- Escrow Milestone Bar -->
+<div class="space-y-1.5">
+<div class="flex justify-between text-xs font-medium text-on-surface-variant">
+<span>Farm Dispatch</span>
+<span>Weighbridge Out</span>
+<span class="text-primary font-bold">Lab Sign-Off (Current)</span>
+<span>Release</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2 overflow-hidden flex">
+<div class="bg-primary h-full w-3/4"></div>
+<div class="bg-secondary-container h-full w-1/4 animate-pulse"></div>
+</div>
+</div>
+</div>
+<!-- Bento Card 2: Live Transit Telemetry Corridor -->
+<div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+<span class="font-headline-sm text-sm font-bold text-on-surface">Active Haulage Telematics</span>
+</div>
+<span class="text-[11px] font-mono bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">TRK-SHA-4190</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/60 flex items-center justify-between">
+<div class="space-y-0.5">
+<div class="text-xs text-outline font-semibold">Corridor Route</div>
+<div class="text-sm font-bold text-on-surface flex items-center gap-1.5">
+<span>Saki, Oyo State</span>
+<span class="material-symbols-outlined text-xs text-primary">east</span>
+<span>Ikeja Industrial, Lagos</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-xs text-outline">ETA Terminal</span>
+<div class="text-sm font-bold text-secondary">3h 40m away</div>
+</div>
+</div>
+<div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+<div class="bg-surface p-2 rounded border border-outline-variant/40">
+<span class="text-outline">Gross Weight (Departure):</span>
+<span class="font-bold text-on-surface block">32.48 MT (Tare verified)</span>
+</div>
+<div class="bg-surface p-2 rounded border border-outline-variant/40">
+<span class="text-outline">Moisture Sign-Off:</span>
+<span class="font-bold text-primary block">11.8% (Target <12.5%)</span>
+</div>
+</div>
+</div>
+<!-- Bento Card 3: Agro Micro-Snippet -->
+<div class="bg-primary text-on-primary rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined">gavel</span>
+</div>
+<div>
+<div class="text-sm font-bold">Zero-Arbitrage Settlement Guarantee</div>
+<div class="text-xs text-primary-fixed-dim">Instant NIBSS bank settlement upon receiver pin</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-xl text-primary-fixed">verified</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Platform Pillars: 4-Step Process Section -->
+<section class="py-16 md:py-24 bg-surface-container-lowest border-y border-outline-variant" id="how-it-works">
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop">
+<div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+<span class="text-xs font-bold uppercase tracking-widest text-primary font-label-sm">Operational Protocol</span>
+<h2 class="font-headline-lg text-headline-lg text-primary font-extrabold tracking-tight">How RAMLP Works in 4 Steps</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+            From the rural farm gate to the industrial off-taker factory floor — a transparent, tech-enabled custody chain designed for African agriculture.
+          </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Step 1 -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant relative flex flex-col justify-between hover:border-primary transition duration-150 group">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary font-bold text-lg border border-outline-variant group-hover:bg-primary group-hover:text-on-primary transition">1</span>
+<span class="material-symbols-outlined text-2xl text-primary">agriculture</span>
+</div>
+<h3 class="font-headline-sm text-lg font-bold text-on-surface">Farm Gate Verification & Harvest Listing</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Direct aggregation from vetted farmer clusters in Oyo, Benue, Kaduna, and Niger. Baseline humidity and initial lot grades logged via field tablets.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant text-xs text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">pin_drop</span>
+<span>100+ Rural Aggregation Hubs</span>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant relative flex flex-col justify-between hover:border-primary transition duration-150 group">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary font-bold text-lg border border-outline-variant group-hover:bg-primary group-hover:text-on-primary transition">2</span>
+<span class="material-symbols-outlined text-2xl text-primary">storefront</span>
+</div>
+<h3 class="font-headline-sm text-lg font-bold text-on-surface">Transparent B2B Wholesale Marketplace</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Millers, food processors, and exporters browse verified inventory lots, negotiate benchmark contract prices, and eliminate non-value intermediaries.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant text-xs text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>Direct Spot & Forward Pricing</span>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant relative flex flex-col justify-between hover:border-primary transition duration-150 group">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary font-bold text-lg border border-outline-variant group-hover:bg-primary group-hover:text-on-primary transition">3</span>
+<span class="material-symbols-outlined text-2xl text-primary">gavel</span>
+</div>
+<h3 class="font-headline-sm text-lg font-bold text-on-surface">CBN-Regulated Milestone Escrow</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Buyer deposits purchase funds into dedicated institutional escrow accounts. Capital remains 100% protected and tamper-proof until certified receipt.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant text-xs text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span>SafeTrade™ Anti-Fraud Shield</span>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant relative flex flex-col justify-between hover:border-primary transition duration-150 group">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary font-bold text-lg border border-outline-variant group-hover:bg-primary group-hover:text-on-primary transition">4</span>
+<span class="material-symbols-outlined text-2xl text-primary">scale</span>
+</div>
+<h3 class="font-headline-sm text-lg font-bold text-on-surface">Fleet Dispatch & Weighbridge Sign-Off</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Haulage tracked via IoT telematics. Destination weighbridge calibration and laboratory moisture test trigger automated NIBSS wallet releases.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant text-xs text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">bolt</span>
+<span>Sub-60s Bank Clearance</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Stakeholder Multi-Perspective Showcase -->
+<section class="py-16 md:py-24 bg-background">
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest text-primary font-label-sm">Built For Nigeria's Value Chain</span>
+<h2 class="font-headline-lg text-headline-lg text-primary font-extrabold tracking-tight mt-1">Designed for Every Stakeholder</h2>
+</div>
+<p class="text-on-surface-variant text-sm max-w-md">
+            Whether you cultivate 5 hectares in Benue or coordinate 400 metric tons for a FMCG processing plant in Ikeja, RAMLP guarantees equity.
+          </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Card 1: Farmers & Cooperatives -->
+<div class="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant shadow-sm flex flex-col justify-between hover:shadow-md transition">
+<div class="space-y-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">psychiatry</span>
+</div>
+<div>
+<span class="text-xs font-bold uppercase text-secondary font-label-sm">For Producers</span>
+<h3 class="font-headline-md text-headline-sm font-bold text-on-surface mt-1">Smallholder & Commercial Farmers</h3>
+<p class="text-body-sm text-body-sm text-on-surface-variant mt-2">
+                  Gain instant access to credit-worthy industrial buyers without suffering steep middleman discounts or delayed payments.
+                </p>
+</div>
+<ul class="space-y-3 text-sm text-on-surface">
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>Guaranteed Escrow Payout:</strong> Zero default risk on certified grain deliveries.</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>Real-Time Market Benchmark:</strong> Know exact wholesale spot values before harvesting.</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>Free Subsidized Quality Labs:</strong> Moisture & aflatoxin pre-screening at cluster depots.</span>
+</li>
+</ul>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant">
+<a class="text-primary font-bold text-sm flex items-center gap-1.5 hover:gap-2.5 transition-all" href="#register-farmer">
+<span>Register as Producer / Cooperative</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Card 2: Industrial Buyers & Off-Takers -->
+<div class="bg-surface-container-lowest rounded-2xl p-8 border-2 border-primary-container shadow-sm flex flex-col justify-between relative hover:shadow-md transition">
+<div class="absolute -top-3.5 right-6 bg-primary-container text-on-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+              High Volume
+            </div>
+<div class="space-y-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">factory</span>
+</div>
+<div>
+<span class="text-xs font-bold uppercase text-primary font-label-sm">For Off-Takers</span>
+<h3 class="font-headline-md text-headline-sm font-bold text-on-surface mt-1">Industrial Buyers & Millers</h3>
+<p class="text-body-sm text-body-sm text-on-surface-variant mt-2">
+                  Procure predictable bulk agricultural commodities with strict moisture guarantees, legal escrow protection, and digital logistics.
+                </p>
+</div>
+<ul class="space-y-3 text-sm text-on-surface">
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong><12.5% Moisture Guarantee:</strong> Strict laboratory certificates attached to each waybill.</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>NIBSS Corporate Escrow:</strong> Retain dispute escrow leverage until destination scales match.</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>Batch Lot Traceability:</strong> Complete provenance tracking to farm cluster source LGA.</span>
+</li>
+</ul>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant">
+<a class="text-primary font-bold text-sm flex items-center gap-1.5 hover:gap-2.5 transition-all" href="#register-buyer">
+<span>Register as Industrial Buyer</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Card 3: Logistics & Haulage Fleet -->
+<div class="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant shadow-sm flex flex-col justify-between hover:shadow-md transition">
+<div class="space-y-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">rv_hookup</span>
+</div>
+<div>
+<span class="text-xs font-bold uppercase text-secondary font-label-sm">For Fleet Operators</span>
+<h3 class="font-headline-md text-headline-sm font-bold text-on-surface mt-1">Logistics & Fleet Carriers</h3>
+<p class="text-body-sm text-body-sm text-on-surface-variant mt-2">
+                  Keep heavy flatbeds and covered trucks moving profitably across inter-state corridors with pre-booked backhaul loads.
+                </p>
+</div>
+<ul class="space-y-3 text-sm text-on-surface">
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>Milestone 1 Advance:</strong> Up to 50% fuel & transit advance upon weighbridge gate-in.</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>Tamper-Proof e-Waybills:</strong> Digital QR manifests validated by corridor check-points.</span>
+</li>
+<li class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span><strong>GIT Insurance Coverage:</strong> Full Goods-In-Transit marine insurance protocol.</span>
+</li>
+</ul>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant">
+<a class="text-primary font-bold text-sm flex items-center gap-1.5 hover:gap-2.5 transition-all" href="#register-carrier">
+<span>Partner as Fleet Carrier</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Real-Time Commodity Exchange Highlights -->
+<section class="py-16 md:py-24 bg-surface-container-lowest border-y border-outline-variant" id="marketplace">
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
+<div>
+<div class="inline-flex items-center gap-1 text-xs font-bold text-primary bg-surface-container px-2.5 py-1 rounded-full mb-2">
+<span class="material-symbols-outlined text-sm">schedule</span> Verified Spot Lots Ready For Dispatch
+            </div>
+<h2 class="font-headline-lg text-headline-lg text-primary font-extrabold tracking-tight">Real-Time Commodity Exchange</h2>
+</div>
+<!-- Category Chips -->
+<div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+<button class="bg-primary text-on-primary text-xs font-semibold px-4 py-2 rounded-lg">All Commodities</button>
+<button class="bg-surface-container-low text-on-surface text-xs font-semibold px-4 py-2 rounded-lg hover:bg-surface-container border border-outline-variant">Grains (Maize, Sorghum)</button>
+<button class="bg-surface-container-low text-on-surface text-xs font-semibold px-4 py-2 rounded-lg hover:bg-surface-container border border-outline-variant">Legumes (Soybeans)</button>
+<button class="bg-surface-container-low text-on-surface text-xs font-semibold px-4 py-2 rounded-lg hover:bg-surface-container border border-outline-variant">Roots (Cassava, Yam)</button>
+</div>
+</div>
+<!-- 3-Column Commodity Lot Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Commodity Lot 1 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 shadow-sm hover:border-primary transition duration-150 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-start justify-between">
+<div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container text-primary font-label-sm text-xs font-bold inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">verified</span> Grade A
+                  </span>
+<h3 class="font-headline-sm text-base font-bold text-on-surface mt-2">Premium Dry White Maize</h3>
+<p class="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-xs text-outline">location_on</span> Dawanau Market Hub, Kano State
+                  </p>
+</div>
+<div class="text-right">
+<div class="font-currency-display text-lg font-extrabold text-primary">₦760,000</div>
+<div class="text-[11px] text-outline">per Metric Ton</div>
+</div>
+</div>
+<!-- Lab Indicators -->
+<div class="grid grid-cols-2 gap-2 bg-surface-container-low p-2.5 rounded-lg text-xs">
+<div>
+<span class="text-outline block">Moisture Content:</span>
+<span class="font-bold text-secondary">11.4% (Optimal)</span>
+</div>
+<div>
+<span class="text-outline block">Foreign Matter:</span>
+<span class="font-bold text-on-surface">< 1.2%</span>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-on-surface-variant pt-1">
+<span>Available: <strong>120 MT</strong></span>
+<span>MOQ: <strong>30 MT (1 Flatbed)</strong></span>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant flex items-center gap-3">
+<button class="w-1/2 bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-xs font-bold py-2.5 rounded-lg transition">Inspect Lot</button>
+<button class="w-1/2 bg-primary-container text-on-primary hover:bg-primary font-label-md text-xs font-bold py-2.5 rounded-lg shadow-sm transition">Commit Escrow</button>
+</div>
+</div>
+<!-- Commodity Lot 2 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 shadow-sm hover:border-primary transition duration-150 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-start justify-between">
+<div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container text-primary font-label-sm text-xs font-bold inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">verified</span> Industrial Grade
+                  </span>
+<h3 class="font-headline-sm text-base font-bold text-on-surface mt-2">Clean Yellow Feed Maize</h3>
+<p class="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-xs text-outline">location_on</span> Bodija Aggregation, Oyo State
+                  </p>
+</div>
+<div class="text-right">
+<div class="font-currency-display text-lg font-extrabold text-primary">₦740,000</div>
+<div class="text-[11px] text-outline">per Metric Ton</div>
+</div>
+</div>
+<!-- Lab Indicators -->
+<div class="grid grid-cols-2 gap-2 bg-surface-container-low p-2.5 rounded-lg text-xs">
+<div>
+<span class="text-outline block">Moisture Content:</span>
+<span class="font-bold text-secondary">12.1% (Standard)</span>
+</div>
+<div>
+<span class="text-outline block">Aflatoxin:</span>
+<span class="font-bold text-on-surface">< 10 ppb (Safe)</span>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-on-surface-variant pt-1">
+<span>Available: <strong>240 MT</strong></span>
+<span>MOQ: <strong>30 MT</strong></span>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant flex items-center gap-3">
+<button class="w-1/2 bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-xs font-bold py-2.5 rounded-lg transition">Inspect Lot</button>
+<button class="w-1/2 bg-primary-container text-on-primary hover:bg-primary font-label-md text-xs font-bold py-2.5 rounded-lg shadow-sm transition">Commit Escrow</button>
+</div>
+</div>
+<!-- Commodity Lot 3 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 shadow-sm hover:border-primary transition duration-150 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-start justify-between">
+<div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container text-primary font-label-sm text-xs font-bold inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">verified</span> Grade AA
+                  </span>
+<h3 class="font-headline-sm text-base font-bold text-on-surface mt-2">Export Quality Non-GMO Soybeans</h3>
+<p class="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-xs text-outline">location_on</span> Giwa Depot, Kaduna State
+                  </p>
+</div>
+<div class="text-right">
+<div class="font-currency-display text-lg font-extrabold text-primary">₦890,000</div>
+<div class="text-[11px] text-outline">per Metric Ton</div>
+</div>
+</div>
+<!-- Lab Indicators -->
+<div class="grid grid-cols-2 gap-2 bg-surface-container-low p-2.5 rounded-lg text-xs">
+<div>
+<span class="text-outline block">Moisture Content:</span>
+<span class="font-bold text-secondary">10.8% (Export Grade)</span>
+</div>
+<div>
+<span class="text-outline block">Oil Content:</span>
+<span class="font-bold text-on-surface">19.5%</span>
+</div>
+</div>
+<div class="flex justify-between items-center text-xs text-on-surface-variant pt-1">
+<span>Available: <strong>90 MT</strong></span>
+<span>MOQ: <strong>15 MT</strong></span>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant flex items-center gap-3">
+<button class="w-1/2 bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-xs font-bold py-2.5 rounded-lg transition">Inspect Lot</button>
+<button class="w-1/2 bg-primary-container text-on-primary hover:bg-primary font-label-md text-xs font-bold py-2.5 rounded-lg shadow-sm transition">Commit Escrow</button>
+</div>
+</div>
+</div>
+<div class="mt-10 text-center">
+<a class="inline-flex items-center gap-2 font-label-lg text-label-md text-primary font-bold hover:underline" href="#view-all-lots">
+<span>View All 142 Active Verified Nigerian Produce Listings</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Institutional SafeTrade Escrow & Quality Protocol Deep-Dive -->
+<section class="py-16 md:py-24 bg-background" id="escrow">
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop">
+<div class="bg-surface-container-lowest rounded-3xl border border-outline-variant p-8 md:p-12 shadow-sm overflow-hidden">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+<div class="lg:col-span-6 space-y-6">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold">
+<span class="material-symbols-outlined text-sm">shield</span> SafeTrade™ Institutional Protocol
+              </div>
+<h2 class="font-headline-lg text-headline-lg text-primary font-extrabold tracking-tight">
+                No Produce Rejections Without Recourse. Zero Payment Default.
+              </h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Nigerian interstate agricultural trade historically suffers from weight tampering, unverified water absorption, and high payment default rates. RAMLP solves this with an immutable three-point custody lock.
+              </p>
+<div class="space-y-4 pt-2">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0 font-bold">1</div>
+<div>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">100% Moisture Guarantee Clause</h4>
+<p class="text-xs text-on-surface-variant mt-0.5">If destination delivery moisture exceeds contracted specs by >0.5%, our pre-calibrated dispute matrix automatically adjusts price or allows immediate escrow refund.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0 font-bold">2</div>
+<div>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">Dual-Weighbridge Reconciliation</h4>
+<p class="text-xs text-on-surface-variant mt-0.5">Electronic gross weight recorded at dispatch terminal is checked against destination weighbridge with automated 0.8% standard transit shrinkage allowance.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0 font-bold">3</div>
+<div>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface">24/7 Legal Arbitrator Network</h4>
+<p class="text-xs text-on-surface-variant mt-0.5">Agricultural arbitration officers situated across major transit chokepoints (Lokoja, Jebba, Ore, Kaduna bypass) provide rapid physical dispute inspection within 3 hours.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Escrow Breakdown Card -->
+<div class="lg:col-span-6 bg-surface-container-low p-6 md:p-8 rounded-2xl border border-outline-variant space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-4">
+<div>
+<span class="text-xs text-outline uppercase font-semibold">Regulated Settlement Mechanism</span>
+<div class="font-headline-sm text-base font-bold text-on-surface">Audited Escrow Breakdown</div>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-container-lowest px-3 py-1 rounded border border-outline-variant text-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-xs">account_balance</span>
+<span>Providus & CBN Regulated</span>
+</div>
+</div>
+<div class="space-y-3 text-sm">
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/60">
+<span class="text-on-surface-variant">Base Produce Value (30 MT Maize @ ₦760k)</span>
+<span class="font-bold text-on-surface font-mono">₦22,800,000.00</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/60">
+<span class="text-on-surface-variant">Interstate Logistics & Haulage (Kano to Lagos)</span>
+<span class="font-bold text-on-surface font-mono">₦1,450,000.00</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/60">
+<span class="text-on-surface-variant">Comprehensive GIT Marine & Transit Insurance</span>
+<span class="font-bold text-on-surface font-mono">₦125,000.00</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/60">
+<span class="text-on-surface-variant">Platform Escrow & Dual Lab Verification Fee (0.8%)</span>
+<span class="font-bold text-on-surface font-mono">₦182,400.00</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-primary/20 flex justify-between items-center">
+<div>
+<span class="text-xs text-outline font-semibold uppercase">Total Escrow Protection Sum</span>
+<div class="font-currency-display text-2xl font-extrabold text-primary">₦24,557,400.00</div>
+</div>
+<div class="text-right">
+<span class="text-xs bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded font-bold">100% SECURED</span>
+<span class="text-[10px] text-outline block mt-1">Released on digital OTP delivery</span>
+</div>
+</div>
+<div class="text-[11px] text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary">info</span>
+<span>Funds are held in bankruptcy-remote trustee accounts governed under CBN Circular BSD/DIR/GEN/LAB/08/042.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- High-Impact Bottom Call to Action Section -->
+<section class="py-16 md:py-20 bg-primary text-on-primary relative overflow-hidden">
+<!-- Background subtle map grid pattern -->
+<div class="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+<span class="material-symbols-outlined text-[360px]">public</span>
+</div>
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop relative z-10 text-center space-y-6">
+<span class="px-3 py-1 rounded-full bg-primary-container text-on-primary-container font-label-sm text-xs font-bold uppercase tracking-wider">
+          National Agricultural Transformation
+        </span>
+<h2 class="font-headline-lg text-headline-lg md:text-display-lg font-extrabold tracking-tight max-w-3xl mx-auto leading-tight">
+          Ready to Modernize Agricultural Trade in Nigeria?
+        </h2>
+<p class="font-body-lg text-body-lg text-primary-fixed max-w-2xl mx-auto">
+          Join over 12,000 registered producers, industrial millers, FMCGs, and haulage contractors trading safely on the RAMLP platform today.
+        </p>
+<div class="pt-4 flex flex-wrap justify-center gap-4">
+<a class="bg-tertiary-fixed text-on-tertiary-fixed hover:bg-tertiary-fixed-dim font-label-lg text-label-md font-bold px-6 py-3.5 rounded-lg shadow-sm transition active:scale-[0.98] flex items-center gap-2" href="#register-farmer">
+<span class="material-symbols-outlined text-lg">spa</span>
+<span>Register as Producer</span>
+</a>
+<a class="bg-surface-container-lowest text-primary hover:bg-surface-container font-label-lg text-label-md font-bold px-6 py-3.5 rounded-lg shadow-sm transition active:scale-[0.98] flex items-center gap-2" href="#register-buyer">
+<span class="material-symbols-outlined text-lg">domain</span>
+<span>Register as Industrial Buyer</span>
+</a>
+<a class="bg-primary-container text-on-primary hover:bg-primary-container/80 border border-primary-fixed/30 font-label-lg text-label-md font-bold px-6 py-3.5 rounded-lg transition active:scale-[0.98] flex items-center gap-2" href="#register-carrier">
+<span class="material-symbols-outlined text-lg">local_shipping</span>
+<span>Partner as Fleet Carrier</span>
+</a>
+</div>
+<div class="pt-6 flex justify-center items-center gap-6 text-xs text-primary-fixed font-medium">
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">schedule</span> Instant BVN / CAC Onboarding</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">support_agent</span> 24/7 Field Desk Support</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">shield</span> Zero Registration Fees</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Shared Component: Institutional Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant py-12">
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop space-y-10">
+<!-- Top Grid of Links -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+<!-- Brand Summary -->
+<div class="lg:col-span-2 space-y-4">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-xl">eco</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary">AgroLink RAMLP</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed max-w-sm">
+            The Rural Agricultural Market Linkage Platform (RAMLP) is Nigeria's flagship digital commodity pipeline connecting rural harvesting clusters directly with high-volume off-takers under Central Bank of Nigeria escrow standards.
+          </p>
+<div class="pt-2 flex items-center gap-4 text-xs font-semibold text-primary">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">verified</span> FMARD Endorsed</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">verified</span> NIBSS Settlement</span>
+</div>
+</div>
+<!-- Col 1: Platform -->
+<div class="space-y-3">
+<h4 class="font-label-md text-sm font-bold text-on-surface">Platform Solutions</h4>
+<ul class="space-y-2 text-xs text-on-surface-variant font-label-sm">
+<li><a class="hover:text-primary transition" href="#marketplace">Grain Marketplace</a></li>
+<li><a class="hover:text-primary transition" href="#haulage">Waybill & Haulage Desk</a></li>
+<li><a class="hover:text-primary transition" href="#labs">Moisture & Quality Labs</a></li>
+<li><a class="hover:text-primary transition" href="#escrow-calc">Escrow Fee Calculator</a></li>
+<li><a class="hover:text-primary transition" href="#telematics">Weighbridge Telematics</a></li>
+</ul>
+</div>
+<!-- Col 2: Institutional -->
+<div class="space-y-3">
+<h4 class="font-label-md text-sm font-bold text-on-surface">Institutional Framework</h4>
+<ul class="space-y-2 text-xs text-on-surface-variant font-label-sm">
+<li><a class="hover:text-primary transition" href="#cbn-compliance">CBN Compliance</a></li>
+<li><a class="hover:text-primary transition" href="#dispute-framework">Dispute Framework</a></li>
+<li><a class="hover:text-primary transition" href="#weighbridge-protocol">Weighbridge Protocol</a></li>
+<li><a class="hover:text-primary transition" href="#moisture-standards">Moisture Standards</a></li>
+<li><a class="hover:text-primary transition" href="#apis">Developer APIs</a></li>
+<li><a class="hover:text-primary transition" href="#privacy">Privacy Notice</a></li>
+</ul>
+</div>
+<!-- Col 3: Corridor Hotlines -->
+<div class="space-y-3">
+<h4 class="font-label-md text-sm font-bold text-on-surface">Regional Control Rooms</h4>
+<div class="space-y-2 text-xs text-on-surface-variant">
+<p><strong>Northern Aggregation (Kano):</strong><br/>Dawanau Grain Market Command Desk</p>
+<p><strong>Middle-Belt Hub (Makurdi):</strong><br/>Benue River Basin Agricultural Post</p>
+<p><strong>South-West Industrial (Ibadan):</strong><br/>Old Bodija Terminal Logistics Cell</p>
+<p class="text-primary font-bold pt-1">Emergency Dispatch: 0800-AGROLINK</p>
+</div>
+</div>
+</div>
+<!-- Legal & Regulatory Bottom Strip -->
+<div class="pt-8 border-t border-outline-variant flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-on-surface-variant">
+<p class="text-center md:text-left">
+          © 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus & NIBSS Settlement Secured.
+        </p>
+<div class="flex items-center gap-6">
+<a class="hover:text-primary transition" href="#terms">Terms of Settlement</a>
+<a class="hover:text-primary transition" href="#escrow-rules">Escrow Rules</a>
+<a class="hover:text-primary transition" href="#git">GIT Insurance Policy</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Arbitrator Escrow Release Certificate &amp; Final Liquidation Award | RAMLP AgroLink</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Typography Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-low": "#edf6e9",
+            "inverse-primary": "#88d89c",
+            "outline-variant": "#bfc9bd",
+            "on-tertiary": "#ffffff",
+            "surface-container-high": "#e2ebde",
+            "outline": "#707a6f",
+            "on-primary-fixed-variant": "#005228",
+            "on-secondary-container": "#36721f",
+            "secondary": "#306b19",
+            "background": "#f3fcef",
+            "tertiary-container": "#7b5700",
+            "on-error-container": "#93000a",
+            "secondary-container": "#b0f491",
+            "primary-fixed-dim": "#88d89c",
+            "on-background": "#161d16",
+            "error": "#ba1a1a",
+            "tertiary-fixed": "#ffdea7",
+            "surface-variant": "#dce5d9",
+            "on-secondary": "#ffffff",
+            "secondary-fixed": "#b0f491",
+            "primary-container": "#176b3a",
+            "tertiary-fixed-dim": "#f8bd45",
+            "on-primary": "#ffffff",
+            "on-error": "#ffffff",
+            "inverse-on-surface": "#eaf3e7",
+            "inverse-surface": "#2a322a",
+            "on-surface-variant": "#404940",
+            "on-tertiary-fixed": "#271900",
+            "surface-dim": "#d4ddd0",
+            "on-tertiary-container": "#ffd07c",
+            "surface-container-highest": "#dce5d9",
+            "surface": "#f3fcef",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "on-primary-container": "#98e9ab",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed": "#052100",
+            "on-surface": "#161d16",
+            "primary-fixed": "#a3f5b6",
+            "surface-bright": "#f3fcef",
+            "surface-container": "#e8f0e4",
+            "primary": "#005128",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-fixed-variant": "#175200",
+            "tertiary": "#5d4100",
+            "on-primary-fixed": "#00210d",
+            "surface-tint": "#196c3b",
+            "secondary-fixed-dim": "#95d878"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "margin-desktop": "2.5rem"
+          },
+          "fontFamily": {
+            "currency-display": ["Manrope", "sans-serif"],
+            "display-lg-mobile": ["Manrope", "sans-serif"],
+            "headline-sm": ["Manrope", "sans-serif"],
+            "label-lg": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "headline-lg": ["Manrope", "sans-serif"],
+            "headline-md": ["Manrope", "sans-serif"],
+            "display-lg": ["Manrope", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "headline-lg-mobile": ["Manrope", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "serif-legal": ["Playfair Display", "serif"]
+          },
+          "fontSize": {
+            "currency-display": ["2rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "display-lg-mobile": ["2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "label-lg": ["1rem", { "lineHeight": "1.5rem", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }],
+            "headline-lg": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-md": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "headline-lg-mobile": ["1.625rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .paper-texture {
+      background-color: #ffffff;
+      background-image: radial-gradient(#edf6e9 0.75px, transparent 0.75px);
+      background-size: 16px 16px;
+    }
+    .watermark-seal {
+      background-image: radial-gradient(circle at center, rgba(0, 81, 40, 0.035) 0%, rgba(0, 81, 40, 0.01) 60%, transparent 80%);
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-certificate, #printable-certificate * {
+        visibility: visible;
+      }
+      #printable-certificate {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TOP APP BAR (Shared Component Anchor) -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-7xl mx-auto h-16">
+<!-- Brand Cluster -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-2xl" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed tracking-tight">AgroLink RAMLP</span>
+<span class="bg-primary-container text-on-primary text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded">Federal Registry</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span>CBN &amp; FMARD Statutory Portal</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-primary font-semibold">Legal &amp; Arbitration Wing</span>
+</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links (Active on Disputes & Escrow) -->
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Marketplace</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Waybill &amp; Haulage</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Quality Lab</a>
+<a class="border-b-2 border-primary dark:border-primary-fixed text-primary dark:text-primary-fixed font-label-md text-label-md pb-1 transition duration-150 ease-in-out font-semibold" href="#">Disputes &amp; Escrow</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed pb-1 transition duration-150 ease-in-out active:scale-[0.99]" href="#">Settlements</a>
+</nav>
+<!-- Right Action Cluster -->
+<div class="flex items-center gap-3">
+<!-- Verification Pill -->
+<div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-medium">CBN Verification Active</span>
+</div>
+<!-- Trailing Icon Actions -->
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" title="Support Agent">
+<span class="material-symbols-outlined text-xl" data-icon="support_agent">support_agent</span>
+</button>
+<div class="h-6 w-px bg-outline-variant"></div>
+<!-- Barrister Officer Profile -->
+<div class="flex items-center gap-2 pl-1">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs border border-primary">
+            AA
+          </div>
+<div class="text-left hidden sm:block">
+<p class="font-label-sm text-label-sm font-semibold text-on-surface leading-tight">Barr. A. Aliyu, SAN</p>
+<p class="text-[10px] text-on-surface-variant leading-tight">Lead High Court Arbitrator</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- SUB-HEADER / STATUTORY ACTION RIBBON -->
+<section class="bg-surface-container border-b border-outline-variant shadow-sm py-4">
+<div class="max-w-7xl mx-auto px-margin-desktop flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<a class="text-primary hover:underline text-xs flex items-center gap-1 font-label-sm" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+            Escrow Docket Registry
+          </a>
+<span class="text-outline-variant text-xs">/</span>
+<span class="text-xs font-mono text-on-surface-variant">DSP-2025-0142</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold flex items-center gap-2">
+<span>Statutory Arbitration Award &amp; Escrow Liquidation Decree</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary-container text-on-secondary-container tracking-normal">ENFORCEABLE JUDGMENT</span>
+</h1>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-wrap items-center gap-2.5">
+<button class="px-4 h-10 bg-surface-container-lowest border border-outline-variant text-primary hover:bg-surface-container-low font-label-md text-label-md rounded-lg flex items-center gap-2 transition duration-150 active:scale-[0.98]" onclick="window.print()">
+<span class="material-symbols-outlined text-lg" data-icon="print">print</span>
+<span>Print Certified True Copy (CTC)</span>
+</button>
+<button class="px-4 h-10 bg-surface-container-lowest border border-outline-variant text-primary hover:bg-surface-container-low font-label-md text-label-md rounded-lg flex items-center gap-2 transition duration-150 active:scale-[0.98]" onclick="downloadDigestMock()">
+<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
+<span>Download Signed PDF (SHA-256)</span>
+</button>
+<button class="px-5 h-10 bg-primary hover:bg-[#11522C] text-on-primary font-label-md text-label-md font-semibold rounded-lg shadow-sm flex items-center gap-2 transition duration-150 active:scale-[0.98]" onclick="triggerTransmissionNotice()">
+<span class="material-symbols-outlined text-lg" data-icon="send">send</span>
+<span>Transmit Order to Providus Custody Bank</span>
+</button>
+</div>
+</div>
+</section>
+<!-- MAIN WORKSPACE / 12-COLUMN DUAL VIEW -->
+<main class="flex-grow max-w-7xl mx-auto w-full px-margin-desktop py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT 8 COLS: FORMAL CERTIFICATE / LEGAL DECREE CANVAS -->
+<article class="lg:col-span-8 bg-surface-container-lowest border-2 border-outline-variant shadow-md rounded-xl p-8 md:p-12 relative overflow-hidden paper-texture" id="printable-certificate">
+<!-- Watermark Background Ornament -->
+<div class="absolute inset-0 pointer-events-none watermark-seal flex items-center justify-center opacity-40">
+<div class="w-[480px] h-[480px] border-[24px] border-[#005128]/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[160px] text-[#005128]/10" data-icon="gavel">gavel</span>
+</div>
+</div>
+<div class="relative z-10 space-y-8">
+<!-- Institutional Header & Coat of Arms Emblem -->
+<div class="text-center pb-6 border-b-2 border-primary/20 space-y-3">
+<div class="flex justify-center items-center gap-4">
+<!-- Nigeria Seal Emblem -->
+<div class="w-16 h-16 rounded-full border-2 border-primary/40 p-1 flex items-center justify-center bg-surface-container-low shadow-inner">
+<div class="w-full h-full rounded-full border border-primary/20 flex flex-col items-center justify-center bg-surface-container-lowest">
+<span class="material-symbols-outlined text-2xl text-primary" data-icon="shield">shield</span>
+<span class="text-[7px] font-bold text-primary tracking-tighter">NIGERIA</span>
+</div>
+</div>
+<!-- RAMLP Emblem -->
+<div class="w-16 h-16 rounded-full border-2 border-secondary/40 p-1 flex items-center justify-center bg-surface-container-low shadow-inner">
+<div class="w-full h-full rounded-full border border-secondary/20 flex flex-col items-center justify-center bg-surface-container-lowest">
+<span class="material-symbols-outlined text-2xl text-secondary" data-icon="balance">balance</span>
+<span class="text-[7px] font-bold text-secondary tracking-tighter">RAMLP</span>
+</div>
+</div>
+</div>
+<div>
+<p class="text-xs uppercase font-bold tracking-[0.25em] text-on-surface-variant font-label-sm">FEDERAL REPUBLIC OF NIGERIA</p>
+<h2 class="font-serif-legal text-2xl md:text-3xl font-bold text-primary mt-1">High Court of Justice / AgroLink Statutory Panel</h2>
+<p class="text-xs font-semibold text-secondary tracking-wider uppercase mt-1">
+              Arbitration and Mediation Act 2023 Statutory Seal • Section 53 Enforceability Decree
+            </p>
+<p class="text-xs text-on-surface-variant mt-0.5">
+              Administered in collaboration with the Central Bank of Nigeria (Escrow Clearing Framework)
+            </p>
+</div>
+<!-- Official Registry Ribbon Strip -->
+<div class="inline-flex flex-wrap items-center justify-center gap-3 bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant font-mono text-xs text-on-surface mt-2">
+<span><strong>CASE REF:</strong> #DSP-2025-0142</span>
+<span class="text-outline-variant">•</span>
+<span><strong>RAMLP DOCKET:</strong> REG-NG-2025-SOYA-792</span>
+<span class="text-outline-variant">•</span>
+<span class="text-primary font-bold">STATUS: ADJUDICATED &amp; ENFORCED</span>
+</div>
+</div>
+<!-- Citation & Legal Reference Block -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-surface-container-low/60 p-4 rounded-lg border border-outline-variant text-xs">
+<div>
+<span class="text-on-surface-variant block font-label-sm font-semibold uppercase text-[10px]">Judicial Registry</span>
+<p class="font-medium text-on-surface mt-0.5">High Court Commercial Division, Abuja FCT</p>
+</div>
+<div>
+<span class="text-on-surface-variant block font-label-sm font-semibold uppercase text-[10px]">Presiding Sole Arbitrator</span>
+<p class="font-medium text-on-surface mt-0.5">Barr. Ahmad Aliyu, SAN (FCIArb)</p>
+</div>
+<div>
+<span class="text-on-surface-variant block font-label-sm font-semibold uppercase text-[10px]">Date of Final Award</span>
+<p class="font-medium text-on-surface mt-0.5">24th October 2025 • 14:32:08 WAT</p>
+</div>
+</div>
+<!-- Tripartite Recitals / Parties to the Dispute -->
+<div class="space-y-3">
+<h3 class="font-headline-sm text-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5 border-b border-outline-variant pb-1">
+<span class="material-symbols-outlined text-base" data-icon="groups">groups</span>
+            1. Tripartite Recitals &amp; Enrolled Parties
+          </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<!-- Complainant -->
+<div class="bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant space-y-1">
+<span class="bg-error-container text-on-error-container text-[10px] font-bold px-2 py-0.5 rounded-full inline-block">Complainant / Off-taker</span>
+<p class="font-label-md text-label-md font-bold text-on-surface">Animal Care Feeds Ltd</p>
+<p class="text-xs text-on-surface-variant">RC-849202 • Ogere Feedmill, Ogun State</p>
+<p class="text-[11px] text-outline font-mono mt-1">RC Account: 1029384721</p>
+</div>
+<!-- Respondent -->
+<div class="bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant space-y-1">
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full inline-block">Respondent / Producer</span>
+<p class="font-label-md text-label-md font-bold text-on-surface">Gboko Soya Farmers Union</p>
+<p class="text-xs text-on-surface-variant">Coop Reg: BN/COOP/2019/114 • Benue State</p>
+<p class="text-[11px] text-outline font-mono mt-1">Aggregator ID: AG-BN-882</p>
+</div>
+<!-- Carrier -->
+<div class="bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant space-y-1">
+<span class="bg-surface-container text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full inline-block">Carrier / Logistics Fleet</span>
+<p class="font-label-md text-label-md font-bold text-on-surface">Tarkaa Logistics Fleet</p>
+<p class="text-xs text-on-surface-variant">Waybill #WB-2025-9921 • Truck DKA-481-XA</p>
+<p class="text-[11px] text-outline font-mono mt-1">Underwriter: Sovereign Trust</p>
+</div>
+</div>
+</div>
+<!-- Forensic Findings & Adjudication Summary -->
+<div class="space-y-3">
+<h3 class="font-headline-sm text-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5 border-b border-outline-variant pb-1">
+<span class="material-symbols-outlined text-base" data-icon="fact_check">fact_check</span>
+            2. Forensic Findings &amp; Legal Grounds
+          </h3>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant text-xs space-y-2 text-on-surface leading-relaxed">
+<p>
+<strong>WHEREAS,</strong> Complainant lodged an escrow freeze request on 21 October 2025 regarding <strong>Soya Beans Lot #792 (30 Metric Tons)</strong>, claiming delivery moisture content of <strong>14.2%</strong> exceeding the maximum contract threshold of <strong>10.5%</strong>.
+            </p>
+<p>
+<strong>FORENSIC EXAMINATION:</strong> Telematics from AgroLink Weighbridge and Quality Lab Sensor Pack #QL-881 verified that goods departed Gboko certified at <strong>9.8% moisture</strong>. An independent survey verified heavy torrential thunderstorm ingress along the Ore–Sagamu transit corridor resulting from tarpaulin failure on carrier vehicle Tarkaa DKA-481-XA.
+            </p>
+<p>
+<strong>RULING:</strong> Pursuant to RAMLP Operational Guideline Art. 14(3) and the <em>Arbitration and Mediation Act 2023</em>, Seller completed good faith dispatch. The loss is determined to be a transit casualty covered under <strong>Sovereign Trust Marine Transit Cargo Policy #STP-CARGO-771</strong>. Complainant is awarded remediation compensation from the transit insurance pool, whilst Seller’s Milestone 2 funds are exonerated and declared ripe for immediate 100% liquidation.
+            </p>
+</div>
+</div>
+<!-- Binding Financial Disbursement Table -->
+<div class="space-y-3">
+<h3 class="font-headline-sm text-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5 border-b border-outline-variant pb-1">
+<span class="material-symbols-outlined text-base" data-icon="payments">payments</span>
+            3. Final Order of Liquidation &amp; Escrow Disbursement
+          </h3>
+<div class="overflow-x-auto rounded-lg border border-outline-variant">
+<table class="w-full text-left text-xs bg-surface-container-lowest">
+<thead class="bg-surface-container-high text-on-surface-variant font-label-sm uppercase text-[10px] tracking-wider">
+<tr>
+<th class="py-2.5 px-4">Beneficiary / Destination Account</th>
+<th class="py-2.5 px-3">Disbursement Classification</th>
+<th class="py-2.5 px-3">Source Channel</th>
+<th class="py-2.5 px-4 text-right">Amount (NGN)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-sm">
+<!-- Row 1: Seller Escrow -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-4">
+<p class="font-bold text-on-surface">Gboko Soya Farmers Union</p>
+<p class="text-[11px] text-on-surface-variant font-mono">Providus Bank • A/C #5400291844</p>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-secondary font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                      100% Milestone 2 Release
+                    </span>
+</td>
+<td class="py-3 px-3 font-mono text-[11px] text-on-surface-variant">Providus Escrow Vault #882</td>
+<td class="py-3 px-4 text-right font-bold text-primary font-mono text-sm">₦5,040,000.00</td>
+</tr>
+<!-- Row 2: Buyer Insurance -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-4">
+<p class="font-bold text-on-surface">Animal Care Feeds Ltd</p>
+<p class="text-[11px] text-on-surface-variant font-mono">Zenith Bank • A/C #1012948271</p>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                      Remediation Insurance Indemnity
+                    </span>
+</td>
+<td class="py-3 px-3 font-mono text-[11px] text-on-surface-variant">Sovereign Underwriting Pool</td>
+<td class="py-3 px-4 text-right font-bold text-on-surface font-mono text-sm">₦1,008,000.00</td>
+</tr>
+<!-- Row 3: Statutory Surcharge -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-4">
+<p class="font-bold text-on-surface">RAMLP Statutory Tribunal Desk</p>
+<p class="text-[11px] text-on-surface-variant font-mono">CBN Consolidated TSA #002008441</p>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                      Panel Administration Surcharge
+                    </span>
+</td>
+<td class="py-3 px-3 font-mono text-[11px] text-on-surface-variant">Carrier Penalty Deductible</td>
+<td class="py-3 px-4 text-right font-medium text-on-surface font-mono text-sm">₦21,000.00</td>
+</tr>
+</tbody>
+<tfoot class="bg-surface-container font-semibold border-t-2 border-outline-variant">
+<tr>
+<td class="py-3 px-4 font-bold text-primary text-xs uppercase tracking-wide" colspan="3">
+                    Net Providus Custody Vault Liquidation Commitment
+                  </td>
+<td class="py-3 px-4 text-right font-currency-display text-currency-display text-primary">
+                    ₦5,040,000.00
+                  </td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+<!-- Electronic Cryptographic Signatures & Authority Seals -->
+<div class="pt-4 space-y-4">
+<h3 class="font-headline-sm text-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5 border-b border-outline-variant pb-1">
+<span class="material-symbols-outlined text-base" data-icon="verified_user">verified_user</span>
+            4. Electronic Cryptographic Attestation &amp; Statutory Seals
+          </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Chief Arbitrator Signature -->
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant flex flex-col justify-between h-44 relative">
+<div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">Sole Presiding Arbitrator</span>
+<p class="font-bold text-on-surface text-xs mt-0.5">Barr. Ahmad Aliyu, SAN</p>
+<p class="text-[10px] text-outline">Fellow, Chartered Institute of Arbitrators (FCIArb)</p>
+</div>
+<div class="my-auto py-1">
+<!-- Stylized Electronic Signature -->
+<p class="font-serif-legal italic text-xl text-primary font-bold transform -rotate-2 select-none">
+                  AhmadAliyu.san
+                </p>
+</div>
+<div class="border-t border-outline-variant/60 pt-1 text-[9px] font-mono text-outline">
+<span>DIGITAL PIN: #9942-FCT-2025</span><br/>
+<span>Timestamp: 2025-10-24 14:32:08 WAT</span>
+</div>
+</div>
+<!-- Providus Bank Custodial Trustee Seal -->
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant flex flex-col justify-between h-44 relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">Custodial Escrow Trustee</span>
+<p class="font-bold text-on-surface text-xs mt-0.5">Providus Bank Plc</p>
+<p class="text-[10px] text-outline">Settlement Operations Desk</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-2xl" data-icon="lock_open">lock_open</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant font-mono text-[9px] text-on-surface leading-tight break-all">
+<span class="text-[8px] uppercase font-bold text-primary block">CBN e-Clearance Token:</span>
+                0x7f4c9a8b12e3...d8a410bfe392
+              </div>
+<div class="border-t border-outline-variant/60 pt-1 text-[9px] font-mono text-secondary font-semibold flex items-center justify-between">
+<span>VAULT UNLOCK: AUTHORIZED</span>
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- NIBSS Automated Payout Switch Stamp -->
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant flex flex-col justify-between h-44 relative">
+<div class="flex items-start justify-between">
+<div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">Instant Payout Switch</span>
+<p class="font-bold text-on-surface text-xs mt-0.5">NIBSS Settlement Engine</p>
+<p class="text-[10px] text-outline">Batch Priority: Tier 1 Real-Time</p>
+</div>
+<div class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-base" data-icon="bolt">bolt</span>
+</div>
+</div>
+<div class="my-auto">
+<div class="inline-block border-2 border-dashed border-primary/40 px-3 py-1.5 rounded bg-surface-container-low text-center w-full">
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase block">NIBSS T+0 DISPATCH LOCK</span>
+<span class="text-[9px] font-mono text-on-surface-variant">SWITCH-ID: NIB-88192-2025</span>
+</div>
+</div>
+<div class="border-t border-outline-variant/60 pt-1 text-[9px] font-mono text-outline flex items-center justify-between">
+<span>Direct Credit NUBAN Validated</span>
+<span class="text-primary font-bold">100% READY</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Cryptographic Ledger Footer Note -->
+<div class="pt-4 border-t border-outline-variant text-[11px] text-on-surface-variant flex flex-col md:flex-row justify-between items-center gap-2">
+<div class="flex items-center gap-2 font-mono">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="fingerprint">fingerprint</span>
+<span>SHA-256 HASH: a89e3f48c1b973ef841d990bc1f3014c55d0482e9b2512f71887e4d9c0fa1a90</span>
+</div>
+<span class="font-label-sm text-[10px] uppercase font-bold text-secondary">Statutory Instrument Enacted • RAMLP FCT Abuja</span>
+</div>
+</div>
+</article>
+<!-- RIGHT 4 COLS: EXECUTION AUDIT, CLEARING ACTIONS & REGULATORY DECLARATION -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Order Enforcement Real-Time Status Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between border-b border-outline-variant pb-3">
+<h4 class="font-label-lg text-label-lg font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="timeline">timeline</span>
+            Enforcement Tracker
+          </h4>
+<span class="px-2 py-0.5 text-[11px] font-bold bg-secondary-container text-on-secondary-container rounded-full">
+            Stage 4 of 4
+          </span>
+</div>
+<!-- Step List -->
+<div class="space-y-4 text-xs">
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Forensic Quality Sensor Upload</p>
+<p class="text-on-surface-variant text-[11px]">Weighbridge #QL-881 verified transit storm casualty.</p>
+<span class="text-[10px] font-mono text-outline">Oct 23, 2025 • 10:14 WAT</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Statutory Arbitration Ruling</p>
+<p class="text-on-surface-variant text-[11px]">High Court Arbitrator signed decree #DSP-2025-0142.</p>
+<span class="text-[10px] font-mono text-outline">Oct 24, 2025 • 14:32 WAT</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Providus Vault Freeze Lifted</p>
+<p class="text-on-surface-variant text-[11px]">Milestone 2 unlocked under CBN Regulation 44.</p>
+<span class="text-[10px] font-mono text-outline">Oct 24, 2025 • 14:38 WAT</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 mt-0.5 ring-4 ring-secondary-container/50">
+<span class="material-symbols-outlined text-sm" data-icon="sync">sync</span>
+</div>
+<div>
+<p class="font-bold text-primary">NIBSS Automated Dispatch Pending</p>
+<p class="text-on-surface-variant text-[11px]">Awaiting Final Transmit execution by Registrar.</p>
+<span class="text-[10px] font-mono text-primary font-semibold">T+0 Window Active</span>
+</div>
+</div>
+</div>
+<button class="w-full h-11 bg-primary hover:bg-[#11522C] text-on-primary font-label-md text-label-md font-bold rounded-lg shadow transition active:scale-[0.98] flex items-center justify-center gap-2" onclick="triggerTransmissionNotice()">
+<span class="material-symbols-outlined text-lg" data-icon="lock_open">lock_open</span>
+<span>Execute Transmit &amp; Disburse</span>
+</button>
+</div>
+<!-- Providus Bank Custody Clearing Details -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<h4 class="font-label-lg text-label-lg font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+          Custodial Clearing Account
+        </h4>
+<div class="p-3 bg-surface-container-low rounded-lg space-y-2 text-xs">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-medium">Custody Depository:</span>
+<span class="font-bold text-on-surface">Providus Bank Plc</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-medium">Vault Ledger ID:</span>
+<span class="font-mono text-on-surface font-semibold">PRV-ESC-7729-SOYA</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-medium">Encumbered Milestone:</span>
+<span class="font-semibold text-primary">₦5,040,000.00</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-medium">CBN Settlement Channel:</span>
+<span class="font-mono text-on-surface">NIBSS Instant Payment (NIP)</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-[11px] text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="shield">shield</span>
+<span>Funds ring-fenced under CBN Agricultural Collateral Protection scheme.</span>
+</div>
+</div>
+<!-- Sovereign Trust Insurance Underwriting Slip -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+<div class="flex items-center justify-between">
+<h4 class="font-label-lg text-label-lg font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-container" data-icon="policy">policy</span>
+            Underwriting Policy Slip
+          </h4>
+<span class="px-2 py-0.5 rounded text-[10px] bg-surface-container font-mono text-on-surface font-bold">APPROVED</span>
+</div>
+<div class="space-y-1.5 text-xs">
+<p class="text-on-surface font-semibold">Sovereign Trust Insurance Plc</p>
+<p class="text-on-surface-variant text-[11px]">Marine &amp; Transit Agricultural Cargo Cover</p>
+<div class="pt-2 border-t border-outline-variant text-[11px] space-y-1">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Policy Number:</span>
+<span class="font-mono font-bold text-on-surface">STP-CARGO-771</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Adjusted Remediation Sum:</span>
+<span class="font-mono font-bold text-primary">₦1,008,000.00</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Claim Assessor Ref:</span>
+<span class="font-mono text-on-surface">ADJ-IBADAN-094</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CBN Regulatory Compliance Declaration Box -->
+<div class="bg-surface-container-high/60 border border-outline-variant rounded-xl p-4 text-xs space-y-2">
+<div class="flex items-center gap-2 font-bold text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-base" data-icon="gavel">gavel</span>
+<span>CBN Regulatory Decree Notice</span>
+</div>
+<p class="text-on-surface-variant text-[11px] leading-relaxed">
+          This award constitutes a final, unappealable liquidation writ pursuant to the provisions of Section 53 of the <em>Arbitration and Mediation Act 2023</em> and the <em>Central Bank of Nigeria Consumer Protection Framework (Agro-Fintech Mandate 2024)</em>. Custody holder Providus Bank Plc is mandated to effect irrevocable automated credit switch within 2 hours of digital transmission.
+        </p>
+<div class="pt-1 flex items-center justify-between text-[10px] text-outline font-mono">
+<span>REGISTRY: COURT-FCT-ABJ</span>
+<span>GAZETTE: VOL. 112 / NO. 44</span>
+</div>
+</div>
+</aside>
+</main>
+<!-- INSTITUTIONAL FOOTER (Shared Component Anchor) -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface border-t border-outline-variant dark:border-outline mt-12 docked full-width bottom">
+<div class="w-full py-8 px-margin-desktop max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<!-- Institutional Copyright & Regulator Text -->
+<div class="text-center md:text-left space-y-1">
+<div class="flex items-center justify-center md:justify-start gap-2">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">AgroLink RAMLP</span>
+<span class="text-xs bg-surface-container text-on-surface-variant px-2 py-0.5 rounded font-mono">v4.2.8</span>
+</div>
+<p class="text-on-surface-variant dark:text-outline-variant font-body-sm text-body-sm max-w-2xl">
+          © 2025 RAMLP AgroLink Continental Ecosystem. Central Bank of Nigeria Regulated Escrow. Providus &amp; NIBSS Settlement Secured.
+        </p>
+</div>
+<!-- Institutional Statutory Links -->
+<div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-2">
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">CBN Compliance</a>
+<a class="text-primary dark:text-primary-fixed font-label-sm text-label-sm hover:underline transition-colors duration-150 font-semibold" href="#">Dispute Framework</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Weighbridge Protocol</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Moisture Standards</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Developer APIs</a>
+<a class="text-on-surface-variant dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed hover:underline transition-colors duration-150" href="#">Privacy Notice</a>
+</div>
+</div>
+</footer>
+<!-- Notification Toast Container -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-32 transition-transform duration-300 ease-out max-w-md bg-inverse-surface text-inverse-on-surface rounded-xl shadow-2xl p-4 border border-outline/30 flex items-start gap-3" id="toast-notification">
+<div class="p-2 rounded-lg bg-primary text-on-primary">
+<span class="material-symbols-outlined text-xl" data-icon="send">send</span>
+</div>
+<div class="flex-grow space-y-1">
+<p class="font-bold text-sm">Order Dispatched to Providus Vault</p>
+<p class="text-xs text-inverse-on-surface/80">
+        Statutory Decree #DSP-2025-0142 transmitted via secure NIBSS API. ₦5,040,000 disbursement queued for instant execution.
+      </p>
+<p class="text-[10px] font-mono text-primary-fixed">NIBSS-TX-REF: 2025-1024-8849-01</p>
+</div>
+<button class="text-inverse-on-surface/60 hover:text-inverse-on-surface" onclick="hideToast()">
+<span class="material-symbols-outlined text-lg" data-icon="close">close</span>
+</button>
+</div>
+<!-- Micro-Interactions Script -->
+<script>
+    function triggerTransmissionNotice() {
+      const toast = document.getElementById('toast-notification');
+      toast.classList.remove('translate-y-32');
+      toast.classList.add('translate-y-0');
+      
+      setTimeout(() => {
+        hideToast();
+      }, 7000);
+    }
+
+    function hideToast() {
+      const toast = document.getElementById('toast-notification');
+      toast.classList.add('translate-y-32');
+      toast.classList.remove('translate-y-0');
+    }
+
+    function downloadDigestMock() {
+      const originalText = event.currentTarget.innerHTML;
+      const btn = event.currentTarget;
+      btn.innerHTML = `<span class="material-symbols-outlined text-lg animate-spin" data-icon="sync">sync</span><span>Verifying SHA-256...</span>`;
+      
+      setTimeout(() => {
+        btn.innerHTML = `<span class="material-symbols-outlined text-lg text-primary" data-icon="check_circle">check_circle</span><span>PDF Verified & Saved</span>`;
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2500);
+      }, 1200);
+    }
+  </script>
+</body></html>
