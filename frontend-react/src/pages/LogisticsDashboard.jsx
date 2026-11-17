@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
   ArrowRight, CalendarDays, CheckCircle2, ClipboardCheck, Compass,
@@ -385,14 +386,14 @@ export default function LogisticsDashboard() {
 
           <div className="rounded-card border border-line bg-white p-4">
             <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
-              <Phone size={12} /> Dispatch desk
+              <Phone size={12} /> Transport team
             </p>
             <p className="mt-1.5 text-[11px] leading-5 text-muted">
               For jobs or problems, message our transport team and tell us where your truck is.
             </p>
-            <a href="tel:+2348000725670" className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-forest-600 hover:underline">
-              <Phone size={12} /> +234 800 072 5670
-            </a>
+            <Link to="/messages" className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-forest-600 hover:underline">
+              <Phone size={12} /> Send a message
+            </Link>
           </div>
         </aside>
       </div>
