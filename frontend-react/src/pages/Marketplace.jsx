@@ -142,7 +142,7 @@ function BasketRail({ onCheckout }) {
     <aside className="rounded-card border border-line bg-white shadow-card xl:sticky xl:top-24">
       <div className="flex items-center justify-between border-b border-line px-4 py-3.5">
         <h2 className="flex items-center gap-2 font-display text-[14px] font-bold text-ink">
-          <ShoppingCart size={15} className="text-forest-500" /> Procurement basket
+          <ShoppingCart size={15} className="text-forest-500" /> Your basket
         </h2>
         <span className="rounded-full bg-forest-50 px-2 py-0.5 text-[10.5px] font-bold text-forest-600">
           {activeCount}
@@ -387,7 +387,7 @@ export default function Marketplace() {
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-forest-50 px-2.5 py-1 text-[11px] font-bold text-forest-600">
             <span className="h-1.5 w-1.5 rounded-full bg-forest-500" />
-            Live board
+            Live market
           </span>
           <p className="text-[12.5px] text-muted">
             <span className="font-semibold text-ink">{meta.total}</span> lots available ·{' '}
@@ -417,7 +417,7 @@ export default function Marketplace() {
           <div className="rounded-card border border-line bg-white p-4 shadow-card">
             <div className="mb-4 flex items-center justify-between">
               <p className="flex items-center gap-1.5 text-[12.5px] font-bold text-ink">
-                <SlidersHorizontal size={14} className="text-forest-500" /> Refine board
+                <SlidersHorizontal size={14} className="text-forest-500" /> Filters
               </p>
               {(activeFilterCount > 0 || filters.q) && (
                 <button type="button" onClick={reset} className="text-[10.5px] font-semibold text-forest-600 hover:underline">

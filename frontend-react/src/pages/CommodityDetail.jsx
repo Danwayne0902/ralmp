@@ -85,7 +85,7 @@ export default function CommodityDetail() {
       .then((data) => {
         if (!active) return
         if (!data?.id) {
-          setError('This lot is no longer on the board.')
+          setError('This lot is no longer for sale.')
           return
         }
         setLot(data)
@@ -134,7 +134,7 @@ export default function CommodityDetail() {
     setAdding(true)
     try {
       await cart.add(Number(id), qty)
-      toast.success(`Added ${qtyUnit(qty, lot.unit)} to your procurement basket`, {
+      toast.success(`Added ${qtyUnit(qty, lot.unit)} to your basket`, {
         action: { label: 'Open basket', onClick: () => navigate('/cart') },
       })
     } catch (err) {
@@ -247,7 +247,7 @@ export default function CommodityDetail() {
                   {lot.commodity_name}
                 </h1>
                 <p className="mt-1.5 text-[13px] text-muted">
-                  Lot #{lot.id} · {qtyUnit(lot.quantity, lot.unit)} on the board
+                  Lot #{lot.id} · {qtyUnit(lot.quantity, lot.unit)} for sale
                 </p>
               </div>
               <Badge tone={soldOut ? 'critical' : stock < 50 ? 'pending' : 'verified'} size="lg">

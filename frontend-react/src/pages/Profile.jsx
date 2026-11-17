@@ -238,7 +238,7 @@ export default function Profile() {
                     <Field label="Full name" required>
                       <Input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} required />
                     </Field>
-                    <Field label="Email" hint="Ask the trade desk to change this">
+                    <Field label="Email" hint="Ask our team to change this">
                       <Input value={profile?.email || ''} disabled className="bg-canvas text-muted" />
                     </Field>
                     <Field label="Phone" required>
@@ -396,7 +396,7 @@ export default function Profile() {
                     trail stays intact.
                   </p>
                   <Button asChild variant="outline" size="sm" className="mt-3">
-                    <Link to="/messages">Contact the trade desk</Link>
+                    <Link to="/messages">Contact our team</Link>
                   </Button>
                 </div>
               </div>
@@ -430,8 +430,8 @@ export default function Profile() {
               {profile?.role === 'farmer'
                 ? 'This origin appears on every lot you publish. Buyers filter supply by state.'
                 : profile?.role === 'buyer'
-                  ? 'This is the default delivery point for procurement. Update it before confirming a delivery window.'
-                  : 'This address anchors dispatch instructions and carrier matching.'}
+                  ? 'This is your default delivery address. Update it before you confirm a delivery window.'
+                  : 'This address is used for pickups and delivery jobs.'}
             </p>
           </div>
 

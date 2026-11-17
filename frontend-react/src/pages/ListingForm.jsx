@@ -414,7 +414,7 @@ export default function ListingForm() {
 
             <div className="mt-4 rounded-xl border border-line bg-canvas p-4">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold text-muted">Board value at this price</p>
+                <p className="text-[11px] font-semibold text-muted">Total value at this price</p>
                 <p className="font-display text-[18px] font-extrabold text-forest-600 tnum">{money(boardValue)}</p>
               </div>
               <p className="mt-1 text-[10.5px] text-muted tnum">

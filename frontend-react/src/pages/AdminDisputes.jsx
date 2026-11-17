@@ -398,7 +398,7 @@ export default function AdminDisputes() {
               A missing delivery note is the most common problem. Tell the transport team before the load arrives, not after.
             </p>
             <Button asChild variant="outline" size="sm" className="mt-2.5 w-full">
-              <Link to="/dispatch">Open the job board</Link>
+              <Link to="/dispatch">See delivery jobs</Link>
             </Button>
           </div>
 

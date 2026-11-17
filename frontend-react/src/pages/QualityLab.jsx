@@ -331,7 +331,7 @@ export default function QualityLab() {
                 are routed to the exception queue instead of sampling.
               </p>
               <Button asChild variant="outline" size="sm" className="mt-2.5 w-full">
-                <Link to="/dispatch">Dispatch board</Link>
+                <Link to="/dispatch">Delivery jobs</Link>
               </Button>
             </div>
           </aside>

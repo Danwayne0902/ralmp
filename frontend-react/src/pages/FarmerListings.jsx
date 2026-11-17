@@ -78,7 +78,7 @@ export default function FarmerListings() {
     setDeleting(true)
     try {
       await produceService.remove(target.id)
-      toast.success(`${target.commodity_name} removed from the board`)
+      toast.success(`${target.commodity_name} removed from the market`)
       setTarget(null)
       await load()
     } catch (err) {
@@ -131,7 +131,7 @@ export default function FarmerListings() {
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Stat icon={Sprout} label="Live lots" value={stats.live} hint={`${meta.total} lots on record`} />
-        <Stat icon={TrendingUp} label="Board value" value={money(stats.value)} tone="sprout" hint="Farm-gate value of live lots" size="lg" />
+        <Stat icon={TrendingUp} label="Value for sale" value={money(stats.value)} tone="sprout" hint="Farm-gate value of live lots" size="lg" />
         <Stat icon={Package} label="Out of stock" value={stats.out} tone="gold" hint="Restore volume to relist" />
         <Stat icon={CalendarDays} label="With photography" value={stats.photos} tone="neutral" hint={`${meta.total - stats.photos} lots need images`} />
       </div>
@@ -199,7 +199,7 @@ export default function FarmerListings() {
                     <Th>Origin</Th>
                     <Th className="text-right">Volume</Th>
                     <Th className="text-right">Farm-gate price</Th>
-                    <Th className="text-right">Board value</Th>
+                    <Th className="text-right">Value for sale</Th>
                     <Th>Harvest</Th>
                     <Th>State</Th>
                     <Th />
@@ -314,8 +314,8 @@ export default function FarmerListings() {
       <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-line bg-white p-4">
         <TriangleAlert size={15} className="mt-0.5 shrink-0 text-harvest-500" />
         <p className="text-[11px] leading-5 text-muted">
-          Deleting a lot removes it from the exchange immediately and is irreversible. If a buyer has already
-          committed stock, the order record is preserved and the trade desk will contact you.
+          Deleting a listing removes it from the market right away and cannot be undone. If a buyer has already
+          taken some stock, the order record is kept and our team will contact you.
         </p>
       </div>
 

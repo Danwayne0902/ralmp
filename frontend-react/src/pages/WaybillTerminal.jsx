@@ -343,7 +343,7 @@ export default function WaybillTerminal() {
             </CardBody>
             <CardFooter>
               <Button asChild variant="outline" size="sm" className="w-full">
-                <Link to="/dispatch">Open fleet board <ArrowRight size={14} /></Link>
+                <Link to="/dispatch">See delivery jobs <ArrowRight size={14} /></Link>
               </Button>
             </CardFooter>
           </Card>

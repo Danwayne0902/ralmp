@@ -158,7 +158,7 @@ export default function EscrowTrust() {
                 {[
                   { value: '10 / 60 / 30', label: 'Pay split' },
                   { value: '≤ 1.0%', label: 'Weight allowance' },
-                  { value: '3 gates', label: 'Proof points' },
+                  { value: '3 checks', label: 'Before payment' },
                 ].map((item) => (
                   <div key={item.label}>
                     <dt className="font-display text-[16px] font-extrabold tracking-tight tnum">{item.value}</dt>

@@ -306,7 +306,7 @@ export default function FarmerDashboard() {
 
           <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
             <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
-              <TrendingUp size={13} /> Value on the board
+              <TrendingUp size={13} /> Value for sale
             </p>
             <p className="mt-1 font-display text-[20px] font-extrabold text-forest-700 tnum">{money(stockValue)}</p>
             <p className="text-[10.5px] leading-4 text-forest-700/70">Farm value of the produce you have for sale.</p>

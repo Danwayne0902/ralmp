@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Banknote, CalendarDays, CheckCircle2, Clock3, Download,
-  Landmark, Lock, MessageSquare, Phone, ShieldCheck, Sprout, Truck, Wallet,
+  Landmark, Lock, MessageSquare, ShieldCheck, Sprout, Truck, Wallet,
 } from 'lucide-react'
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
@@ -301,11 +301,10 @@ export default function Payouts() {
 
           <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
             <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
-              <Phone size={13} /> Need help with a payment?
+              <MessageSquare size={13} /> Need help with a payment?
             </p>
             <p className="mt-1 text-[10.5px] leading-4 text-forest-700/75">
-              Call the trade desk on <a href="tel:+2348000725670" className="font-semibold underline">+234 800 072 5670</a>.
-              We can check any payment with you.
+              Send us a message from the Messages page and we will check it with you.
             </p>
           </div>
 

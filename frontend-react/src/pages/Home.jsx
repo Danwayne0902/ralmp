@@ -86,7 +86,7 @@ const STAKEHOLDERS = [
       'See every job in one place',
     ],
     to: '/dispatch',
-    cta: 'Go to the job board',
+    cta: 'See delivery jobs',
   },
 ]
 

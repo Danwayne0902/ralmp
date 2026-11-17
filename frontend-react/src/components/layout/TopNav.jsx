@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   BarChart3, CreditCard, FileText, FileWarning, FlaskConical, Gavel, Layers, LayoutDashboard,
   LogOut, Menu, MessageSquare, Package, ReceiptText, Search, ShoppingCart, Sprout,
-  Store, Truck, User as UserIcon, Users, Wallet, ShieldCheck, ArrowRight, Phone,
+  Store, Truck, User as UserIcon, Users, Wallet, ShieldCheck, ArrowRight,
 } from 'lucide-react'
 import { useAuth } from '../../store/auth'
 import { useCart } from '../../store/cart'
@@ -362,11 +362,10 @@ export default function TopNav() {
 
           <div className="rounded-xl border border-line bg-canvas p-4">
             <p className="flex items-center gap-2 text-[12px] font-bold text-forest-600">
-              <Phone size={14} /> Need help?
+              <MessageSquare size={14} /> Need help?
             </p>
             <p className="mt-1 text-[12px] leading-5 text-muted">
-              Call the trade desk on <a href="tel:+2348000725670" className="font-semibold text-ink hover:underline">+234 800 072 5670</a>.
-              We are open 07:00 to 19:00, Monday to Saturday.
+              Send us a message from the Messages page and we will reply as soon as we can.
             </p>
           </div>
         </div>
