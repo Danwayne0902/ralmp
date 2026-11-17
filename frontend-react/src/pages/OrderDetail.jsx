@@ -23,7 +23,7 @@ const NEXT_STATUS = {
   pending: { value: 'confirmed', label: 'Accept order', tone: 'primary' },
   accepted: { value: 'processing', label: 'Begin processing', tone: 'primary' },
   confirmed: { value: 'processing', label: 'Begin processing', tone: 'primary' },
-  processing: { value: 'shipped', label: 'Dispatch with waybill', tone: 'primary' },
+  processing: { value: 'shipped', label: 'Send with delivery note', tone: 'primary' },
   shipped: { value: 'delivered', label: 'Mark delivered', tone: 'primary' },
   delivered: { value: 'completed', label: 'Close & settle', tone: 'secondary' },
 }
@@ -147,7 +147,7 @@ export default function OrderDetail() {
   if (loading) {
     return (
       <div className="page-wrap page-pad">
-        <Loading label="Loading order ledger" />
+        <Loading label="Loading order" />
       </div>
     )
   }
@@ -157,7 +157,7 @@ export default function OrderDetail() {
       <div className="page-wrap page-pad">
         <EmptyState
           icon={Package}
-          title="Order not accessible"
+          title="You cannot open this order"
           description={error || 'This order does not exist or you do not have permission to view it.'}
           action={
             <Button asChild variant="outline">
@@ -198,13 +198,13 @@ export default function OrderDetail() {
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <Badge tone={paid ? 'verified' : 'pending'} size="md">
           {paid ? <BadgeCheck size={11} /> : <Clock3 size={11} />}
-          {paid ? 'Escrow funded' : 'Escrow unfunded'}
+          {paid ? 'Payment received' : 'Not paid yet'}
         </Badge>
         {order.delivery?.tracking_number && (
           <Badge tone="transit" size="md"><Truck size={11} /> WB {order.delivery.tracking_number}</Badge>
         )}
         {order.status === 'cancelled' && (
-          <Badge tone="critical" size="md"><CircleAlert size={11} /> Escrow frozen · stock restored</Badge>
+          <Badge tone="critical" size="md"><CircleAlert size={11} /> Payment on hold · stock returned</Badge>
         )}
         <p className="text-[11px] text-muted">
           Delivery requested for <span className="font-semibold text-ink-soft">{fmtDate(order.delivery_date)}</span>
@@ -248,11 +248,11 @@ export default function OrderDetail() {
                   </Tr>
                 ))}
                 <Tr className="hover:bg-transparent">
-                  <Td colSpan={3} className="text-right text-[11.5px] text-muted">Haulage & freight</Td>
+                  <Td colSpan={3} className="text-right text-[11.5px] text-muted">Delivery</Td>
                   <Td className="text-right tnum">{money(order.delivery_fee)}</Td>
                 </Tr>
                 <Tr className="hover:bg-transparent">
-                  <Td colSpan={3} className="text-right text-[12px] font-bold text-ink">Total escrow commitment</Td>
+                  <Td colSpan={3} className="text-right text-[12px] font-bold text-ink">Total paid</Td>
                   <Td className="text-right font-display text-[16px] font-extrabold text-forest-600 tnum">
                     {money(order.total_price)}
                   </Td>
@@ -261,7 +261,7 @@ export default function OrderDetail() {
             </Table>
             {order.notes && (
               <div className="border-t border-line px-5 py-4">
-                <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">Buyer instructions</p>
+                <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">Buyer notes</p>
                 <p className="mt-1 whitespace-pre-line text-[12px] leading-5 text-ink-soft/85">{order.notes}</p>
               </div>
             )}
@@ -272,21 +272,21 @@ export default function OrderDetail() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
-                <Truck size={16} className="text-forest-500" /> Haulage & waybill
+                <Truck size={16} className="text-forest-500" /> Delivery
               </h2>
               {order.delivery?.status ? (
                 <Badge tone="transit" size="sm">{order.delivery.status}</Badge>
               ) : (
-                <Badge tone="neutral" size="sm">Awaiting carrier</Badge>
+                <Badge tone="neutral" size="sm">Waiting for a transporter</Badge>
               )}
             </div>
 
             <div className="grid gap-5 p-5 sm:grid-cols-[1fr_auto]">
               <div className="min-w-0">
                 <dl className="space-y-0.5">
-                  <KeyValue label="Waybill reference" mono>{waybill || 'Not issued yet'}</KeyValue>
-                  <KeyValue label="Carrier">{order.delivery?.logistics_provider?.name || 'Matching in progress'}</KeyValue>
-                  <KeyValue label="Vehicle / plate">{order.delivery?.vehicle_number || 'Not assigned'}</KeyValue>
+                  <KeyValue label="Delivery note number" mono>{waybill || 'Not issued yet'}</KeyValue>
+                  <KeyValue label="Transporter">{order.delivery?.logistics_provider?.name || 'Finding a transporter'}</KeyValue>
+                  <KeyValue label="Vehicle and plate">{order.delivery?.vehicle_number || 'Not assigned'}</KeyValue>
                   <KeyValue label="Origin">{order.produce?.location || order.farmer?.address || 'Farm gate'}</KeyValue>
                   <KeyValue label="Destination">
                     {[order.buyer?.lga, order.buyer?.state].filter(Boolean).join(', ') || order.buyer?.address || 'Buyer delivery point'}
@@ -312,7 +312,7 @@ export default function OrderDetail() {
                   </ol>
                 ) : (
                   <p className="mt-4 rounded-xl border border-dashed border-sage-400 bg-canvas px-3.5 py-3 text-[11.5px] leading-5 text-muted">
-                    Tracking events appear when the carrier accepts the dispatch and issues the origin weighbridge slip.
+                    Updates appear when a transporter accepts the job and records the pickup weight.
                   </p>
                 )}
               </div>
@@ -329,7 +329,7 @@ export default function OrderDetail() {
                         level="M"
                       />
                     </div>
-                    <p className="text-center font-mono text-[9px] leading-3 text-muted">Scan to verify<br />order ledger</p>
+                    <p className="text-center font-mono text-[9px] leading-3 text-muted">Scan to check<br />this order</p>
                     <Button
                       type="button"
                       variant="outline"
@@ -344,7 +344,7 @@ export default function OrderDetail() {
                   <div className="grid h-[150px] w-[150px] place-items-center rounded-xl border border-dashed border-sage-400 bg-canvas text-center">
                     <div>
                       <Lock size={18} className="mx-auto text-sage-400" />
-                      <p className="mt-1.5 px-3 text-[10px] leading-4 text-muted">Waybill issues after escrow funding</p>
+                      <p className="mt-1.5 px-3 text-[10px] leading-4 text-muted">Delivery note comes after payment</p>
                     </div>
                   </div>
                 )}
@@ -354,21 +354,21 @@ export default function OrderDetail() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <PartyCard
-              title={isFarmer ? 'Buyer on record' : 'Grower on record'}
+              title={isFarmer ? 'Buyer' : 'Farmer'}
               person={isFarmer ? order.buyer : order.farmer}
               role={isFarmer ? 'buyer' : 'farmer'}
               action={
                 counterparty?.id && (
                   <Button asChild variant="outline" size="sm" className="mt-3 w-full">
                     <Link to={`/messages?to=${counterparty.id}&name=${encodeURIComponent(counterparty.name || '')}`}>
-                      <MessageSquare size={13} /> Message {counterparty.name?.split(' ')[0] || 'party'}
+                      <MessageSquare size={13} /> Message {counterparty.name?.split(' ')[0] || 'them'}
                     </Link>
                   </Button>
                 )
               }
             />
             <div className="rounded-card border border-line bg-white p-4">
-              <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Payment record</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Payment details</p>
               <p className="mt-2 font-display text-[22px] font-extrabold tracking-tight text-ink tnum">{money(order.total_price)}</p>
               <dl className="mt-2 space-y-0.5">
                 <KeyValue label="State">
@@ -380,7 +380,7 @@ export default function OrderDetail() {
               {isBuyer && !paid && (
                 <Button asChild size="sm" className="mt-3 w-full">
                   <Link to={`/payment/${order.id}`}>
-                    <CreditCard size={13} /> Fund escrow
+                    <CreditCard size={13} /> Pay now
                   </Link>
                 </Button>
               )}
@@ -417,7 +417,7 @@ export default function OrderDetail() {
               )}
               {isAdmin && !canManage && (
                 <p className="rounded-lg border border-line bg-canvas px-3 py-2 text-[11px] text-muted">
-                  Administrator view. Status changes are available from the admin order ledger.
+                  Admin view. You can change statuses from the admin orders page.
                 </p>
               )}
               {isBuyer && paid && order.status === 'delivered' && (
@@ -432,25 +432,25 @@ export default function OrderDetail() {
               )}
               {(order.status === 'cancelled' || order.status === 'rejected') && (
                 <p className="rounded-lg border border-critical-200 bg-critical-50 px-3 py-2.5 text-[11px] leading-5 text-critical-600">
-                  This order is closed. Reserved stock was returned to the grower and unsettled capital is refundable.
+                  This order is closed. The stock went back to the farmer and any money not used can be refunded.
                 </p>
               )}
             </div>
           </div>
 
-          <Callout tone="sage" icon={FileText} title="Audit trail">
+          <Callout tone="sage" icon={FileText} title="Full record">
             Every status change, payment event and tracking update is written to this order. Screenshots of this
-            page are not required for a dispute — the ledger is the evidence.
+            page are not needed for a complaint — this order record is the proof.
           </Callout>
 
           <div className="rounded-card border border-line bg-white p-4">
             <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Need help?</p>
             <p className="mt-1 text-[11.5px] leading-5 text-muted">
-              The trade desk can freeze settlement and open an arbitration file on your behalf.
+              Our team can pause the payment and open a complaint for you.
             </p>
             <Button asChild variant="outline" size="sm" className="mt-3 w-full">
               <Link to="/admin/disputes">
-                <CircleAlert size={13} /> Dispute & arbitration
+                <CircleAlert size={13} /> Complaints
               </Link>
             </Button>
           </div>
@@ -463,10 +463,10 @@ export default function OrderDetail() {
         title={confirm?.label || 'Confirm action'}
         description={
           confirm?.type === 'cancel'
-            ? 'This restores the grower’s stock and closes the order. Unfunded orders need no refund.'
+            ? 'This returns the stock to the farmer and closes the order. If you have not paid, no refund is needed.'
             : confirm?.status === 'rejected'
-              ? 'Rejecting restores stock to the grower listing and closes the order.'
-              : 'The change is recorded in the order ledger and the counterparty is notified by email.'
+              ? 'Rejecting returns the stock to the farmer and closes the order.'
+              : 'The change is saved on the order and the other person is told by email.'
         }
         footer={
           <>

@@ -1,36 +1,34 @@
 import { Link } from 'react-router-dom'
-import { ArrowUpRight, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react'
+import { ArrowUpRight, Mail, MapPin, ShieldCheck } from 'lucide-react'
 
 const COLUMNS = [
   {
     title: 'Marketplace',
     links: [
-      { label: 'Spot exchange', to: '/commodities' },
-      { label: 'Escrow & trust', to: '/escrow' },
-      { label: 'Open an account', to: '/register' },
+      { label: 'Marketplace', to: '/commodities' },
+      { label: 'How escrow works', to: '/escrow' },
+      { label: 'Create an account', to: '/register' },
     ],
   },
   {
-    title: 'Participants',
+    title: 'Join us',
     links: [
-      { label: 'Farmer hub', to: '/farmer' },
-      { label: 'Buyer procurement', to: '/buyer' },
-      { label: 'Carrier dispatch', to: '/dispatch' },
-      { label: 'Platform administration', to: '/admin' },
+      { label: 'Join as a farmer', to: '/register' },
+      { label: 'Join as a buyer', to: '/register' },
+      { label: 'Join as a transporter', to: '/register' },
     ],
   },
   {
-    title: 'Assurance',
+    title: 'Learn more',
     links: [
-      { label: 'Settlement ledger', to: '/settlements' },
-      { label: 'Quality inspection', to: '/admin/quality' },
-      { label: 'Dispute arbitration', to: '/admin/disputes' },
+      { label: 'How payments work', to: '/escrow' },
+      { label: 'Marketplace', to: '/commodities' },
       { label: 'Sign in', to: '/login' },
     ],
   },
 ]
 
-const REGULATORS = ['CBN', 'NIBSS', 'FMAFS', 'NAFDAC', 'SON', 'NSPRI']
+const REGULATORS = ['Real farmers', 'Safe payments', 'Honest weights', 'Fair review']
 
 export default function Footer() {
   return (
@@ -48,12 +46,12 @@ export default function Footer() {
               </span>
             </div>
             <p className="mt-4 text-[13px] leading-6 text-forest-100/75">
-              Nigeria&apos;s rural agricultural market linkage infrastructure — verified farm-gate supply,
-              collateralised haulage and tripartite escrow settlement under CBN oversight.
+              We link farmers to buyers across Nigeria. Every trade is checked and paid
+              through a safe escrow account, so both sides are protected.
             </p>
             <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-forest-700 px-3 py-1.5 text-[11px] font-semibold text-forest-100">
               <ShieldCheck size={13} className="text-harvest-300" />
-              CBN Circular FSR/DIR/GEN/07/041
+              Built for safe farm trade
             </p>
           </div>
 
@@ -83,16 +81,16 @@ export default function Footer() {
         <div className="mt-10 grid gap-4 border-t border-forest-700/60 pt-7 sm:grid-cols-3">
           <p className="flex items-start gap-2.5 text-[12px] leading-5 text-forest-100/70">
             <MapPin size={14} className="mt-0.5 shrink-0 text-harvest-300" />
-            Plot 14, Ibrahim Dasuki Street, Asokoro, Abuja FCT, Nigeria
+            Built in Nigeria for farms and buyers across the country.
           </p>
-          <a href="tel:+2348000725670" className="flex items-start gap-2.5 text-[12px] leading-5 text-forest-100/70 hover:text-white">
-            <Phone size={14} className="mt-0.5 shrink-0 text-harvest-300" />
-            +234 800 072 5670 · USSD *347*44#
-          </a>
-          <a href="mailto:trade@ralmp.ng" className="flex items-start gap-2.5 text-[12px] leading-5 text-forest-100/70 hover:text-white">
+          <p className="flex items-start gap-2.5 text-[12px] leading-5 text-forest-100/70">
             <Mail size={14} className="mt-0.5 shrink-0 text-harvest-300" />
-            trade@ralmp.ng · desk open 07:00–19:00 WAT
-          </a>
+            Need help? Send us a message from your dashboard.
+          </p>
+          <p className="flex items-start gap-2.5 text-[12px] leading-5 text-forest-100/70">
+            <ShieldCheck size={14} className="mt-0.5 shrink-0 text-harvest-300" />
+            Your money stays in a separate escrow account until the job is done.
+          </p>
         </div>
       </div>
 

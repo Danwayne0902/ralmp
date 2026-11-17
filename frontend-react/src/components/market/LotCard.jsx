@@ -38,7 +38,7 @@ export function LotCard({ lot, onAdd, adding = false, canTrade = true, className
         <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2.5">
           <Badge tone={verified ? 'verified' : 'pending'} size="sm" className="bg-white/95 backdrop-blur">
             <BadgeCheck size={11} />
-            {verified ? 'Verified grower' : 'Verification pending'}
+            {verified ? 'Verified farmer' : 'Not verified yet'}
           </Badge>
           <Badge tone="dark" size="sm" className="capitalize">
             {lot?.category || 'produce'}
@@ -54,7 +54,7 @@ export function LotCard({ lot, onAdd, adding = false, canTrade = true, className
       <div className="flex flex-1 flex-col p-4">
         <p className="flex items-center gap-1.5 text-[11px] font-medium text-muted">
           <BadgeCheck size={12} className={verified ? 'text-forest-500' : 'text-sage-400'} />
-          <span className="break-words">{lot?.user?.name || 'Independent grower'}</span>
+          <span className="break-words">{lot?.user?.name || 'Farmer'}</span>
           <span className="text-sage-400">·</span>
           <span className="break-words">{lot?.user?.state || lot?.location?.split(',')?.pop()?.trim()}</span>
         </p>
@@ -92,22 +92,22 @@ export function LotCard({ lot, onAdd, adding = false, canTrade = true, className
             </span>
           ) : (
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-forest-50 px-2 py-1 text-[10px] font-bold text-forest-600">
-              <ShieldCheck size={10} /> Escrow protected
+              <ShieldCheck size={10} /> Payment protected
             </span>
           )}
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Button asChild variant="outline" size="sm" className="w-full">
-            <Link to={`/commodities/${lot.id}`}>Inspect lot</Link>
+            <Link to={`/commodities/${lot.id}`}>View details</Link>
           </Button>
           {canTrade ? (
             <Button variant="primary" size="sm" className="w-full" onClick={onAdd} disabled={adding || stock < 1}>
-              {stock < 1 ? 'Sold out' : adding ? 'Adding…' : 'Commit escrow'}
+              {stock < 1 ? 'Sold out' : adding ? 'Adding…' : 'Add to basket'}
             </Button>
           ) : (
             <Button asChild variant="primary" size="sm" className="w-full">
-              <Link to={`/commodities/${lot.id}`}>View lot</Link>
+              <Link to={`/commodities/${lot.id}`}>View details</Link>
             </Button>
           )}
         </div>

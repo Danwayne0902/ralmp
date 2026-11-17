@@ -9,26 +9,26 @@ export default function AuthShell({ children, aside }) {
         <div className="pointer-events-none absolute -bottom-32 -left-32 h-[420px] w-[420px] rounded-full bg-sprout-400/20 blur-3xl" aria-hidden />
 
         <Link to="/" className="relative inline-flex items-center gap-1.5 text-[12px] font-semibold text-forest-100/70 transition hover:text-white">
-          <ArrowLeft size={14} /> Back to the exchange
+          <ArrowLeft size={14} /> Back to home
         </Link>
 
         <div className="relative mt-10 max-w-md">
           <span className="inline-flex items-center gap-2 rounded-full border border-forest-700 px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-harvest-300">
-            <ShieldCheck size={13} /> Institutional access
+            <ShieldCheck size={13} /> Secure access
           </span>
           <h2 className="mt-5 font-display text-[32px] font-extrabold leading-[1.12] tracking-[-0.025em] text-white xl:text-[38px]">
-            {aside?.title || 'One account. Three operating positions.'}
+            {aside?.title || 'One account. One simple workspace.'}
           </h2>
           <p className="mt-4 text-[13.5px] leading-6 text-forest-100/70">
             {aside?.description ||
-              'Farmers, buyers and carriers operate on the same verified supply chain with a single settlement ledger.'}
+              'Farmers, buyers and transporters use the same safe payment system. You only see what belongs to you.'}
           </p>
 
           <ul className="mt-8 space-y-3.5">
             {(aside?.points || [
-              'Pre-funded escrow before dispatch',
-              'Dual weighbridge and lab evidence',
-              'Milestone settlement with audit trail',
+              'Buyer pays before the goods move',
+              'Weight and quality are checked',
+              'Money is paid step by step',
             ]).map((point) => (
               <li key={point} className="flex items-start gap-2.5 text-[13px] text-forest-100/85">
                 <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-white/12">
@@ -42,10 +42,10 @@ export default function AuthShell({ children, aside }) {
 
         <div className="relative mt-10 border-t border-forest-700/70 pt-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-forest-300">
-            Regulatory framework
+            Built on clear rules
           </p>
           <p className="mt-1.5 text-[11.5px] leading-5 text-forest-100/55">
-            CBN Circular FSR/DIR/GEN/07/041 · NIBSS settlement mandates · Arbitration and Mediation Act 2023
+            Safe payments, fair weight checks and a clear way to settle complaints.
           </p>
         </div>
       </aside>

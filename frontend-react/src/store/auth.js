@@ -32,6 +32,12 @@ export const useAuth = create((set, get) => ({
     return user
   },
 
+  adopt: (token, user) => {
+    localStorage.setItem(TOKEN_KEY, token)
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+    set({ token, user, isLoggedIn: true })
+  },
+
   refresh: async () => {
     if (!get().token) return null
     const res = await authService.me()

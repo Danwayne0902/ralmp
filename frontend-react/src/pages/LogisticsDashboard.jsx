@@ -18,7 +18,7 @@ import { useAuth } from '../store/auth'
 const BOARD = [
   { key: 'assigned', label: 'Accepted', tone: 'pending', next: 'picked_up', nextLabel: 'Mark picked up' },
   { key: 'picked_up', label: 'Picked up', tone: 'gold', next: 'in_transit', nextLabel: 'Start transit' },
-  { key: 'in_transit', label: 'In transit', tone: 'transit', next: 'delivered', nextLabel: 'Confirm delivery' },
+  { key: 'in_transit', label: 'On the way', tone: 'transit', next: 'delivered', nextLabel: 'Confirm delivery' },
   { key: 'delivered', label: 'Delivered', tone: 'verified', next: null },
 ]
 
@@ -99,7 +99,7 @@ export default function LogisticsDashboard() {
         location: event.location || undefined,
         notes: event.notes || undefined,
       })
-      toast.success('Waybill milestone recorded')
+      toast.success('Delivery update saved')
       setActive(null)
       await load()
     } catch (err) {
@@ -129,12 +129,12 @@ export default function LogisticsDashboard() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Carrier dispatch"
-        title="Fleet & waybill board"
-        description="Haulage assigned to your fleet, with milestone capture and a live freight estimator."
+        eyebrow="My jobs"
+        title="Delivery jobs"
+        description="Jobs given to you, with simple updates and a quick price check."
         actions={
           <Button variant="outline" size="md" onClick={load} disabled={loading}>
-            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh board
+            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
           </Button>
         }
       />
@@ -150,10 +150,10 @@ export default function LogisticsDashboard() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Truck} label="Active hauls" value={dashboard?.active_deliveries ?? 0} hint="Accepted, picked up or in transit" />
-            <Stat icon={CheckCircle2} label="Completed" value={dashboard?.completed_deliveries ?? 0} tone="sprout" hint="Delivered to destination" />
-            <Stat icon={Wallet} label="Freight in motion" value={money(activeValue)} tone="gold" hint="Pre-funded inside escrow" size="lg" />
-            <Stat icon={ShieldCheck} label="Settled freight" value={money(completedValue)} tone="neutral" hint="Delivered and release-eligible" size="lg" />
+            <Stat icon={Truck} label="Jobs in progress" value={dashboard?.active_deliveries ?? 0} hint="Accepted, picked up or moving" />
+            <Stat icon={CheckCircle2} label="Delivered" value={dashboard?.completed_deliveries ?? 0} tone="sprout" hint="Dropped off at the buyer" />
+            <Stat icon={Wallet} label="Delivery money on the way" value={money(activeValue)} tone="gold" hint="Already paid into escrow" size="lg" />
+            <Stat icon={ShieldCheck} label="Money earned" value={money(completedValue)} tone="neutral" hint="Delivered and ready to pay out" size="lg" />
           </>
         )}
       </div>
@@ -163,8 +163,8 @@ export default function LogisticsDashboard() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Dispatch board</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Move a haul by recording the physical milestone. Buyers and growers see it immediately.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">My jobs</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Tap a job to update it. The buyer and the farmer see the change at once.</p>
               </div>
               <Badge tone="live" size="sm"><span className="h-1.5 w-1.5 rounded-full bg-forest-500" /> Live</Badge>
             </div>
@@ -176,8 +176,8 @@ export default function LogisticsDashboard() {
             ) : deliveries.length === 0 ? (
               <EmptyState
                 icon={Truck}
-                title="No hauls assigned yet"
-                description="The trade desk matches carriers against funded orders. When a haul is assigned to your fleet it appears here with origin, destination and freight value."
+                title="No jobs yet"
+                description="We match you with paid orders. When a job is given to you, it shows here with the pickup, drop-off and delivery pay."
                 className="border-0 shadow-none"
                 action={<Button variant="outline" onClick={load}><RefreshCw size={14} /> Check again</Button>}
               />
@@ -194,7 +194,7 @@ export default function LogisticsDashboard() {
                     <div className="space-y-2">
                       {grouped[column.key].length === 0 && (
                         <p className="rounded-lg border border-dashed border-sage-400 px-2.5 py-6 text-center text-[10.5px] text-muted">
-                          No hauls
+                          No jobs
                         </p>
                       )}
                       {grouped[column.key].map((delivery) => (
@@ -247,15 +247,15 @@ export default function LogisticsDashboard() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Haulage register</h2>
-                <p className="mt-0.5 text-[11px] text-muted">All hauls assigned to {user?.name || 'your fleet'}.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">All my jobs</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Every job given to {user?.name || 'you'}.</p>
               </div>
               <span className="text-[10.5px] text-muted">{deliveries.length} records</span>
             </div>
             {loading ? (
               <div className="space-y-2 p-5">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
             ) : deliveries.length === 0 ? (
-              <p className="px-5 py-8 text-center text-[12px] text-muted">No haulage records yet.</p>
+              <p className="px-5 py-8 text-center text-[12px] text-muted">No jobs yet.</p>
             ) : (
               <Table minWidth={760}>
                 <thead>
@@ -263,7 +263,7 @@ export default function LogisticsDashboard() {
                     <Th>Haul</Th>
                     <Th>Route</Th>
                     <Th>Driver / vehicle</Th>
-                    <Th className="text-right">Freight</Th>
+                    <Th className="text-right">Delivery pay</Th>
                     <Th>Status</Th>
                     <Th>Tracking</Th>
                     <Th />
@@ -307,12 +307,12 @@ export default function LogisticsDashboard() {
                 <Route size={15} />
               </span>
               <div>
-                <h2 className="font-display text-[13.5px] font-bold text-ink">Freight estimator</h2>
-                <p className="text-[10px] text-muted">Platform reference rate</p>
+                <h2 className="font-display text-[13.5px] font-bold text-ink">Price estimate</h2>
+                <p className="text-[10px] text-muted">Our standard rate</p>
               </div>
             </div>
             <form onSubmit={getQuote} className="space-y-3 p-4">
-              <Field label="Route distance (km)" required>
+              <Field label="Distance (km)" required>
                 <Input
                   type="number"
                   min="0.1"
@@ -324,7 +324,7 @@ export default function LogisticsDashboard() {
                   className="h-10 text-[12.5px]"
                 />
               </Field>
-              <Field label="Cargo weight (kg)" required>
+              <Field label="Weight (kg)" required>
                 <Input
                   type="number"
                   min="0.1"
@@ -336,25 +336,25 @@ export default function LogisticsDashboard() {
                   className="h-10 text-[12.5px]"
                 />
               </Field>
-              <Field label="Service level" required>
+              <Field label="Speed" required>
                 <NativeSelect
                   value={estimate.delivery_type}
                   onChange={(e) => setEstimate((prev) => ({ ...prev, delivery_type: e.target.value }))}
                   className="h-10 text-[12.5px]"
                 >
-                  <option value="standard">Standard</option>
-                  <option value="express">Express (1.5×)</option>
+                  <option value="standard">Normal</option>
+                  <option value="express">Fast (1.5×)</option>
                 </NativeSelect>
               </Field>
               <Button type="submit" size="sm" className="w-full" disabled={quoting}>
                 {quoting ? <Loader2 size={13} className="animate-spin" /> : <Gauge size={13} />}
-                {quoting ? 'Calculating…' : 'Estimate freight'}
+                {quoting ? 'Calculating…' : 'Estimate price'}
               </Button>
             </form>
 
             {quote && (
               <div className="border-t border-line px-4 py-3.5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Estimated haulage</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Estimated price</p>
                 <p className="mt-0.5 font-display text-[24px] font-extrabold tracking-tight text-forest-600 tnum">
                   {money(quote.estimated_cost)}
                 </p>
@@ -362,10 +362,10 @@ export default function LogisticsDashboard() {
                   <div className="flex justify-between"><dt className="text-muted">Base</dt><dd className="tnum">{money(quote.breakdown?.base_cost)}</dd></div>
                   <div className="flex justify-between"><dt className="text-muted">Distance</dt><dd className="tnum">{money(quote.breakdown?.distance_cost)}</dd></div>
                   <div className="flex justify-between"><dt className="text-muted">Weight</dt><dd className="tnum">{money(quote.breakdown?.weight_cost)}</dd></div>
-                  <div className="flex justify-between"><dt className="text-muted">Service multiplier</dt><dd className="tnum">{quote.breakdown?.express_multiplier}×</dd></div>
+                  <div className="flex justify-between"><dt className="text-muted">Speed charge</dt><dd className="tnum">{quote.breakdown?.express_multiplier}×</dd></div>
                 </dl>
                 <p className="mt-2 text-[9.5px] leading-4 text-muted">
-                  Reference only. Final freight is fixed inside the buyer&apos;s escrow at checkout.
+                  This is only an estimate. The final delivery pay is fixed when the buyer pays at checkout.
                 </p>
               </div>
             )}
@@ -373,13 +373,13 @@ export default function LogisticsDashboard() {
 
           <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
             <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
-              <ClipboardCheck size={13} /> Evidence checklist
+              <ClipboardCheck size={13} /> What to send
             </p>
             <ul className="mt-2 space-y-2 text-[10.5px] leading-4 text-forest-700/80">
-              <li>Origin gross–tare slip before departure</li>
-              <li>Driver identity and plate captured on the e-Waybill</li>
-              <li>Destination re-weigh on arrival</li>
-              <li>Buyer receiving receipt at silo discharge</li>
+              <li>Pickup weight note before you leave</li>
+              <li>Driver name and plate on the delivery note</li>
+              <li>Weigh again when you arrive</li>
+              <li>Buyer signs for the goods</li>
             </ul>
           </div>
 
@@ -388,7 +388,7 @@ export default function LogisticsDashboard() {
               <Phone size={12} /> Dispatch desk
             </p>
             <p className="mt-1.5 text-[11px] leading-5 text-muted">
-              For unassigned loads and capacity disputes, contact the haulage desk with your fleet availability.
+              For jobs or problems, message our transport team and tell us where your truck is.
             </p>
             <a href="tel:+2348000725670" className="mt-2 inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-forest-600 hover:underline">
               <Phone size={12} /> +234 800 072 5670
@@ -400,14 +400,14 @@ export default function LogisticsDashboard() {
       <Modal
         open={Boolean(active)}
         onOpenChange={(open) => !open && setActive(null)}
-        title={active ? `Record milestone · haul #${active.id}` : 'Record milestone'}
-        description="The milestone updates the delivery record and the buyer's order timeline."
+        title={active ? `Update job #${active.id}` : 'Update job'}
+        description="This updates the order for the buyer and the farmer."
         footer={
           <>
             <Button variant="ghost" onClick={() => setActive(null)} disabled={saving}>Cancel</Button>
             <Button onClick={submitUpdate} disabled={saving}>
               {saving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
-              {saving ? 'Recording…' : 'Record milestone'}
+              {saving ? 'Saving…' : 'Update job'}
             </Button>
           </>
         }
@@ -417,29 +417,29 @@ export default function LogisticsDashboard() {
             <dl className="grid gap-2 rounded-xl border border-line bg-canvas px-4 py-3 text-[11.5px] sm:grid-cols-2">
               <div><dt className="text-muted">Pickup</dt><dd className="font-semibold text-ink">{active.pickup_location}</dd></div>
               <div><dt className="text-muted">Destination</dt><dd className="font-semibold text-ink">{active.delivery_location}</dd></div>
-              <div><dt className="text-muted">Freight</dt><dd className="font-semibold text-ink tnum">{money(active.delivery_cost)}</dd></div>
+              <div><dt className="text-muted">Delivery pay</dt><dd className="font-semibold text-ink tnum">{money(active.delivery_cost)}</dd></div>
               <div><dt className="text-muted">Current state</dt><dd className="font-semibold capitalize text-ink">{active.status?.replace('_', ' ')}</dd></div>
             </dl>
 
-            <Field label="Milestone status" required>
+            <Field label="Job status" required>
               <NativeSelect value={event.status} onChange={(e) => setEvent((prev) => ({ ...prev, status: e.target.value }))}>
                 <option value="assigned">Accepted / assigned</option>
                 <option value="picked_up">Picked up at origin</option>
-                <option value="in_transit">In transit</option>
+                <option value="in_transit">On the way</option>
                 <option value="delivered">Delivered to destination</option>
                 <option value="cancelled">Cancelled</option>
               </NativeSelect>
             </Field>
 
-            <Field label="Location" hint="Weighbridge, hub or gate">
+            <Field label="Place" hint="Weight bridge, park or gate">
               <Input
                 value={event.location}
                 onChange={(e) => setEvent((prev) => ({ ...prev, location: e.target.value }))}
-                placeholder="e.g. Ijebu-Ife weighbridge"
+                placeholder="e.g. Ijebu-Ife weigh bridge"
               />
             </Field>
 
-            <Field label="Weighbridge / milestone notes">
+            <Field label="Weight and job notes">
               <Textarea
                 rows={3}
                 maxLength={1000}

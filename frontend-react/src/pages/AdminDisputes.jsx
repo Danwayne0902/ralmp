@@ -78,8 +78,8 @@ export default function AdminDisputes() {
           severity: 'closed',
           trigger: order.status === 'rejected' ? 'Order rejected after commitment' : 'Order cancelled',
           detail: paid
-            ? 'Escrow was funded. Refund path must be confirmed by the settlement desk before the record is closed.'
-            : 'No funds captured. Reserved stock was restored to the grower listing.',
+            ? 'The buyer paid. Our team must confirm the refund before the file is closed.'
+            : 'No money was taken. The stock went back to the farmer listing.',
           action: paid ? 'Confirm refund' : 'Verify stock restoration',
         })
         return
@@ -90,9 +90,9 @@ export default function AdminDisputes() {
           ...base,
           kind: 'unfunded',
           severity: age >= 3 ? 'critical' : 'high',
-          trigger: 'Escrow unfunded past the reservation window',
-          detail: `Order reserved ${age} ${age === 1 ? 'day' : 'days'} ago and still has no captured payment. Stock is held against this commitment.`,
-          action: 'Chase buyer or release stock',
+          trigger: 'Order not paid in time',
+          detail: `Order placed ${age} ${age === 1 ? 'day' : 'days'} ago and still not paid. The stock is being held for this buyer.`,
+          action: 'Ask the buyer or release the stock',
         })
       }
 
@@ -101,9 +101,9 @@ export default function AdminDisputes() {
           ...base,
           kind: 'dormant',
           severity: 'high',
-          trigger: 'Funded order not acknowledged by grower',
-          detail: 'Buyer capital is in custody but the grower has not accepted the order. Escrow cannot advance without acknowledgement.',
-          action: 'Contact grower',
+          trigger: 'Paid order not accepted by the farmer',
+          detail: 'The buyer has paid but the farmer has not accepted the order. The money cannot move until they do.',
+          action: 'Contact farmer',
         })
       }
 
@@ -112,9 +112,9 @@ export default function AdminDisputes() {
           ...base,
           kind: 'waybill',
           severity: 'medium',
-          trigger: 'Processing without a waybill',
-          detail: 'No carrier tracking reference is bound to the order. Weight and custody evidence will be missing at destination.',
-          action: 'Assign carrier & waybill',
+          trigger: 'Being prepared without a delivery note',
+          detail: 'No delivery note is attached to the order. The weight record will be missing at drop-off.',
+          action: 'Add transporter and delivery note',
         })
       }
 
@@ -123,9 +123,9 @@ export default function AdminDisputes() {
           ...base,
           kind: 'waybill',
           severity: 'critical',
-          trigger: 'In transit without e-Waybill',
-          detail: 'The order is marked shipped but no waybill exists. Destination re-weigh cannot be matched to an origin slip.',
-          action: 'Raise waybill immediately',
+          trigger: 'On the way without a delivery note',
+          detail: 'The order is marked as sent but there is no delivery note. The two weight records cannot be matched.',
+          action: 'Add the delivery note now',
         })
       }
 
@@ -134,9 +134,9 @@ export default function AdminDisputes() {
           ...base,
           kind: 'release',
           severity: 'medium',
-          trigger: 'Delivered with escrow still held',
-          detail: 'The lot is marked delivered but the final tranche has not been reconciled. Confirm the receiving receipt before release.',
-          action: 'Reconcile final tranche',
+          trigger: 'Delivered but payment still on hold',
+          detail: 'The goods are marked delivered but the last payment has not been checked. Confirm the buyer signed before paying.',
+          action: 'Check the final payment',
         })
       }
 
@@ -179,16 +179,16 @@ export default function AdminDisputes() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Administration · arbitration"
-        title="Exception & dispute queue"
-        description="Every item below is derived from a real order in the ledger — unfunded commitments, missing waybills, dormancy and reversals. No synthetic case files."
+        eyebrow="Complaints"
+        title="Complaints and orders on hold"
+        description="Each item comes from a real order: unpaid orders, missing delivery notes, old orders and refunds. Nothing here is made up."
         actions={
           <>
             <Button variant="outline" size="md" onClick={load} disabled={loading}>
               <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh queue
             </Button>
             <Button asChild variant="outline" size="md">
-              <Link to="/admin/quality"><FileWarning size={15} /> Quality protocol</Link>
+              <Link to="/admin/quality"><FileWarning size={15} /> Quality checks</Link>
             </Button>
           </>
         }
@@ -202,9 +202,9 @@ export default function AdminDisputes() {
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Stat icon={CircleAlert} label="Open exceptions" value={open.length} tone={criticalCount > 0 ? 'critical' : 'gold'} hint={`${criticalCount} at critical severity`} />
-        <Stat icon={Wallet} label="Capital exposed" value={money(exposure)} tone="gold" hint="Unfunded or dormant commitments" size="lg" />
-        <Stat icon={Snowflake} label="Reversed volume" value={money(reversed)} tone="neutral" hint={`${closed.length} cancelled or rejected orders`} size="lg" />
-        <Stat icon={ShieldCheck} label="Ledger coverage" value={orders.length} tone="sprout" hint="Orders reviewed for exceptions" />
+        <Stat icon={Wallet} label="Money at risk" value={money(exposure)} tone="gold" hint="Unpaid or stalled orders" size="lg" />
+        <Stat icon={Snowflake} label="Refunds" value={money(reversed)} tone="neutral" hint={`${closed.length} cancelled or rejected orders`} size="lg" />
+        <Stat icon={ShieldCheck} label="Orders checked" value={orders.length} tone="sprout" hint="Orders reviewed for problems" />
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -223,7 +223,7 @@ export default function AdminDisputes() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Filter by order, party or trigger"
+            placeholder="Search by order, person or problem"
             aria-label="Filter exceptions"
             className="h-full w-48 bg-transparent text-[12px] outline-none placeholder:text-muted/60"
           />
@@ -241,11 +241,11 @@ export default function AdminDisputes() {
             title={tab === 'open' ? 'No open exceptions' : 'Nothing in this view'}
             description={
               orders.length === 0
-                ? 'The ledger has no orders yet. Exceptions appear automatically when an order breaches a control threshold.'
-                : 'Every order in the ledger is within its control window. New exceptions surface here as thresholds are crossed.'
+                ? 'There are no orders yet. A problem will show here automatically when an order needs attention.'
+                : 'Every order is within its time window. New problems will show here as they come up.'
             }
             className="border-0 shadow-none"
-            action={<Button variant="outline" onClick={load}><RefreshCw size={14} /> Re-scan ledger</Button>}
+            action={<Button variant="outline" onClick={load}><RefreshCw size={14} /> Check again</Button>}
           />
         ) : (
           <>
@@ -255,10 +255,10 @@ export default function AdminDisputes() {
                   <tr>
                     <Th>Severity</Th>
                     <Th>Order</Th>
-                    <Th>Trigger</Th>
-                    <Th>Parties</Th>
-                    <Th className="text-right">Exposure</Th>
-                    <Th>Ledger state</Th>
+                    <Th>Problem</Th>
+                    <Th>People</Th>
+                    <Th className="text-right">Amount</Th>
+                    <Th>Order status</Th>
                     <Th>Age</Th>
                     <Th />
                   </tr>
@@ -343,18 +343,17 @@ export default function AdminDisputes() {
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="rounded-card border border-line bg-white p-5 shadow-card">
           <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
-            <Gavel size={16} className="text-forest-500" /> Arbitration pathway
+            <Gavel size={16} className="text-forest-500" /> How a complaint is settled
           </h2>
           <p className="mt-1 text-[11.5px] leading-5 text-muted">
-            Exceptions that cannot be resolved by evidence move to formal arbitration under the Arbitration and
-            Mediation Act 2023. The order ledger is the primary evidence bundle.
+            If the two sides cannot agree, a neutral person reviews the proof. The order record is the main evidence.
           </p>
           <ol className="mt-4 grid gap-3 sm:grid-cols-2">
             {[
-              { step: '01', title: 'Evidence preservation', body: 'Freeze the order ledger, waybill and weighbridge slips. No further tranche release.' },
-              { step: '02', title: 'Mediation window', body: 'Both counterparties submit position papers within five business days.' },
-              { step: '03', title: 'Arbitrator appointment', body: 'A neutral arbitrator is appointed from the panel agreed in the trade rules.' },
-              { step: '04', title: 'Award & settlement', body: 'The award directs the custodial trustee. Released or refunded amounts are written to the ledger.' },
+              { step: '01', title: 'Keep the proof', body: 'We lock the order, the delivery note and the weight records. No more money moves.' },
+              { step: '02', title: 'Both sides explain', body: 'Each side sends their side of the story within five working days.' },
+              { step: '03', title: 'A neutral person steps in', body: 'We pick a reviewer from our agreed panel.' },
+              { step: '04', title: 'Decision and payment', body: 'The reviewer decides. We then pay out or refund, and save the decision on the order.' },
             ].map((item) => (
               <li key={item.step} className="rounded-xl border border-line bg-canvas p-3.5">
                 <p className="font-display text-[11px] font-extrabold text-sage-400">{item.step}</p>
@@ -368,40 +367,38 @@ export default function AdminDisputes() {
         <aside className="space-y-4">
           <div className="rounded-card border border-line bg-forest-900 p-5 text-white shadow-card">
             <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-forest-200">
-              <Lock size={12} className="text-harvest-300" /> Freeze authority
+              <Lock size={12} className="text-harvest-300" /> Who can pause a payment
             </p>
             <p className="mt-2 text-[12px] leading-5 text-forest-100/80">
-              No single administrator can move escrow. A freeze holds the next tranche; release or refund requires
-              dual sign-off from the settlement committee.
+              No one admin can move the money. Pausing or paying out needs two people to approve.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <Badge tone="dark" size="sm"><Scale size={10} /> Dual sign-off</Badge>
-              <Badge tone="dark" size="sm"><Landmark size={10} /> Custodial trustee</Badge>
+              <Badge tone="dark" size="sm"><Scale size={10} /> Two approvals</Badge>
+              <Badge tone="dark" size="sm"><Landmark size={10} /> Trust account</Badge>
             </div>
           </div>
 
           <div className="rounded-card border border-line bg-white p-4">
             <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
-              <FileWarning size={12} /> Queue integrity
+              <FileWarning size={12} /> How this list works
             </p>
             <ul className="mt-2 space-y-2 text-[10.5px] leading-4 text-muted">
-              <li className="flex gap-1.5"><CheckCircle2 size={11} className="mt-0.5 shrink-0 text-forest-500" /> Each item references a live order ID.</li>
-              <li className="flex gap-1.5"><CheckCircle2 size={11} className="mt-0.5 shrink-0 text-forest-500" /> Thresholds use order age, payment state and waybill presence.</li>
-              <li className="flex gap-1.5"><CheckCircle2 size={11} className="mt-0.5 shrink-0 text-forest-500" /> No laboratory, weight or case values are simulated.</li>
-              <li className="flex gap-1.5"><X size={11} className="mt-0.5 shrink-0 text-critical-500" /> Resolved items leave the open queue automatically.</li>
+              <li className="flex gap-1.5"><CheckCircle2 size={11} className="mt-0.5 shrink-0 text-forest-500" /> Every item comes from a real order.</li>
+              <li className="flex gap-1.5"><CheckCircle2 size={11} className="mt-0.5 shrink-0 text-forest-500" /> We check the order age, payment and delivery note.</li>
+              <li className="flex gap-1.5"><CheckCircle2 size={11} className="mt-0.5 shrink-0 text-forest-500" /> No test, weight or case numbers are made up.</li>
+              <li className="flex gap-1.5"><X size={11} className="mt-0.5 shrink-0 text-critical-500" /> Solved items leave this list automatically.</li>
             </ul>
           </div>
 
           <div className="rounded-card border border-harvest-200 bg-harvest-50 p-4">
             <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-harvest-600">
-              <Truck size={13} /> Carrier escalation
+              <Truck size={13} /> Transporter follow-up
             </p>
             <p className="mt-1 text-[10.5px] leading-4 text-harvest-600/85">
-              Missing waybills are the most common evidence gap. Escalate to the haulage desk before destination
-              re-weigh, not after.
+              A missing delivery note is the most common problem. Tell the transport team before the load arrives, not after.
             </p>
             <Button asChild variant="outline" size="sm" className="mt-2.5 w-full">
-              <Link to="/dispatch">Open dispatch board</Link>
+              <Link to="/dispatch">Open the job board</Link>
             </Button>
           </div>
 

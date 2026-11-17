@@ -15,7 +15,7 @@ export function EscrowLedger({ order, className, showTitle = true }) {
       {showTitle && (
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h3 className="flex items-center gap-2 text-[13px] font-bold text-ink">
-            <ShieldCheck size={15} className="text-forest-500" /> Escrow ledger
+            <ShieldCheck size={15} className="text-forest-500" /> Payment record
           </h3>
           <span className="text-[10.5px] font-semibold uppercase tracking-wide text-muted">NGN (₦)</span>
         </div>
@@ -26,32 +26,32 @@ export function EscrowLedger({ order, className, showTitle = true }) {
           <dd className="font-semibold text-ink tnum">{money(subtotal)}</dd>
         </div>
         <div className="flex items-center justify-between gap-3 py-2.5">
-          <dt className="text-muted">Dedicated freight & haulage</dt>
+          <dt className="text-muted">Delivery</dt>
           <dd className="font-semibold text-ink tnum">{money(delivery)}</dd>
         </div>
         <div className="flex items-center justify-between gap-3 py-2.5">
-          <dt className="text-muted">Quality & moisture lab seal</dt>
+          <dt className="text-muted">Quality and moisture check</dt>
           <dd className="font-semibold text-forest-600">No charge</dd>
         </div>
         <div className="flex items-center justify-between gap-3 py-2.5">
-          <dt className="text-muted">CBN escrow custody fee (0.25%)</dt>
+          <dt className="text-muted">Escrow holding fee</dt>
           <dd className="font-semibold text-forest-600">Waived</dd>
         </div>
       </dl>
       <div className="border-t border-line px-4 py-3.5">
-        <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">Total escrow commitment</p>
+        <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">Total to pay</p>
         <p className="mt-0.5 font-display text-[26px] font-extrabold leading-8 tracking-tight text-forest-600 tnum">
           {money(total)}
         </p>
         <p className="mt-1 text-[11px] leading-4 text-muted">
-          Funds are held against milestone sign-off. Released only on verified weight, moisture and silo acceptance.
+          Your money is held safely. It is paid out only after the weight, moisture and delivery are confirmed.
         </p>
       </div>
     </div>
   )
 }
 
-export function MilestoneSchedule({ order, compact = false, className, title = 'Milestone settlement schedule' }) {
+export function MilestoneSchedule({ order, compact = false, className, title = 'Payment plan' }) {
   const schedule = escrowSchedule(order)
   const settled = schedule.filter((m) => m.state === 'settled').length
   const pct = Math.round((settled / schedule.length) * 100)
@@ -64,11 +64,11 @@ export function MilestoneSchedule({ order, compact = false, className, title = '
             <Lock size={15} className="text-forest-500" /> {title}
           </h2>
           <p className="mt-0.5 text-[11.5px] text-muted">
-            {settled} of {schedule.length} tranches released · {pct}% disbursed
+            {settled} of {schedule.length} payments made · {pct}% paid
           </p>
         </div>
         <span className="rounded-full border border-forest-100 bg-forest-50 px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-forest-600">
-          Milestone-based
+          Step by step
         </span>
       </div>
 

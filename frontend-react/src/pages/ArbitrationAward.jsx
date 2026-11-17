@@ -74,14 +74,14 @@ export default function ArbitrationAward() {
   const seal = fingerprint(`award:${reference}`, 64)
   const caseRef = `#DSP-${new Date(order?.order_date || Date.now()).getFullYear()}-${String(order?.id ?? 0).padStart(4, '0')}`
   const docket = `REG-NG-${new Date(order?.order_date || Date.now()).getFullYear()}-${String(order?.id ?? 0).padStart(6, '0')}`
-  const complainant = order?.buyer?.name || 'Off-taker'
-  const respondent = order?.farmer?.name || 'Producer'
+  const complainant = order?.buyer?.name || 'Buyer'
+  const respondent = order?.farmer?.name || 'Farmer'
 
   const disbursements = schedule.map((tranche) => ({
     id: tranche.key,
     beneficiary: respondent,
     classification: `${tranche.index} · ${tranche.short}`,
-    channel: 'RAMLP custody vault',
+    channel: 'RALMP escrow account',
     amount: tranche.amount,
     state: tranche.state,
   }))
@@ -117,17 +117,17 @@ export default function ArbitrationAward() {
     return (
       <div className="page-wrap page-pad">
         <PageHeader
-          eyebrow="Administration · arbitration"
-          title="Draft escrow release certificate"
-          description="Draft award templates prepared from the order ledger for settlement-desk review. No arbitration ruling is recorded in the platform yet."
+          eyebrow="Complaints"
+          title="Draft release document"
+          description="A draft based on the order record for our team to review. There is no real ruling yet."
         />
         <EmptyState
           icon={Gavel}
-          title="No escrow disputes on the docket"
-          description="When a consignment dispute freezes an escrow commitment, the case is enrolled here for adjudication and the enforcement award is issued against the custody vault."
+          title="No complaints on hold"
+          description="When a complaint freezes an order, it appears here for review."
           action={
             <Button asChild>
-              <Link to="/admin/disputes">Open exception desk <ArrowRight size={15} /></Link>
+              <Link to="/admin/disputes">See complaints <ArrowRight size={15} /></Link>
             </Button>
           }
         />
@@ -138,9 +138,9 @@ export default function ArbitrationAward() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Administration · arbitration"
-        title="Draft escrow release certificate"
-        description="A draft award document generated from the order ledger for settlement-desk review. It is not an enforceable ruling and moves no funds."
+        eyebrow="Complaints"
+        title="Draft release document"
+        description="A draft made from the order record for our team. It is not a ruling and moves no money."
         actions={
           <>
             <select
@@ -164,25 +164,24 @@ export default function ArbitrationAward() {
 
       {error && (
         <div className="mb-5">
-          <Callout tone="critical" icon={CircleAlert} title="Docket feed unavailable">
+          <Callout tone="critical" icon={CircleAlert} title="We cannot load complaints">
             {error}
           </Callout>
         </div>
       )}
 
       <div className="mb-5">
-        <Callout tone="pending" icon={CircleAlert} title="Draft document — not an adjudication">
-          Arbitration rulings are not yet recorded by the platform API. This certificate is generated from the selected
-          order record so the settlement desk can review a proposed disposition; it is not a court order and no funds
-          move from this screen.
+        <Callout tone="pending" icon={CircleAlert} title="Draft only — not a ruling">
+          The platform does not record real rulings yet. This document is built from the chosen order so our team can
+          review a proposed decision. It is not a court order and no money moves from this screen.
         </Callout>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat icon={Scale} label="Escrow under review" value={money(total)} hint={order?.produce?.commodity_name || `Order #${order?.id}`} />
+        <Stat icon={Scale} label="Money under review" value={money(total)} hint={order?.produce?.commodity_name || `Order #${order?.id}`} />
         <Stat icon={Gavel} label="Document status" value="Draft" hint={caseRef} tone="gold" />
-        <Stat icon={Users} label="Enrolled parties" value={order ? String(2 + (order.delivery?.logistics_provider ? 1 : 0)) : '—'} hint={order?.delivery?.logistics_provider ? 'Off-taker · producer · carrier' : 'Off-taker · producer'} tone="neutral" />
-        <Stat icon={Fingerprint} label="Document fingerprint" value={order ? `${seal.slice(0, 8)}…` : '—'} hint="Hash of this draft" tone="sprout" />
+        <Stat icon={Users} label="People involved" value={order ? String(2 + (order.delivery?.logistics_provider ? 1 : 0)) : '—'} hint={order?.delivery?.logistics_provider ? 'Buyer · farmer · transporter' : 'Buyer · farmer'} tone="neutral" />
+        <Stat icon={Fingerprint} label="Document code" value={order ? `${seal.slice(0, 8)}…` : '—'} hint="Code for this draft" tone="sprout" />
       </div>
 
       <div className="mt-5 space-y-5">
@@ -192,23 +191,23 @@ export default function ArbitrationAward() {
               <Landmark size={24} />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-muted">RALMP settlement desk</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-muted">RALMP review team</p>
               <h2 className="mt-1 font-display text-[20px] font-bold leading-6 tracking-[-0.01em] text-ink sm:text-[24px]">
-                Draft escrow release certificate
+                Draft payment release document
               </h2>
               <p className="mt-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-forest-600">
-                Prepared for settlement-desk review · not enforceable
+                Prepared for team review · not enforceable
               </p>
               <p className="mt-0.5 text-[11.5px] text-muted">
-                Generated from the order ledger under the custodial escrow framework
+                Built from the order record and the escrow rules
               </p>
             </div>
             <div className="inline-flex flex-wrap items-center gap-3 rounded-full border border-line bg-canvas px-4 py-1.5 font-mono text-[11px] text-ink-soft">
-              <span><strong className="text-ink">CASE REF:</strong> {caseRef}</span>
+              <span><strong className="text-ink">CASE:</strong> {caseRef}</span>
               <span className="text-sage-400">•</span>
-              <span><strong className="text-ink">DOCKET:</strong> {docket}</span>
+              <span><strong className="text-ink">FILE:</strong> {docket}</span>
               <span className="text-sage-400">•</span>
-              <span className="font-bold text-harvest-600">STATUS: DRAFT · NOT ADJUDICATED</span>
+              <span className="font-bold text-harvest-600">STATUS: DRAFT · NOT DECIDED</span>
             </div>
           </CardBody>
         </Card>
@@ -217,11 +216,11 @@ export default function ArbitrationAward() {
           <CardBody className="grid gap-4 sm:grid-cols-3">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Prepared for</p>
-              <p className="mt-0.5 text-[12.5px] font-medium text-ink">RALMP settlement &amp; arbitration desk</p>
+              <p className="mt-0.5 text-[12.5px] font-medium text-ink">RALMP review team</p>
             </div>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Prepared by</p>
-              <p className="mt-0.5 text-[12.5px] font-medium text-ink">{user?.name || 'Settlement desk reviewer'}</p>
+              <p className="mt-0.5 text-[12.5px] font-medium text-ink">{user?.name || 'Review team member'}</p>
             </div>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Date prepared</p>
@@ -231,63 +230,60 @@ export default function ArbitrationAward() {
         </Card>
 
         <Card>
-          <CardHeader icon={Users} title="1. Parties on the order record" description="Names carried from the live order ledger" />
+          <CardHeader icon={Users} title="1. People on the order" description="Names from the order record" />
           <CardBody className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-line bg-canvas p-3.5">
-              <Badge tone="critical" size="sm">Off-taker / buyer</Badge>
+              <Badge tone="critical" size="sm">Buyer</Badge>
               <p className="mt-2 text-[13px] font-bold text-ink">{complainant}</p>
-              <p className="mt-0.5 text-[11.5px] text-muted">Order #{order?.id} · escrow freeze applicant</p>
+              <p className="mt-0.5 text-[11.5px] text-muted">Order #{order?.id} · asked for the hold</p>
             </div>
             <div className="rounded-xl border border-line bg-canvas p-3.5">
-              <Badge tone="verified" size="sm">Producer / grower</Badge>
+              <Badge tone="verified" size="sm">Farmer</Badge>
               <p className="mt-2 text-[13px] font-bold text-ink">{respondent}</p>
-              <p className="mt-0.5 text-[11.5px] text-muted">{order?.produce?.location || 'Producer of record'}</p>
+              <p className="mt-0.5 text-[11.5px] text-muted">{order?.produce?.location || 'Farm on record'}</p>
             </div>
             <div className="rounded-xl border border-line bg-canvas p-3.5">
-              <Badge tone="neutral" size="sm">Carrier / logistics fleet</Badge>
-              <p className="mt-2 text-[13px] font-bold text-ink">{order?.delivery?.logistics_provider?.name || 'Carrier of record'}</p>
+              <Badge tone="neutral" size="sm">Transporter</Badge>
+              <p className="mt-2 text-[13px] font-bold text-ink">{order?.delivery?.logistics_provider?.name || 'Transporter on record'}</p>
               <p className="mt-0.5 text-[11.5px] text-muted">
-                {order?.delivery?.tracking_number ? `Waybill ${order.delivery.tracking_number}` : 'Waybill on the transport leg'}
+                {order?.delivery?.tracking_number ? `Delivery note ${order.delivery.tracking_number}` : 'No delivery note yet'}
               </p>
             </div>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader icon={FileText} title="2. Order facts & proposed grounds" description="Drawn from the order record, not an arbitration docket" />
+          <CardHeader icon={FileText} title="2. Order facts and reasons" description="Taken from the order record, not a court file" />
           <CardBody className="space-y-2.5 text-[12.5px] leading-6 text-ink-soft">
             <p>
               <strong className="text-ink">ORDER RECORD:</strong> placed on{' '}
-              {fmtDate(order?.order_date)} by the off-taker for{' '}
+              {fmtDate(order?.order_date)} by the buyer for{' '}
               <strong className="text-ink">
                 {order?.produce?.commodity_name || `Order #${order?.id}`} ({num(order?.quantity)} units)
               </strong>{' '}
               valued at <strong className="text-ink">{money(total)}</strong>.
             </p>
             <p>
-              <strong className="text-ink">LEDGER STATE:</strong> the order stands at status{' '}
+              <strong className="text-ink">ORDER STATUS:</strong> the order stands at status{' '}
               <strong className="text-ink">{order?.status}</strong> with payment{' '}
-              <strong className="text-ink">{order?.payment_status || 'unfunded'}</strong>. No weighbridge, laboratory or
-              arbitration findings are recorded against this order in the platform.
+              <strong className="text-ink">{order?.payment_status || 'unpaid'}</strong>. No weight, lab or review findings are recorded against this order.
             </p>
             <p>
-              <strong className="text-ink">PROPOSED DISPOSITION:</strong> subject to settlement-desk sign-off, the
-              commitment would be liquidated in the tranche order set out below. Milestones without recorded evidence
-              stay locked in escrow; this draft does not release or move any funds.
+              <strong className="text-ink">PROPOSED DECISION:</strong> if the team approves, the money would be paid in the parts shown below. Any step without proof stays in escrow. This draft does not release or move any money.
             </p>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader icon={Gavel} title="3. Proposed disbursement schedule" description="For review only — not a binding instruction" />
+          <CardHeader icon={Gavel} title="3. Proposed payments" description="For review only — not a binding instruction" />
           <Table minWidth={780}>
             <thead>
               <tr>
-                <Th>Beneficiary</Th>
-                <Th>Disbursement classification</Th>
-                <Th>Source channel</Th>
-                <Th className="text-right">Amount (NGN)</Th>
-                <Th>State</Th>
+                <Th>Who gets paid</Th>
+                <Th>Payment part</Th>
+                <Th>Paid from</Th>
+                <Th className="text-right">Amount (naira)</Th>
+                <Th>Status</Th>
               </tr>
             </thead>
             <tbody>
@@ -296,7 +292,7 @@ export default function ArbitrationAward() {
                   <Td>
                     <p className="font-semibold text-ink">{row.beneficiary}</p>
                     <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted">
-                      <MapPin size={10} /> RAMLP registered account
+                      <MapPin size={10} /> RALMP account
                     </p>
                   </Td>
                   <Td className="text-[12px] text-muted">{row.classification}</Td>
@@ -309,7 +305,7 @@ export default function ArbitrationAward() {
             <tfoot>
               <tr className="bg-canvas">
                 <Td colSpan={3} className="border-b-0 text-[11px] font-bold uppercase tracking-wide text-forest-600">
-                  Net custody vault liquidation commitment
+                  Total to be paid from escrow
                 </Td>
                 <Td className="border-b-0 text-right font-display text-[15px] font-extrabold tnum text-forest-600">
                   {money(total)}
@@ -320,13 +316,13 @@ export default function ArbitrationAward() {
           </Table>
           <CardFooter className="justify-between">
             <p className="text-[11.5px] text-muted">
-              Draft only. Tranche amounts follow the 10/60/30 escrow model applied to this order.
+              Draft only. The amounts follow the 10/60/30 split used on this order.
             </p>
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => toast.info('Draft only — arbitration rulings and escrow release are not enabled in this build')}
+                onClick={() => toast.info('Draft only — real rulings and payments are not enabled in this build')}
               >
                 <Gavel size={14} /> Mark as reviewed
               </Button>
@@ -338,12 +334,12 @@ export default function ArbitrationAward() {
         </Card>
 
         <Card>
-          <CardHeader icon={ShieldCheck} title="4. Document attestation" description="Fingerprint of this draft for review tracking" />
+          <CardHeader icon={ShieldCheck} title="4. Draft record" description="A code that marks this draft for easy tracing" />
           <CardBody className="grid gap-4 sm:grid-cols-3">
             <div className="flex h-full flex-col justify-between rounded-xl border border-line bg-canvas p-4">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Prepared by</p>
-                <p className="mt-1 text-[13px] font-bold text-ink">{user?.name || 'Settlement desk reviewer'}</p>
+                <p className="mt-1 text-[13px] font-bold text-ink">{user?.name || 'Review team member'}</p>
                 <p className="mt-0.5 text-[11px] text-muted">Platform administrator · draft author</p>
               </div>
               <Badge tone="pending" size="sm" className="mt-4 self-start"><Clock3 size={11} /> Unsigned</Badge>
@@ -351,8 +347,8 @@ export default function ArbitrationAward() {
             <div className="flex h-full flex-col justify-between rounded-xl border border-line bg-canvas p-4">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Review status</p>
-                <p className="mt-1 text-[13px] font-bold text-ink">Awaiting settlement-desk sign-off</p>
-                <p className="mt-0.5 text-[11px] text-muted">Docket {docket}</p>
+                <p className="mt-1 text-[13px] font-bold text-ink">Awaiting team sign-off</p>
+                <p className="mt-0.5 text-[11px] text-muted">File {docket}</p>
               </div>
               <Badge tone="pending" size="sm" className="mt-4 self-start"><Clock3 size={11} /> Not enrolled</Badge>
             </div>
@@ -367,7 +363,7 @@ export default function ArbitrationAward() {
           <CardFooter className="justify-between">
             <dl className="flex flex-wrap gap-x-8">
               <KeyValue label="Draft reference" mono>{caseRef}</KeyValue>
-              <KeyValue label="Docket" mono>{docket}</KeyValue>
+              <KeyValue label="File number" mono>{docket}</KeyValue>
             </dl>
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer size={14} /> Print certificate

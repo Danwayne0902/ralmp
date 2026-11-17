@@ -13,10 +13,10 @@ import { money, qtyUnit, unitOne } from '../lib/format'
 import { cn, downloadCsv, parseError } from '../lib/utils'
 
 const LAB_MATRIX = [
-  { label: 'Moisture ceiling', value: '≤ 12.5% max', note: 'Automated sensor rejection at gate' },
-  { label: 'Aflatoxin limit', value: '< 10 ppb', note: 'Feed-grade safety guaranteed' },
-  { label: 'Foreign chaff', value: '≤ 2.0% max', note: 'Cleaning surcharge beyond limit' },
-  { label: 'Broken kernels', value: '≤ 5.0% max', note: 'Grade reclassification beyond limit' },
+  { label: 'Moisture limit', value: '≤ 12.5% max', note: 'Checked when the goods arrive' },
+  { label: 'Aflatoxin limit', value: '< 10 ppb', note: 'Limit agreed for animal feed' },
+  { label: 'Foreign matter', value: '≤ 2.0% max', note: 'A cleaning fee applies above the limit' },
+  { label: 'Broken grains', value: '≤ 5.0% max', note: 'The grade drops above the limit' },
 ]
 
 export default function BatchProcurement() {
@@ -97,9 +97,9 @@ export default function BatchProcurement() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Procurement · batch desk"
-        title="Multi-lot batch procurement"
-        description="Bundle verified supplier lots into a single escrow commitment, set counter-offers and lock the batch in one instruction."
+        eyebrow="Buy in bulk"
+        title="Buy from many farms at once"
+        description="Put produce from different farms into one order, make an offer and pay once."
         actions={
           <Button variant="outline" size="md" onClick={load}>
             <RefreshCw size={15} /> Refresh lots
@@ -109,7 +109,7 @@ export default function BatchProcurement() {
 
       {error && (
         <div className="mb-5">
-          <Callout tone="critical" icon={CircleAlert} title="Marketplace feed unavailable">
+          <Callout tone="critical" icon={CircleAlert} title="We cannot load the marketplace">
             {error}
           </Callout>
         </div>
@@ -137,8 +137,8 @@ export default function BatchProcurement() {
         <div className="mt-5">
           <EmptyState
             icon={Package}
-            title="No supplier lots listed"
-            description="Batch procurement works across live marketplace listings. Once producers publish verified lots, bundle them here into a single escrow commitment."
+            title="No produce listed yet"
+            description="You can group produce once farmers add listings. Then choose what you need and pay once."
           />
         </div>
       ) : (
@@ -147,8 +147,8 @@ export default function BatchProcurement() {
             <Card>
               <CardHeader
                 icon={Layers}
-                title="Consolidated lot aggregation deck"
-                description={`${chosen.length} supplier ${chosen.length === 1 ? 'lot' : 'lots'} bundled into a single settlement milestone`}
+                title="Your bulk basket"
+                description={`${chosen.length} supplier ${chosen.length === 1 ? 'listing' : 'listings'} grouped into one payment`}
                 action={<Badge tone="outline" size="md">{money(targetValue)} batch value</Badge>}
               />
               <div className="hidden sm:block">
@@ -181,7 +181,7 @@ export default function BatchProcurement() {
                               <span className="min-w-0">
                                 <span className="block font-semibold text-ink">Lot #{lot.id}</span>
                                 <span className="mt-0.5 flex items-center gap-1 text-[11.5px] text-muted">
-                                  <MapPin size={11} /> {lot.user?.name || 'Independent grower'}
+                                  <MapPin size={11} /> {lot.user?.name || 'Farmer'}
                                   {lot.location ? ` · ${lot.location}` : ''}
                                 </span>
                               </span>
@@ -240,7 +240,7 @@ export default function BatchProcurement() {
                             </span>
                           </span>
                           <span className="mt-0.5 block break-words text-[11.5px] text-muted">
-                            {lot.user?.name || 'Independent grower'}
+                            {lot.user?.name || 'Farmer'}
                           </span>
                           <span className="mt-2 flex items-center justify-between gap-2">
                             <span className="text-[12px] text-muted">Asking {money(lot.price)}</span>
@@ -275,8 +275,8 @@ export default function BatchProcurement() {
             <Card>
               <CardHeader
                 icon={FlaskConical}
-                title="Mandatory lab matrix"
-                description="Applied to every lot in the batch before the weighbridge tranche releases"
+                title="Quality checks for this order"
+                description="Applied to every item before the second payment is released"
                 action={<Badge tone="outline" size="sm">SON / AFEX calibrated</Badge>}
               />
               <CardBody className="grid gap-3 sm:grid-cols-2">
@@ -293,7 +293,7 @@ export default function BatchProcurement() {
 
           <aside className="space-y-4">
             <Card>
-              <CardHeader icon={Wallet} title="Escrow breakdown" description="Live aggregation of the selected lots" />
+              <CardHeader icon={Wallet} title="Payment breakdown" description="Live total for the items you picked" />
               <CardBody className="space-y-3">
                 <div className="space-y-1.5 border-b border-line pb-3">
                   <div className="flex items-center justify-between text-[12.5px]">
@@ -320,32 +320,32 @@ export default function BatchProcurement() {
                 <div className="space-y-2 border-b border-line pb-3 text-[12.5px]">
                   <div className="flex items-center justify-between text-muted">
                     <span className="inline-flex items-center gap-1.5">
-                      <ShieldCheck size={14} className="text-forest-500" /> Multi-corridor haulage
+                      <ShieldCheck size={14} className="text-forest-500" /> Delivery across states
                     </span>
                     <span className="font-semibold text-ink">Quoted at checkout</span>
                   </div>
                   <div className="flex items-center justify-between text-muted">
                     <span className="inline-flex items-center gap-1.5">
-                      <FlaskConical size={14} className="text-forest-500" /> Moisture lab spectrometry
+                      <FlaskConical size={14} className="text-forest-500" /> Moisture test
                     </span>
                     <Badge tone="verified" size="sm">Free · pilot</Badge>
                   </div>
                   <div className="flex items-center justify-between text-muted">
                     <span className="inline-flex items-center gap-1.5">
-                      <Scale size={14} className="text-forest-500" /> Weighbridge telematics
+                      <Scale size={14} className="text-forest-500" /> Weight check
                     </span>
                     <Badge tone="verified" size="sm">Free · pilot</Badge>
                   </div>
                   <div className="flex items-center justify-between text-muted">
                     <span className="inline-flex items-center gap-1.5">
-                      <Lock size={14} className="text-forest-500" /> Custody trustee escrow fee
+                      <Lock size={14} className="text-forest-500" /> Escrow holding fee
                     </span>
                     <span className="font-semibold text-ink">Subsidised</span>
                   </div>
                 </div>
 
                 <div className="rounded-xl border border-line bg-canvas p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted">Total escrow commitment</p>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted">Total to pay</p>
                   <p className="mt-1 font-display text-[22px] font-extrabold tracking-tight text-forest-600 tnum">
                     {money(targetValue)}
                   </p>
@@ -361,11 +361,11 @@ export default function BatchProcurement() {
                     disabled={!chosen.length}
                     onClick={() =>
                       toast.success(
-                        `Batch escrow request raised for ${chosen.length} ${chosen.length === 1 ? 'lot' : 'lots'} · ${money(targetValue)}`,
+                        `Bulk order sent for ${chosen.length} ${chosen.length === 1 ? 'listing' : 'listings'} · ${money(targetValue)}`,
                       )
                     }
                   >
-                    <Lock size={15} /> Commit & lock batch escrow
+                    <Lock size={15} /> Place bulk order
                   </Button>
                   <Button variant="outline" className="w-full" onClick={exportProforma} disabled={!chosen.length}>
                     <Download size={15} /> Export proforma invoice
@@ -374,9 +374,8 @@ export default function BatchProcurement() {
               </CardBody>
             </Card>
 
-            <Callout tone="sage" icon={Sparkles} title="How batching helps">
-              One escrow commitment, one settlement milestone. Counter-offers are routed to each supplier in parallel and
-              the batch locks the moment every lot is accepted.
+            <Callout tone="sage" icon={Sparkles} title="Why buy together">
+              One payment for everything. Offers go to every farmer at the same time, and the order is placed as soon as each one accepts.
             </Callout>
           </aside>
         </div>

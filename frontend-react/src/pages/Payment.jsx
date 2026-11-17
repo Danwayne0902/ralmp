@@ -64,7 +64,7 @@ export default function Payment() {
       const res = await paymentService.verify(reference)
       setReceipt(res.data?.payment || { reference })
       setOrder((prev) => ({ ...prev, ...res.data?.order, payment_status: 'paid' }))
-      toast.success('Escrow funded. The grower and carrier have been notified.')
+      toast.success('Escrow funded. The farmer and transporter have been told.')
     } catch (err) {
       toast.error(parseError(err))
       setError(parseError(err))
@@ -110,7 +110,7 @@ export default function Payment() {
   if (loading) {
     return (
       <div className="page-wrap page-pad">
-        <Loading label="Loading escrow instruction" />
+        <Loading label="Loading payment" />
       </div>
     )
   }
@@ -139,12 +139,12 @@ export default function Payment() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Escrow funding"
-        title={paid ? 'Escrow funded' : 'Fund the escrow commitment'}
+        eyebrow="Pay into escrow"
+        title={paid ? 'Payment received' : 'Pay for this order'}
         description={
           paid
-            ? 'Your capital is held in custodial trust and will release against the milestone schedule below.'
-            : 'The order is reserved. Funds move into a CBN-regulated custodial vault — not to the grower or carrier.'
+            ? 'Your money is held safely and paid out step by step as the order moves.'
+            : 'The order is reserved. The money goes into a safe escrow account. It does not go to the farmer or the transporter yet.'
         }
         actions={
           <Button asChild variant="ghost" size="md">
@@ -179,18 +179,18 @@ export default function Payment() {
 
             <div className="grid gap-6 p-5 sm:grid-cols-2 sm:p-6">
               <div>
-                <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">{paid ? 'Escrow commitment' : 'Amount to fund'}</p>
+                <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">{paid ? 'Amount paid' : 'Amount to pay'}</p>
                 <p className="mt-1 font-display text-[34px] font-extrabold leading-10 tracking-tight text-forest-600 tnum">
                   {money(order.total_price)}
                 </p>
                 <p className="mt-1 text-[11.5px] text-muted">
-                  {paid ? 'Received in full' : 'One payment · milestone release'}
+                  {paid ? 'Received in full' : 'One payment now, paid out in steps' }
                 </p>
               </div>
               <dl className="space-y-1">
-                <KeyValue label="Produce subtotal" mono>{money(order.subtotal)}</KeyValue>
-                <KeyValue label="Haulage & freight" mono>{money(order.delivery_fee)}</KeyValue>
-                <KeyValue label="Custody fee" mono>Waived</KeyValue>
+                <KeyValue label="Produce total" mono>{money(order.subtotal)}</KeyValue>
+                <KeyValue label="Delivery" mono>{money(order.delivery_fee)}</KeyValue>
+                <KeyValue label="Holding fee" mono>Waived</KeyValue>
               </dl>
             </div>
 
@@ -198,7 +198,7 @@ export default function Payment() {
               <div className="flex flex-wrap items-center justify-between gap-2 text-[11.5px]">
                 <p className="flex items-center gap-1.5 text-muted">
                   <Truck size={13} className="text-forest-500" />
-                  {order.farmer?.name || 'Registered grower'}
+                  {order.farmer?.name || 'Farmer'}
                   <span className="text-sage-400">→</span>
                   {order.buyer?.name || user?.name || 'Your delivery point'}
                 </p>
@@ -213,9 +213,9 @@ export default function Payment() {
 
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              { icon: Landmark, title: 'Custodial vault', body: 'Providus Bank trust arrangement under CBN circular FSR/DIR/GEN/07/041.' },
-              { icon: ShieldCheck, title: 'Dual authorisation', body: 'No single party can release escrow. Evidence events drive every tranche.' },
-              { icon: Wallet, title: 'Refund path', body: 'Undelivered or rejected lots restore stock and return unsettled capital.' },
+              { icon: Landmark, title: 'Safe account', body: 'The money is held in a separate trust account. We cannot spend it on the business.' },
+              { icon: ShieldCheck, title: 'Two approvals', body: 'No one person can move the money. Each payment needs its proof.' },
+              { icon: Wallet, title: 'Refund', body: 'If the goods are not delivered or are rejected, the farmer keeps the stock and you get your money back.' },
             ].map((item) => (
               <div key={item.title} className="rounded-card border border-line bg-white p-4">
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest-50 text-forest-600">
@@ -235,11 +235,10 @@ export default function Payment() {
                 <Check size={26} strokeWidth={2.6} />
               </span>
               <h2 className="mt-4 font-display text-[19px] font-extrabold tracking-[-0.01em] text-ink">
-                Funds secured in escrow
+                Money received
               </h2>
               <p className="mt-1.5 text-[12px] leading-5 text-muted">
-                The grower has been notified and a carrier will be matched against the origin. The first tranche
-                releases after the origin weighbridge slip.
+                The farmer has been told, and we will find a transporter. The first 10% is paid after pickup.
               </p>
               <dl className="mt-4 space-y-1 rounded-xl border border-line bg-canvas px-3.5 py-2.5 text-left">
                 <KeyValue label="Reference" mono>{receipt?.reference || order.payment_reference || '—'}</KeyValue>
@@ -251,7 +250,7 @@ export default function Payment() {
                 </Link>
               </Button>
               <Button asChild variant="ghost" size="md" className="mt-1 w-full">
-                <Link to="/settlements">Open settlement ledger</Link>
+                <Link to="/settlements">See payments</Link>
               </Button>
             </div>
           ) : (
@@ -259,17 +258,17 @@ export default function Payment() {
               <div className="rounded-card border border-line bg-white shadow-card">
                 <div className="border-b border-line px-5 py-4">
                   <h2 className="flex items-center gap-2 font-display text-[14.5px] font-bold text-ink">
-                    <Lock size={15} className="text-forest-500" /> Fund with Paystack
+                    <Lock size={15} className="text-forest-500" /> Pay with Paystack
                   </h2>
-                  <p className="mt-0.5 text-[11px] text-muted">Card, transfer or USSD · NGN settlement</p>
+                  <p className="mt-0.5 text-[11px] text-muted">Card or bank transfer · paid in naira</p>
                 </div>
                 <div className="space-y-4 p-5">
                   <div className="rounded-xl border border-line bg-canvas px-4 py-3.5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Payable now</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Pay now</p>
                     <p className="mt-0.5 font-display text-[26px] font-extrabold tracking-tight text-ink tnum">
                       {money(order.total_price)}
                     </p>
-                    <p className="mt-1 text-[10.5px] text-muted">Full pre-funding is required before dispatch.</p>
+                    <p className="mt-1 text-[10.5px] text-muted">The full amount must be paid before the goods move.</p>
                   </div>
 
                   {error && (
@@ -285,12 +284,12 @@ export default function Payment() {
 
                   {fallbackUrl && (
                     <Button asChild variant="outline" size="sm" className="w-full">
-                      <a href={fallbackUrl}>Continue on Paystack</a>
+                      <a href={fallbackUrl}>Pay on Paystack</a>
                     </Button>
                   )}
 
                   <Button asChild variant="ghost" size="sm" className="w-full">
-                    <Link to={`/orders/${order.id}`}>Pay later — keep the reservation</Link>
+                    <Link to={`/orders/${order.id}`}>Pay later — keep my order</Link>
                   </Button>
 
                   <p className="text-center text-[10px] leading-4 text-muted">
@@ -304,8 +303,8 @@ export default function Payment() {
                   <Clock3 size={13} /> Reservation window
                 </p>
                 <p className="mt-1 text-[11px] leading-5 text-harvest-600/85">
-                  The grower&apos;s stock is already deducted for this order. Fund promptly — unfunded orders can be
-                  cancelled by the grower or the trade desk.
+                  The farmer has already set this stock aside for you. Please pay soon — if an order stays unpaid,
+                  the farmer or our team can cancel it.
                 </p>
               </div>
             </>

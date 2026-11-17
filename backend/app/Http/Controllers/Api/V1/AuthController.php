@@ -31,9 +31,24 @@ class AuthController extends Controller
             'state' => 'required|string',
             'lga' => 'required|string',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'name.required' => 'Please enter your full name.',
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'That email address does not look right.',
+            'email.unique' => 'This email is already registered. Try signing in instead.',
+            'phone.required' => 'Please enter your phone number.',
+            'phone.unique' => 'This phone number is already registered. Try another number.',
+            'password.required' => 'Please create a password.',
+            'password.min' => 'Your password needs at least 8 characters.',
+            'password.confirmed' => 'The two passwords do not match.',
+            'role.required' => 'Please choose the kind of account you want.',
+            'address.required' => 'Please enter your address.',
+            'state.required' => 'Please choose your state.',
+            'lga.required' => 'Please enter your local government area.',
         ]);
 
-        $verificationToken = Str::random(64);
+        $verifyByEmail = (bool) config('auth.email_verification', false);
+        $verificationToken = $verifyByEmail ? Str::random(64) : null;
 
         $userData = [
             'name' => $validated['name'],
@@ -44,9 +59,10 @@ class AuthController extends Controller
             'address' => $validated['address'],
             'state' => $validated['state'],
             'lga' => $validated['lga'],
-            'email_verified_at' => null,
+            'email_verified_at' => $verifyByEmail ? null : now(),
+            'verification_status' => !$verifyByEmail,
             // Store only a hash; the raw token is emailed to the user.
-            'verification_token' => hash('sha256', $verificationToken),
+            'verification_token' => $verificationToken ? hash('sha256', $verificationToken) : null,
         ];
 
         // Handle profile image upload
@@ -60,12 +76,26 @@ class AuthController extends Controller
         // Assign role
         $user->assignRole($validated['role']);
 
-        // Send verification email
-        Mail::to($user->email)->send(new VerifyEmail($user, $verificationToken));
+        if ($verifyByEmail) {
+            // A mail problem must never lose a registration.
+            try {
+                Mail::to($user->email)->send(new VerifyEmail($user, $verificationToken));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        // Sign the new member in right away so they land on their own
+        // dashboard instead of a dead end.
+        $token = $user->createToken('auth_token');
 
         return response()->json([
-            'message' => 'User registered successfully. Please verify your email.',
-            'user' => $user->only(['id', 'name', 'email', 'phone', 'role', 'profile_image']),
+            'message' => $verifyByEmail
+                ? 'Account created. Check your email to verify it.'
+                : 'Account created. Welcome to RALMP.',
+            'token' => $token->plainTextToken,
+            'needs_verification' => $verifyByEmail,
+            'user' => $user->only(['id', 'name', 'email', 'phone', 'role', 'profile_image', 'email_verified_at']),
         ], 201);
     }
 
@@ -77,26 +107,30 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
+        ], [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'That email address does not look right.',
+            'password.required' => 'Please enter your password.',
         ]);
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['Email or password is not correct.'],
             ]);
         }
 
-        if (is_null($user->email_verified_at)) {
+        if (is_null($user->email_verified_at) && config('auth.email_verification', false)) {
             return response()->json([
-                'message' => 'Please verify your email address before logging in.',
+                'message' => 'Please verify your email before you sign in.',
                 'code' => 'email_unverified',
             ], 403);
         }
 
         if (!$user->is_active) {
             return response()->json([
-                'message' => 'This account has been suspended.',
+                'message' => 'This account is on hold. Please contact the trade desk.',
                 'code' => 'account_suspended',
             ], 403);
         }

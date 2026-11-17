@@ -148,9 +148,9 @@ export default function AdminAnalytics() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Administration · analytics"
-        title="Market analytics"
-        description="Order flow, settled revenue and supply concentration across the exchange, measured from the live ledger."
+        eyebrow="Reports"
+        title="Reports"
+        description="Orders, money and supply, measured from live records."
         actions={
           <>
             <Button variant="outline" size="md" onClick={loadAnalytics} disabled={loading}>
@@ -174,10 +174,10 @@ export default function AdminAnalytics() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Package} label="Orders in ledger" value={num(analytics?.total_orders)} hint={`${ordersWindow} in the last ${period} days`} />
+            <Stat icon={Package} label="Orders" value={num(analytics?.total_orders)} hint={`${ordersWindow} in the last ${period} days`} />
             <Stat icon={Wallet} label="Settled revenue" value={money(analytics?.total_revenue ?? 0)} tone="sprout" hint={`${compactMoney(revenueWindow)} in the window`} size="lg" />
             <Stat icon={Sprout} label="Live listings" value={num(analytics?.total_listings)} tone="gold" hint="Availability-marked lots only" />
-            <Stat icon={Users} label="Participants" value={num(analytics?.total_users)} tone="neutral" hint={`${analytics?.total_farmers || 0} growers · ${analytics?.total_buyers || 0} buyers`} />
+            <Stat icon={Users} label="Participants" value={num(analytics?.total_users)} tone="neutral" hint={`${analytics?.total_farmers || 0} farmers · ${analytics?.total_buyers || 0} buyers`} />
           </>
         )}
       </div>
@@ -208,8 +208,8 @@ export default function AdminAnalytics() {
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
         <ChartCard
-          title="Order volume"
-          description="Orders created per day across the exchange."
+          title="Orders"
+          description="Orders placed each day."
           action={chartLoading ? <Skeleton className="h-5 w-16" /> : <Badge tone="neutral" size="sm">{ordersWindow} orders</Badge>}
         >
           {chartLoading ? (
@@ -241,8 +241,8 @@ export default function AdminAnalytics() {
         </ChartCard>
 
         <ChartCard
-          title="Settled revenue"
-          description="Value of delivered and completed orders per day."
+          title="Money settled"
+          description="Value of delivered and finished orders each day."
           action={chartLoading ? <Skeleton className="h-5 w-16" /> : <Badge tone="verified" size="sm">{compactMoney(revenueWindow)}</Badge>}
         >
           {chartLoading ? (
@@ -317,8 +317,8 @@ export default function AdminAnalytics() {
           </div>
 
           <ChartCard
-            title="Supply concentration"
-            description="Most listed commodities on the exchange today."
+            title="What is listed"
+            description="The crops with the most listings today."
           >
             {chartLoading ? (
               <Skeleton className="h-[210px] w-full rounded-xl" />
@@ -381,7 +381,7 @@ export default function AdminAnalytics() {
             {loading ? (
               <div className="mt-4 space-y-2">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8" />)}</div>
             ) : statuses.length === 0 ? (
-              <p className="mt-4 text-[11.5px] text-muted">No orders in the ledger.</p>
+              <p className="mt-4 text-[11.5px] text-muted">No orders yet.</p>
             ) : (
               <ul className="mt-3 divide-y divide-line">
                 {statuses.map(([status, value]) => (

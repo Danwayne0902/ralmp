@@ -139,19 +139,25 @@ cd frontend && npm install && npm run dev   # http://127.0.0.1:8081
 `frontend-react/` can then be ignored or removed without affecting the API or
 the original client.
 
-#### Demo accounts
+#### Accounts
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Buyer | `buyer@ramlp.com` | `password` |
-| Farmer (demo login) | `farmer@ramlp.com` | `password` |
-| Administrator | `admin@ramlp.com` | `password` |
-| Grower co-op | `ogunvalley@ralmp.test` | `password` |
-| Grain co-op | `kadunagrain@ralmp.test` | `password` |
-| Root-crop co-op | `benueroots@ralmp.test` | `password` |
+There is no public demo login. Create your own account from the registration
+page, or promote an existing user to admin:
+
+```bash
+php artisan tinker --execute="
+\$u = App\Models\User::where('email', 'you@example.com')->firstOrFail();
+\$u->update(['role' => 'admin', 'email_verified_at' => now(), 'is_active' => true]);
+\$u->syncRoles(['admin']);
+"
+```
+
+New registrations are signed in immediately. Email confirmation is optional and
+is controlled by `AUTH_EMAIL_VERIFICATION` (off by default because the app must
+work without a mail server).
 
 The spot market is seeded with 23 lots across grains, legumes, tubers, vegetables,
-fruits and spices from these growers. Listings were created through the public
+fruits and spices from three co-op accounts. Listings were created through the public
 API, so prices, volumes and units behave exactly like user-created lots. Category
 artwork is illustrative, not lot photography.
 
@@ -162,7 +168,7 @@ e-waybills, laboratory assays or NIBSS payouts. Those screens
 (`/escrow`, `/admin/arbitration`, `/admin/quality/terminal`, `/dispatch/waybill`,
 `/farmer/settlement`, `/buyer/procurement`) render the control framework and
 derive their content from real order, listing and payment records. Draft or
-unavailable data is labelled as such (for example "Draft — not adjudicated",
+unavailable data is labelled as such (for example "Draft only — not decided",
 or an empty state) and no assay values, awards or settlement references are
 invented.
 

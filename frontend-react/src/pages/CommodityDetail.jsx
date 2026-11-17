@@ -123,12 +123,12 @@ export default function CommodityDetail() {
       return
     }
     if (!user) {
-      toast.info('Sign in to stage an escrow commitment')
+      toast.info('Sign in to add this to your basket')
       navigate('/login', { state: { from: `/commodities/${id}` } })
       return
     }
     if (user.role !== 'buyer') {
-      toast.error('Only buyer accounts can commit escrow')
+      toast.error('Only buyer accounts can place orders')
       return
     }
     setAdding(true)
@@ -147,7 +147,7 @@ export default function CommodityDetail() {
   if (loading) {
     return (
       <div className="page-wrap page-pad">
-        <Loading label="Loading lot sheet" />
+        <Loading label="Loading produce" />
       </div>
     )
   }
@@ -157,8 +157,8 @@ export default function CommodityDetail() {
       <div className="page-wrap page-pad">
         <EmptyState
           icon={Sprout}
-          title="Lot unavailable"
-          description={error || 'This listing may have been sold or withdrawn by the grower.'}
+          title="Not available"
+          description={error || 'This listing may have been sold or withdrawn by the farmer.'}
           action={
             <Button asChild variant="outline">
               <Link to="/commodities">
@@ -180,7 +180,7 @@ export default function CommodityDetail() {
       <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-[11.5px] text-muted" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-forest-600">Home</Link>
         <ChevronRight size={12} />
-        <Link to="/commodities" className="hover:text-forest-600">Spot exchange</Link>
+        <Link to="/commodities" className="hover:text-forest-600">Marketplace</Link>
         <ChevronRight size={12} />
         <Link to={`/commodities?category=${lot.category}`} className="capitalize hover:text-forest-600">
           {lot.category}
@@ -206,7 +206,7 @@ export default function CommodityDetail() {
               )}
               <div className="absolute left-3 top-3 flex flex-wrap gap-2">
                 <Badge tone={verified ? 'verified' : 'pending'} size="md" className="bg-white/95 backdrop-blur">
-                  <BadgeCheck size={12} /> {verified ? 'Verified grower' : 'Verification pending'}
+                  <BadgeCheck size={12} /> {verified ? 'Verified farmer' : 'Not verified yet'}
                 </Badge>
                 <Badge tone="dark" size="md" className="capitalize">{lot.category}</Badge>
               </div>
@@ -257,7 +257,7 @@ export default function CommodityDetail() {
 
             <p className="mt-5 whitespace-pre-line text-[13.5px] leading-6 text-ink-soft/85">
               {lot.description ||
-                'The grower has not attached a long-form description for this lot. Request grading and moisture detail from the trade desk before committing at scale.'}
+                'The farmer has not added a longer description for this produce. Ask our team for the grade and moisture details before you buy in bulk.'}
             </p>
 
             <dl className="mt-6 grid gap-x-8 border-t border-line pt-3 sm:grid-cols-2">
@@ -284,14 +284,14 @@ export default function CommodityDetail() {
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest-50 text-forest-600">
                   <FlaskConical size={15} />
                 </span>
-                <h2 className="font-display text-[14px] font-bold text-ink">Quality protocol</h2>
+                <h2 className="font-display text-[14px] font-bold text-ink">Quality checks</h2>
               </div>
               <ul className="mt-4 space-y-3">
                 {[
-                  { label: 'Origin visual grade', note: 'Grower-declared at listing', done: true },
-                  { label: 'Moisture assay', note: 'Issued at destination lab', done: false },
-                  { label: 'Weight verification', note: 'Dual weighbridge at 1.0% tolerance', done: false },
-                  { label: 'Silo acceptance', note: 'Buyer receiving receipt', done: false },
+                  { label: 'Visible grade', note: 'Told to us by the farmer', done: true },
+                  { label: 'Moisture test', note: 'Done by a lab at drop-off', done: false },
+                  { label: 'Weight check', note: 'Weighed at pickup and delivery', done: false },
+                  { label: 'Goods delivered', note: 'Buyer signs for the goods', done: false },
                 ].map((step) => (
                   <li key={step.label} className="flex items-start gap-2.5">
                     <span
@@ -311,7 +311,7 @@ export default function CommodityDetail() {
               </ul>
               <p className="mt-4 border-t border-line pt-3 text-[10.5px] leading-4 text-muted">
                 Lab values are released only after the destination sample is sealed. The platform does not publish
-                grower-declared moisture as a verified figure.
+                moisture the farmer told us as a checked figure.
               </p>
             </div>
 
@@ -320,14 +320,14 @@ export default function CommodityDetail() {
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-harvest-50 text-harvest-600">
                   <Truck size={15} />
                 </span>
-                <h2 className="font-display text-[14px] font-bold text-ink">Haulage & custody</h2>
+                <h2 className="font-display text-[14px] font-bold text-ink">Delivery and safe payment</h2>
               </div>
               <ul className="mt-4 space-y-3">
                 {[
-                  { icon: Weight, title: 'Origin weighbridge', note: 'Tare and gross captured before dispatch' },
-                  { icon: Truck, title: 'e-Waybill issuance', note: 'Carrier identity bound to the order' },
-                  { icon: Scale, title: 'Destination re-weigh', note: 'Variance adjudicated automatically' },
-                  { icon: Warehouse, title: 'Silo discharge', note: 'Buyer signs the receiving receipt' },
+                  { icon: Weight, title: 'Pickup weight', note: 'Recorded before the goods leave' },
+                  { icon: Truck, title: 'Delivery note', note: 'Transporter added to the order' },
+                  { icon: Scale, title: 'Weigh again on arrival', note: 'Any big difference is checked' },
+                  { icon: Warehouse, title: 'Goods delivered', note: 'Buyer signs for the goods' },
                 ].map((step) => (
                   <li key={step.title} className="flex items-start gap-2.5">
                     <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md bg-sage-100 text-forest-600">
@@ -341,7 +341,7 @@ export default function CommodityDetail() {
                 ))}
               </ul>
               <p className="mt-4 flex items-center gap-1.5 border-t border-line pt-3 text-[10.5px] text-muted">
-                <ClipboardCheck size={12} className="text-forest-500" /> Freight is pre-funded inside the same escrow.
+                <ClipboardCheck size={12} className="text-forest-500" /> Delivery money is already in the same safe account.
               </p>
             </div>
           </div>
@@ -349,7 +349,7 @@ export default function CommodityDetail() {
           {related.length > 0 && (
             <section>
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="font-display text-[17px] font-bold text-ink">Similar lots on the board</h2>
+                <h2 className="font-display text-[17px] font-bold text-ink">Similar produce</h2>
                 <Link to={`/commodities?category=${lot.category}`} className="text-[11.5px] font-semibold text-forest-600 hover:underline">
                   View category
                 </Link>
@@ -366,7 +366,7 @@ export default function CommodityDetail() {
         <aside className="space-y-4 self-start lg:sticky lg:top-24">
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="border-b border-line px-5 py-4">
-              <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Farm-gate price</p>
+              <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Farm price</p>
               <div className="mt-1 flex items-baseline gap-1.5">
                 <span className="font-display text-[30px] font-extrabold leading-9 tracking-tight text-forest-600 tnum">
                   {money(lot.price)}
@@ -374,7 +374,7 @@ export default function CommodityDetail() {
                 <span className="text-[12px] font-medium text-muted">/ {lot.unit}</span>
               </div>
               <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-muted">
-                <ShieldCheck size={12} className="text-forest-500" /> Escrow protected · freight estimated at {money(DELIVERY_FEE)}
+                <ShieldCheck size={12} className="text-forest-500" /> Payment protected · delivery about {money(DELIVERY_FEE)}
               </p>
             </div>
 
@@ -400,39 +400,39 @@ export default function CommodityDetail() {
 
               <div className="space-y-2 rounded-xl border border-line bg-canvas px-3.5 py-3 text-[12px]">
                 <div className="flex justify-between text-muted">
-                  <span>Produce subtotal</span>
+                  <span>Produce total</span>
                   <span className="font-semibold text-ink tnum">{money(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-muted">
-                  <span>Estimated haulage</span>
+                  <span>Delivery estimate</span>
                   <span className="font-semibold text-ink tnum">{money(qty > 0 ? DELIVERY_FEE : 0)}</span>
                 </div>
                 <div className="flex justify-between border-t border-line pt-2">
-                  <span className="font-semibold text-ink">Escrow commitment</span>
+                  <span className="font-semibold text-ink">Total to pay</span>
                   <span className="font-display text-[15px] font-extrabold text-forest-600 tnum">{money(total)}</span>
                 </div>
               </div>
 
               {soldOut ? (
-                <Button size="lg" className="w-full" disabled>Lot unavailable</Button>
+                <Button size="lg" className="w-full" disabled>Not available</Button>
               ) : canTrade ? (
                 <Button size="lg" className="w-full" onClick={addToCart} disabled={adding || qty < 1}>
-                  <Lock size={15} /> {adding ? 'Adding to basket…' : user ? 'Commit to escrow basket' : 'Sign in to commit'}
+                  <Lock size={15} /> {adding ? 'Adding to basket…' : user ? 'Add to basket' : 'Sign in to add'}
                 </Button>
               ) : (
                 <Button asChild size="lg" className="w-full" variant="outline">
-                  <Link to="/login">Buyer account required</Link>
+                  <Link to="/login">Sign in as a buyer</Link>
                 </Button>
               )}
 
               <p className="text-center text-[10.5px] leading-4 text-muted">
-                No charge yet. Review freight and milestone split at escrow checkout.
+                No money is taken yet. Check delivery and the payment steps at checkout.
               </p>
             </div>
           </div>
 
           <div className="rounded-card border border-line bg-white p-5">
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Grower on record</p>
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Farmer</p>
             <div className="mt-3 flex items-center gap-3">
               <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-forest-50 text-forest-600">
                 {lot.user?.profile_image ? (
@@ -442,7 +442,7 @@ export default function CommodityDetail() {
                 )}
               </span>
               <div className="min-w-0">
-                <p className="break-words text-[13.5px] font-bold text-ink">{lot.user?.name || 'Independent grower'}</p>
+                <p className="break-words text-[13.5px] font-bold text-ink">{lot.user?.name || 'Farmer'}</p>
                 <p className="text-[11px] text-muted">
                   {[lot.user?.lga, lot.user?.state].filter(Boolean).join(', ') || 'Origin not disclosed'}
                 </p>
@@ -458,7 +458,7 @@ export default function CommodityDetail() {
             </div>
             {user && user.role === 'buyer' && (
               <Button asChild variant="outline" size="sm" className="mt-4 w-full">
-                <Link to={`/messages?to=${lot.user_id}&name=${encodeURIComponent(lot.user?.name || '')}`}>Message grower</Link>
+                <Link to={`/messages?to=${lot.user_id}&name=${encodeURIComponent(lot.user?.name || '')}`}>Message farmer</Link>
               </Button>
             )}
           </div>
@@ -466,9 +466,9 @@ export default function CommodityDetail() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
               <h2 className="flex items-center gap-2 font-display text-[13.5px] font-bold text-ink">
-                <Lock size={14} className="text-forest-500" /> Settlement schedule
+                <Lock size={14} className="text-forest-500" /> Payment steps
               </h2>
-              <span className="text-[10px] font-bold uppercase tracking-wide text-muted">This commitment</span>
+              <span className="text-[10px] font-bold uppercase tracking-wide text-muted">Your order</span>
             </div>
             <ol className="divide-y divide-line px-5">
               {schedule.map((tranche) => (
@@ -498,8 +498,8 @@ export default function CommodityDetail() {
               <Clock3 size={13} /> What happens next
             </p>
             <p className="mt-1.5 text-[11px] leading-5 text-forest-700/75">
-              Your basket stages the commitment. At checkout you authorise the escrow and a carrier is matched
-              against the origin. The grower is notified only after funds are locked.
+              Your basket holds the items for now. At checkout you pay into escrow and we find a transporter.
+              The farmer is told only after your money is safe in escrow.
             </p>
           </div>
         </aside>

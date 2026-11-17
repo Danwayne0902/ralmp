@@ -20,6 +20,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Email verification
+    |--------------------------------------------------------------------------
+    |
+    | When this is off, new accounts are usable straight away. The platform
+    | is often installed without a mail server, so blocking sign-in until an
+    | email arrives would lock people out. Turn it on once mail delivery is
+    | configured and you want to confirm every address.
+    |
+    */
+
+    'email_verification' => env('AUTH_EMAIL_VERIFICATION', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication Guards
     |--------------------------------------------------------------------------
     |

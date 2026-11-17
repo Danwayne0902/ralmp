@@ -15,51 +15,51 @@ import { Avatar } from '../ui/Data'
 
 const PUBLIC_LINKS = [
   { to: '/commodities', label: 'Marketplace' },
-  { to: '/escrow', label: 'Escrow & trust' },
+  { to: '/escrow', label: 'How escrow works' },
 ]
 
 const WORKSPACE = {
   buyer: {
-    label: 'Procurement',
+    label: 'Buying',
     links: [
-      { to: '/buyer', label: 'Overview', icon: LayoutDashboard, end: true },
-      { to: '/commodities', label: 'Spot market', icon: Store },
-      { to: '/buyer/procurement', label: 'Batch procurement', icon: Layers },
-      { to: '/cart', label: 'Escrow checkout', icon: CreditCard },
-      { to: '/orders', label: 'Orders & waybills', icon: Package },
-      { to: '/settlements', label: 'Settlement ledger', icon: Wallet },
+      { to: '/buyer', label: 'Home', icon: LayoutDashboard, end: true },
+      { to: '/commodities', label: 'Buy produce', icon: Store },
+      { to: '/buyer/procurement', label: 'Buy in bulk', icon: Layers },
+      { to: '/cart', label: 'Basket', icon: CreditCard },
+      { to: '/orders', label: 'My orders', icon: Package },
+      { to: '/settlements', label: 'Payments', icon: Wallet },
     ],
   },
   farmer: {
-    label: 'Farm hub',
+    label: 'My farm',
     links: [
-      { to: '/farmer', label: 'Hub overview', icon: LayoutDashboard, end: true },
-      { to: '/farmer/listings', label: 'My lots', icon: Sprout },
-      { to: '/farmer/listings/create', label: 'Add harvest', icon: Package },
-      { to: '/orders', label: 'Waybills', icon: Truck },
-      { to: '/farmer/payouts', label: 'Payouts', icon: Wallet },
-      { to: '/farmer/settlement', label: 'Settlement receipts', icon: ReceiptText },
+      { to: '/farmer', label: 'Home', icon: LayoutDashboard, end: true },
+      { to: '/farmer/listings', label: 'My produce', icon: Sprout },
+      { to: '/farmer/listings/create', label: 'Add produce', icon: Package },
+      { to: '/orders', label: 'Deliveries', icon: Truck },
+      { to: '/farmer/payouts', label: 'My money', icon: Wallet },
+      { to: '/farmer/settlement', label: 'Receipts', icon: ReceiptText },
     ],
   },
   logistics_provider: {
-    label: 'Dispatch',
+    label: 'My jobs',
     links: [
-      { to: '/dispatch', label: 'Fleet board', icon: LayoutDashboard, end: true },
-      { to: '/dispatch/waybill', label: 'e-Waybill & gate-in', icon: FileText },
-      { to: '/orders', label: 'Haulage orders', icon: Package },
-      { to: '/messages', label: 'Carrier messages', icon: MessageSquare },
+      { to: '/dispatch', label: 'Home', icon: LayoutDashboard, end: true },
+      { to: '/dispatch/waybill', label: 'Delivery notes', icon: FileText },
+      { to: '/orders', label: 'Jobs', icon: Package },
+      { to: '/messages', label: 'Messages', icon: MessageSquare },
     ],
   },
   admin: {
-    label: 'Administration',
+    label: 'Admin',
     links: [
-      { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
-      { to: '/admin/users', label: 'Users', icon: Users },
-      { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-      { to: '/admin/disputes', label: 'Disputes', icon: FileWarning },
-      { to: '/admin/arbitration', label: 'Arbitration', icon: Gavel },
-      { to: '/admin/quality', label: 'Quality lab', icon: FlaskConical, end: true },
-      { to: '/admin/quality/terminal', label: 'Inspector terminal', icon: FlaskConical },
+      { to: '/admin', label: 'Home', icon: LayoutDashboard, end: true },
+      { to: '/admin/users', label: 'People', icon: Users },
+      { to: '/admin/analytics', label: 'Reports', icon: BarChart3 },
+      { to: '/admin/disputes', label: 'Complaints', icon: FileWarning },
+      { to: '/admin/arbitration', label: 'Awards', icon: Gavel },
+      { to: '/admin/quality', label: 'Quality checks', icon: FlaskConical, end: true },
+      { to: '/admin/quality/terminal', label: 'Checker screen', icon: FlaskConical },
     ],
   },
 }
@@ -159,7 +159,7 @@ export default function TopNav() {
               className="hidden h-9 items-center gap-2 rounded-lg border border-line bg-canvas px-3 text-[12px] text-muted transition hover:border-sage-400 hover:text-ink md:flex"
             >
               <Search size={14} />
-              <span>Search lots…</span>
+              <span>Search produce</span>
               <span className="kbd ml-2 hidden lg:inline">/</span>
             </button>
 
@@ -176,7 +176,7 @@ export default function TopNav() {
                 {user?.role === 'buyer' && (
                   <Link
                     to="/cart"
-                    aria-label={`Escrow basket, ${cartCount} items`}
+                    aria-label={`Basket, ${cartCount} items`}
                     className="relative grid h-9 w-9 place-items-center rounded-lg text-muted transition hover:bg-sage-100 hover:text-ink"
                   >
                     <ShoppingCart size={18} />
@@ -205,10 +205,12 @@ export default function TopNav() {
                   }
                   items={[
                     { type: 'label', label: roleLabel(user?.role) },
-                    { label: 'Workspace home', icon: LayoutDashboard, onSelect: () => navigate(roleHome(user?.role)) },
+                    { label: 'My dashboard', icon: LayoutDashboard, onSelect: () => navigate('/dashboard') },
                     { label: 'My profile', icon: UserIcon, onSelect: () => navigate('/profile') },
                     { label: 'Messages', icon: MessageSquare, onSelect: () => navigate('/messages') },
-                    { label: 'Settlement ledger', icon: Wallet, onSelect: () => navigate('/settlements') },
+                    ...(['buyer', 'admin'].includes(user?.role)
+                      ? [{ label: 'Payments', icon: Wallet, onSelect: () => navigate('/settlements') }]
+                      : []),
                     { type: 'separator' },
                     { label: 'Sign out', icon: LogOut, tone: 'danger', onSelect: handleLogout },
                   ]}
@@ -260,14 +262,14 @@ export default function TopNav() {
               ))}
               <span className="ml-auto hidden items-center gap-1.5 text-[10.5px] text-muted lg:flex">
                 <ShieldCheck size={12} className="text-forest-500" />
-                CBN-regulated escrow · NIBSS settlement
+                Your money is held safely until delivery
               </span>
             </div>
           </div>
         )}
       </header>
 
-      <Sheet open={searchOpen} onOpenChange={setSearchOpen} title="Search the exchange" description="Find verified lots by commodity, category or origin hub." side="right">
+      <Sheet open={searchOpen} onOpenChange={setSearchOpen} title="Search produce" description="Find what you need by crop or by place." side="right">
         <form onSubmit={submitSearch} className="space-y-3">
           <div className="flex items-center gap-2 rounded-btn border border-line bg-white px-3">
             <Search size={16} className="text-muted" />
@@ -280,11 +282,11 @@ export default function TopNav() {
             />
           </div>
           <Button type="submit" className="w-full">
-            Search marketplace <ArrowRight size={15} />
+            Search <ArrowRight size={15} />
           </Button>
         </form>
         <div className="mt-6">
-          <p className="label-caps">Popular searches</p>
+          <p className="label-caps">Common searches</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {['Maize', 'Soybean', 'Yam', 'Tomatoes', 'Cassava', 'Rice'].map((term) => (
               <button
@@ -344,7 +346,7 @@ export default function TopNav() {
                   </div>
                 </div>
                 <Link to="/profile" className="mt-4 block rounded-lg px-3 py-2.5 text-sm font-semibold text-ink-soft hover:bg-sage-100">
-                  Profile & KYC
+                  My profile
                 </Link>
                 <button onClick={handleLogout} className="mt-1 block w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-critical-600 hover:bg-critical-50">
                   Sign out
@@ -360,10 +362,11 @@ export default function TopNav() {
 
           <div className="rounded-xl border border-line bg-canvas p-4">
             <p className="flex items-center gap-2 text-[12px] font-bold text-forest-600">
-              <Phone size={14} /> Offline trade desk
+              <Phone size={14} /> Need help?
             </p>
             <p className="mt-1 text-[12px] leading-5 text-muted">
-              Dial <span className="font-mono font-semibold text-ink">*347*44#</span> to list harvest and authorise payouts without data.
+              Call the trade desk on <a href="tel:+2348000725670" className="font-semibold text-ink hover:underline">+234 800 072 5670</a>.
+              We are open 07:00 to 19:00, Monday to Saturday.
             </p>
           </div>
         </div>

@@ -15,10 +15,10 @@ import { fmtDateTime, imgUrl, money, num, qtyUnit } from '../lib/format'
 import { cn, parseError } from '../lib/utils'
 
 const ASSAYS = [
-  { key: 'moisture', label: 'Moisture content', unit: '%', limit: 12.5, compare: 'lte', spec: '≤ 12.50% max', bench: 'NIS 253:2018' },
-  { key: 'aflatoxin', label: 'Aflatoxin B1', unit: 'ppb', limit: 10, compare: 'lt', spec: '< 10.0 ppb', bench: 'Feed-grade safety limit' },
-  { key: 'chaff', label: 'Foreign chaff & impurity', unit: '%', limit: 2, compare: 'lte', spec: '≤ 2.00% max', bench: 'Max allowable 2.0%' },
-  { key: 'broken', label: 'Broken / defective kernels', unit: '%', limit: 5, compare: 'lte', spec: '≤ 5.00% max', bench: 'Max standard 5.0%' },
+  { key: 'moisture', label: 'Moisture', unit: '%', limit: 12.5, compare: 'lte', spec: '≤ 12.50% max', bench: 'Standard limit' },
+  { key: 'aflatoxin', label: 'Aflatoxin B1', unit: 'ppb', limit: 10, compare: 'lt', spec: '< 10.0 ppb', bench: 'Food safety limit' },
+  { key: 'chaff', label: 'Dirt and other matter', unit: '%', limit: 2, compare: 'lte', spec: '≤ 2.00% max', bench: 'Max 2.0%' },
+  { key: 'broken', label: 'Broken grains', unit: '%', limit: 5, compare: 'lte', spec: '≤ 5.00% max', bench: 'Max 5.0%' },
 ]
 
 function assayPass(key, raw) {
@@ -31,24 +31,24 @@ function assayPass(key, raw) {
 const VERDICTS = [
   {
     key: 'release',
-    label: 'Full approval & release milestone 2',
+    label: 'All good — release the 60% payment',
     icon: CheckCircle2,
     tone: 'forest',
-    copy: 'Releases the 60% weighbridge & lab tranche from escrow into the producer wallet. All parameters meet Grade 1 specification.',
+    copy: 'Releases the 60% payment to the farmer. Every reading is inside the agreed range.',
   },
   {
     key: 'conditional',
-    label: 'Conditional clearance with moisture discount',
+    label: 'Pass with a small price cut',
     icon: Percent,
     tone: 'gold',
-    copy: 'Applies a drying or conditioning surcharge against the tranche before the balance is released to the producer.',
+    copy: 'Takes a small amount off the payment for drying, then releases the rest to the farmer.',
   },
   {
     key: 'freeze',
-    label: 'Escrow freeze & escalate quality dispute',
+    label: 'Hold the money and open a complaint',
     icon: Gavel,
     tone: 'critical',
-    copy: 'Immobilises the consignment funds, serves a re-sample notice and routes the matter to RAMLP arbitration.',
+    copy: 'Stops the payment, asks for a new sample and sends the case to a review.',
   },
 ]
 
@@ -129,7 +129,7 @@ export default function InspectorTerminal() {
   function signOff() {
     if (!order) return
     setSigned(true)
-    toast.success('Inspection signed off and sealed to the consignment ledger')
+    toast.success('Your result has been saved on the order')
   }
 
   if (loading) {
@@ -150,14 +150,14 @@ export default function InspectorTerminal() {
     return (
       <div className="page-wrap page-pad">
         <PageHeader
-          eyebrow="Quality · inspector terminal"
-          title="Lab inspection & sign-off"
-          description="Capture spectrometry readings, reconcile the dual weighbridge and seal the statutory verdict for a consignment."
+          eyebrow="Checker"
+          title="Check and sign off"
+          description="Enter the test readings, compare the two weights and record the result."
         />
         <EmptyState
           icon={FlaskConical}
-          title="No consignments awaiting inspection"
-          description="Consignments appear here once a carrier has recorded an origin pickup and the load is inbound to a destination terminal."
+          title="Nothing waiting for a check"
+          description="Items appear here after pickup, on the way to the delivery point."
           action={
             <Button asChild>
               <Link to="/admin/quality">Open quality lab <ArrowRight size={15} /></Link>
@@ -171,13 +171,13 @@ export default function InspectorTerminal() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Quality · inspector terminal"
-        title="Lab inspection & sign-off"
-        description="Spectrometry readings, dual-weighbridge reconciliation and the statutory verdict sealed against the consignment."
+        eyebrow="Checker"
+        title="Check and sign off"
+        description="Test readings, the two weights and the final result for this load."
         actions={
           <>
             <select
-              aria-label="Select consignment"
+              aria-label="Select load"
               value={activeId ?? ''}
               onChange={(e) => setActiveId(Number(e.target.value) || null)}
               className="select"
@@ -197,7 +197,7 @@ export default function InspectorTerminal() {
 
       {error && (
         <div className="mb-5">
-          <Callout tone="critical" icon={CircleAlert} title="Lab terminal link degraded">
+          <Callout tone="critical" icon={CircleAlert} title="We cannot load the check list">
             {error}
           </Callout>
         </div>
@@ -206,17 +206,17 @@ export default function InspectorTerminal() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Stat
           icon={Beaker}
-          label="Consignment"
+          label="Order"
           value={order ? `#${order.id}` : '—'}
-          hint={order?.produce?.commodity_name || 'Commodity pending'}
+          hint={order?.produce?.commodity_name || 'Produce pending'}
         />
-        <Stat icon={Scale} label="Declared load" value={order ? qtyUnit(order.quantity, 'units') : '—'} hint="Origin manifest" />
-        <Stat icon={ShieldCheck} label="Milestone 2 tranche" value={money(milestone)} hint="Released on sign-off" tone="sprout" />
+        <Stat icon={Scale} label="Load size" value={order ? qtyUnit(order.quantity, 'units') : '—'} hint="As stated by the farmer" />
+        <Stat icon={ShieldCheck} label="60% payment" value={money(milestone)} hint="Paid when you sign off" tone="sprout" />
         <Stat
           icon={Fingerprint}
           label="Sign-off status"
-          value={signed ? 'Sealed' : 'Open'}
-          hint={signed ? 'Cryptographically attested' : 'Awaiting inspector seal'}
+          value={signed ? 'Signed' : 'Open'}
+          hint={signed ? 'Saved with your name and time' : 'Waiting for your sign-off'}
           tone={signed ? 'forest' : 'neutral'}
         />
       </div>
@@ -226,8 +226,8 @@ export default function InspectorTerminal() {
           <Card>
             <CardHeader
               icon={FlaskConical}
-              title="Spectrometry & assays"
-              description="Enter the bench readings — pass/fail is evaluated against the statutory specification."
+              title="Test readings"
+              description="Enter the readings. Pass or fail is checked against the agreed limit."
               action={<Badge tone="outline" size="sm">NIRS probe calibrated</Badge>}
             />
             <CardBody className="space-y-4">
@@ -257,7 +257,7 @@ export default function InspectorTerminal() {
                     </div>
                   </div>
                   <p className="mt-2 text-center text-[11.5px] text-muted">
-                    Safe-zone ceiling <span className="font-bold text-ink">&lt; 12.50%</span>
+                    Safe limit <span className="font-bold text-ink">&lt; 12.50%</span>
                   </p>
                 </div>
 
@@ -309,14 +309,13 @@ export default function InspectorTerminal() {
           <Card>
             <CardHeader
               icon={Scale}
-              title="Dual-weighbridge reconciliation"
-              description="Origin gross against destination gross — variance must stay within the 1.0% statutory tolerance."
-              action={<Badge tone="outline" size="sm">ANPR verified</Badge>}
+              title="Compare the two weights"
+              description="Compare the pickup weight with the drop-off weight. The difference must stay within 1.0%."
             />
             <CardBody className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl border border-line bg-canvas p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">Origin farm gate</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">Weight at pickup</p>
                   <input
                     type="number"
                     inputMode="decimal"
@@ -328,7 +327,7 @@ export default function InspectorTerminal() {
                   />
                 </div>
                 <div className="rounded-xl border border-line bg-canvas p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">Destination gross</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">Weight at drop-off</p>
                   <input
                     type="number"
                     inputMode="decimal"
@@ -342,11 +341,11 @@ export default function InspectorTerminal() {
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-white p-3.5">
                 <div>
-                  <p className="text-[13px] font-semibold text-ink">Transit loss / variance</p>
-                  <p className="mt-0.5 text-[11.5px] text-muted">Within 1.0% of declared net load is tolerance-compliant.</p>
+                  <p className="text-[13px] font-semibold text-ink">Difference in weight</p>
+                  <p className="mt-0.5 text-[11.5px] text-muted">Up to 1.0% is allowed.</p>
                 </div>
                 {variance === null ? (
-                  <Badge tone="neutral" size="md">Awaiting capture</Badge>
+                  <Badge tone="neutral" size="md">Waiting for both weights</Badge>
                 ) : (
                   <div className="text-right">
                     <p className="font-display text-[15px] font-bold tnum text-ink">
@@ -354,7 +353,7 @@ export default function InspectorTerminal() {
                       {num(variance, 2)}%
                     </p>
                     <Badge tone={Math.abs(variance) <= 1 ? 'verified' : 'critical'} size="sm" className="mt-1">
-                      {Math.abs(variance) <= 1 ? 'Tolerance compliant' : 'Outside tolerance'}
+                      {Math.abs(variance) <= 1 ? 'Within the allowed limit' : 'Outside the allowed limit'}
                     </Badge>
                   </div>
                 )}
@@ -363,7 +362,7 @@ export default function InspectorTerminal() {
           </Card>
 
           <Card>
-            <CardHeader icon={Camera} title="Sampling evidence" description="Photographic record attached to the consignment" />
+            <CardHeader icon={Camera} title="Sample photos" description="Photos saved with this order" />
             <CardBody>
               {images.length ? (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -371,7 +370,7 @@ export default function InspectorTerminal() {
                     <figure key={index} className="overflow-hidden rounded-xl border border-line bg-canvas">
                       <img src={imgUrl(image)} alt={produce?.commodity_name || 'Sampling evidence'} className="h-24 w-full object-cover" />
                       <figcaption className="px-2.5 py-2 text-[11px] font-medium text-muted">
-                        Sample {index + 1} · {produce?.commodity_name || 'Consignment'}
+                        Sample {index + 1} · {produce?.commodity_name || 'Produce'}
                       </figcaption>
                     </figure>
                   ))}
@@ -380,14 +379,14 @@ export default function InspectorTerminal() {
                 <div className="rounded-xl border border-dashed border-sage-400 bg-white/60 px-6 py-10 text-center">
                   <Camera size={22} className="mx-auto text-forest-500" />
                   <p className="mt-3 text-[13px] font-semibold text-ink">No evidence attached</p>
-                  <p className="mt-1 text-[12px] text-muted">Photographs supplied by the producer appear here for bench verification.</p>
+                  <p className="mt-1 text-[12px] text-muted">Photos from the farmer will appear here for you to check.</p>
                 </div>
               )}
             </CardBody>
           </Card>
 
           <Card>
-            <CardHeader icon={Gavel} title="Inspection verdict" description="Select one statutory decision" />
+            <CardHeader icon={Gavel} title="Your decision" description="Choose one result" />
             <CardBody className="space-y-2.5">
               {VERDICTS.map((option) => {
                 const active = verdict === option.key
@@ -439,19 +438,19 @@ export default function InspectorTerminal() {
 
         <aside className="space-y-4">
           <Card>
-            <CardHeader icon={BadgeCheck} title="Consignment metadata" description="Parties and origin on record" />
+            <CardHeader icon={BadgeCheck} title="Order details" description="People and place on record" />
             <CardBody className="space-y-1">
-              <KeyValue label="Commodity">{order?.produce?.commodity_name || '—'}</KeyValue>
-              <KeyValue label="Declared load">{order ? qtyUnit(order.quantity, 'units') : '—'}</KeyValue>
+              <KeyValue label="Produce">{order?.produce?.commodity_name || '—'}</KeyValue>
+              <KeyValue label="Load size">{order ? qtyUnit(order.quantity, 'units') : '—'}</KeyValue>
               <div className="rounded-xl border border-line bg-canvas p-3">
-                <p className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-muted">Producer / origin</p>
+                <p className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-muted">Farmer / farm</p>
                 <p className="mt-1 text-[13px] font-semibold text-ink">{order?.farmer?.name || '—'}</p>
                 <p className="mt-0.5 flex items-center gap-1 text-[11.5px] text-muted">
                   <MapPin size={11} /> {produce?.location || 'Origin not stated'}
                 </p>
               </div>
               <div className="rounded-xl border border-line bg-canvas p-3">
-                <p className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-muted">Receiver / buyer</p>
+                <p className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-muted">Buyer / drop-off</p>
                 <p className="mt-1 text-[13px] font-semibold text-ink">{order?.buyer?.name || '—'}</p>
                 <p className="mt-0.5 text-[11.5px] text-muted">Order #{order?.id ?? '—'}</p>
               </div>
@@ -459,55 +458,55 @@ export default function InspectorTerminal() {
           </Card>
 
           <Card>
-            <CardHeader icon={ShieldCheck} title="Milestone 2 trigger" description="60% weighbridge & lab tranche" />
+            <CardHeader icon={ShieldCheck} title="60% payment" description="Paid when the check passes" />
             <CardBody>
               <p className="font-display text-[24px] font-extrabold tracking-tight text-forest-600 tnum">{money(milestone)}</p>
               <p className="mt-1 text-[12px] leading-5 text-muted">
-                Held in the RAMLP custody vault and released the moment the inspector seal is applied.
+                Held in escrow and paid the moment you sign off.
               </p>
             </CardBody>
           </Card>
 
           <Card>
-            <CardHeader icon={Fingerprint} title="Cryptographic sign-off" description="Inspector attestation" />
+            <CardHeader icon={Fingerprint} title="Your sign-off" description="Saved with your name and time" />
             <CardBody className="space-y-3">
               <div className="relative grid h-28 place-items-center rounded-xl border border-dashed border-sage-400 bg-canvas">
                 {signed ? (
                   <div className="text-center">
                     <CheckCircle2 size={26} className="mx-auto text-forest-600" />
-                    <p className="mt-1.5 text-[12px] font-semibold text-forest-600">Sealed · {fmtDateTime(new Date())}</p>
+                    <p className="mt-1.5 text-[12px] font-semibold text-forest-600">Signed · {fmtDateTime(new Date())}</p>
                   </div>
                 ) : (
-                  <p className="px-4 text-center text-[11.5px] text-muted">Digital stylus / touch signature surface</p>
+                  <p className="px-4 text-center text-[11.5px] text-muted">Your signature will appear here</p>
                 )}
               </div>
               <div className="space-y-2 text-[11.5px]">
                 <div className="flex items-center gap-2 rounded-lg border border-line bg-white p-2.5">
                   <BadgeCheck size={15} className="shrink-0 text-forest-500" />
                   <div>
-                    <p className="font-semibold text-ink">Inspector session verified</p>
-                    <p className="text-muted">Signed in against the NIS/NAFDAC inspector register</p>
+                    <p className="font-semibold text-ink">You are signed in</p>
+                    <p className="text-muted">Your name is saved with this result</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 rounded-lg border border-line bg-white p-2.5">
                   <MapPin size={15} className="shrink-0 text-forest-500" />
                   <div>
-                    <p className="font-semibold text-ink">Geo-stamp captured</p>
-                    <p className="text-muted">Terminal location bound to the seal at sign-off</p>
+                    <p className="font-semibold text-ink">Time recorded</p>
+                    <p className="text-muted">The date and time are saved with the result</p>
                   </div>
                 </div>
               </div>
             </CardBody>
             <CardFooter className="flex-col items-stretch gap-2">
               <Button className="w-full" onClick={signOff} disabled={signed}>
-                <Fingerprint size={15} /> {signed ? 'Signed & sealed' : `Sign & release ${money(milestone)}`}
+                <Fingerprint size={15} /> {signed ? 'Signed' : `Sign and release ${money(milestone)}`}
               </Button>
               <Button
                 variant="outline"
                 className="w-full border-critical-200 text-critical-600 hover:bg-critical-50"
-                onClick={() => { setVerdict('freeze'); toast.info('Consignment flagged for arbitration') }}
+                onClick={() => { setVerdict('freeze'); toast.info('The order has been sent for review') }}
               >
-                <Snowflake size={15} /> Flag dispute
+                <Snowflake size={15} /> Hold and report
               </Button>
             </CardFooter>
           </Card>

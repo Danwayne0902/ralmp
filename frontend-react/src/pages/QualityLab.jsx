@@ -18,40 +18,40 @@ const PROTOCOL = [
     group: 'Cereals & grains',
     icon: Sprout,
     items: [
-      { commodity: 'Yellow / white maize', moisture: '13.5%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 10 ppb' },
-      { commodity: 'Rice paddy', moisture: '14.0%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 10 ppb' },
-      { commodity: 'Sorghum', moisture: '13.0%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 10 ppb' },
-      { commodity: 'Millet', moisture: '13.0%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 10 ppb' },
+      { commodity: 'Yellow / white maize', moisture: '13.5%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 10 ppb' },
+      { commodity: 'Rice paddy', moisture: '14.0%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 10 ppb' },
+      { commodity: 'Sorghum', moisture: '13.0%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 10 ppb' },
+      { commodity: 'Millet', moisture: '13.0%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 10 ppb' },
     ],
   },
   {
     group: 'Legumes & oilseeds',
     icon: Beaker,
     items: [
-      { commodity: 'Soybean', moisture: '12.0%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 10 ppb' },
-      { commodity: 'Cowpea', moisture: '12.0%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 10 ppb' },
-      { commodity: 'Groundnut', moisture: '9.0%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 15 ppb' },
-      { commodity: 'Sesame seed', moisture: '8.0%', tolerance: '≤ 1.0% weight variance', aflatoxin: '≤ 10 ppb' },
+      { commodity: 'Soybean', moisture: '12.0%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 10 ppb' },
+      { commodity: 'Cowpea', moisture: '12.0%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 10 ppb' },
+      { commodity: 'Groundnut', moisture: '9.0%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 15 ppb' },
+      { commodity: 'Sesame seed', moisture: '8.0%', tolerance: '≤ 1.0% difference', aflatoxin: '≤ 10 ppb' },
     ],
   },
   {
     group: 'Tubers & fresh produce',
     icon: ThermometerSun,
     items: [
-      { commodity: 'Cassava tubers', moisture: 'Fresh weight basis', tolerance: '≤ 2.0% weight variance', aflatoxin: 'Not applicable' },
-      { commodity: 'Yam tubers', moisture: 'Fresh weight basis', tolerance: '≤ 2.0% weight variance', aflatoxin: 'Not applicable' },
-      { commodity: 'Tomatoes & peppers', moisture: 'Fresh weight basis', tolerance: '≤ 3.0% weight variance', aflatoxin: 'Not applicable' },
-      { commodity: 'Onions', moisture: 'Cured, dry skin', tolerance: '≤ 3.0% weight variance', aflatoxin: 'Not applicable' },
+      { commodity: 'Cassava tubers', moisture: 'Fresh weight basis', tolerance: '≤ 2.0% difference', aflatoxin: 'Not applicable' },
+      { commodity: 'Yam tubers', moisture: 'Fresh weight basis', tolerance: '≤ 2.0% difference', aflatoxin: 'Not applicable' },
+      { commodity: 'Tomatoes & peppers', moisture: 'Fresh weight basis', tolerance: '≤ 3.0% difference', aflatoxin: 'Not applicable' },
+      { commodity: 'Onions', moisture: 'Cured, dry skin', tolerance: '≤ 3.0% difference', aflatoxin: 'Not applicable' },
     ],
   },
 ]
 
 const STAGES = [
-  { key: 'origin', label: 'Origin declaration', icon: Sprout, body: 'Grower declares variety, harvest date and visual grade at listing. This is not an assay.' },
-  { key: 'sample', label: 'Sealed sampling', icon: Microscope, body: 'Destination agent draws and seals a composite sample against the order, witnessed by the carrier.' },
-  { key: 'assay', label: 'Laboratory assay', icon: FlaskConical, body: 'Moisture, foreign matter and aflatoxin are measured by an accredited laboratory.' },
-  { key: 'weigh', label: 'Weighbridge reconciliation', icon: Weight, body: 'Destination gross–tare is matched to the origin slip at the contracted tolerance.' },
-  { key: 'release', label: 'Release decision', icon: Lock, body: 'Pass advances the 60% tranche. Fail freezes the balance and opens the exception queue.' },
+  { key: 'origin', label: 'What the farmer says', icon: Sprout, body: 'The farmer gives the type, harvest date and visible grade when listing. This is not a test result.' },
+  { key: 'sample', label: 'Take a sealed sample', icon: Microscope, body: 'Someone at the drop-off point takes a sample, seals it and links it to the order. The transporter watches.' },
+  { key: 'assay', label: 'Test the sample', icon: FlaskConical, body: 'A lab checks moisture, dirt and aflatoxin.' },
+  { key: 'weigh', label: 'Compare the weights', icon: Weight, body: 'The drop-off weight is compared with the pickup weight within the agreed allowance.' },
+  { key: 'release', label: 'Decide on payment', icon: Lock, body: 'A pass releases the 60% payment. A fail puts the rest on hold and opens a review.' },
 ]
 
 const PERFORMED = [
@@ -59,7 +59,7 @@ const PERFORMED = [
   'Foreign matter and broken grain percentage',
   'Aflatoxin screening against the contract band',
   'Live infestation and odour check',
-  'Origin gross–tare weight reconciliation',
+  'Pickup weight check against the truck weight',
   'Seal integrity and carrier identity match',
 ]
 
@@ -119,9 +119,9 @@ export default function QualityLab() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Administration · quality assurance"
-        title="Quality & assay protocol"
-        description="The inspection protocol behind every escrow release. Queue entries are real live lots; measured values appear only once an accredited laboratory files a result."
+        eyebrow="Quality checks"
+        title="Quality and tests"
+        description="The checks behind every payment. The list shows real produce. Results appear only when a lab sends them."
         actions={
           <>
             <Button variant="outline" size="md" onClick={load} disabled={loading}>
@@ -141,19 +141,18 @@ export default function QualityLab() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat icon={Microscope} label="Lots awaiting assay" value={queue.length} tone="gold" hint="Live lots without a filed result" />
-        <Stat icon={FlaskConical} label="Protocol groups" value={PROTOCOL.length} tone="sprout" hint="Cereals, legumes, fresh produce" />
-        <Stat icon={Scale} label="Weight tolerance" value="≤ 1.0%" hint="Standard contract band" />
-        <Stat icon={CircleAlert} label="Filed off-spec results" value="0" tone="neutral" hint="No laboratory result on record" />
+        <Stat icon={Microscope} label="Waiting for a test" value={queue.length} tone="gold" hint="Live produce without a result" />
+        <Stat icon={FlaskConical} label="Produce groups" value={PROTOCOL.length} tone="sprout" hint="Cereals, legumes, fresh produce" />
+        <Stat icon={Scale} label="Weight allowance" value="≤ 1.0%" hint="Standard order limit" />
+        <Stat icon={ShieldCheck} label="Check steps" value={STAGES.length} tone="neutral" hint="From sample to decision" />
       </div>
 
       <div className="mt-5 rounded-card border border-harvest-200 bg-harvest-50 px-4 py-3.5">
         <p className="flex items-start gap-2 text-[11.5px] leading-5 text-harvest-700">
           <CircleAlert size={14} className="mt-0.5 shrink-0" />
           <span>
-            <span className="font-bold">Data integrity:</span> the platform does not invent moisture, aflatoxin or
-            weight readings. Bands below are the default contract template; the binding band is the value disclosed
-            on the order. Queue rows show what is scheduled for inspection, not a result.
+            <span className="font-bold">No made-up results:</span> we never invent moisture, aflatoxin or weight
+            readings. The ranges below are the default template. The order itself sets the real range. The list shows what is waiting for a check, not a result.
           </span>
         </p>
       </div>
@@ -163,9 +162,9 @@ export default function QualityLab() {
           value={tab}
           onValueChange={setTab}
           items={[
-            { value: 'queue', label: 'Inspection queue', count: queue.length },
-            { value: 'protocol', label: 'Protocol & tolerances' },
-            { value: 'workflow', label: 'Chain of custody' },
+            { value: 'queue', label: 'Waiting for a check', count: queue.length },
+            { value: 'protocol', label: 'Ranges and limits' },
+            { value: 'workflow', label: 'How a check works' },
           ]}
           size="sm"
         />
@@ -177,12 +176,12 @@ export default function QualityLab() {
             <div className="rounded-card border border-line bg-white shadow-card">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-4">
                 <div>
-                  <h2 className="font-display text-[15px] font-bold text-ink">Lots awaiting destination assay</h2>
+                  <h2 className="font-display text-[15px] font-bold text-ink">Waiting for a test</h2>
                   <p className="mt-0.5 text-[11px] text-muted">
-                    Sorted by harvest age. Sampling is triggered at the destination silo, not at listing.
+                    Oldest harvest first. A sample is taken at the drop-off point, not when the produce is listed.
                   </p>
                 </div>
-                <Badge tone="live" size="sm"><span className="h-1.5 w-1.5 rounded-full bg-forest-500" /> Live lots</Badge>
+                <Badge tone="live" size="sm"><span className="h-1.5 w-1.5 rounded-full bg-forest-500" /> Live produce</Badge>
               </div>
 
               {loading ? (
@@ -192,8 +191,8 @@ export default function QualityLab() {
               ) : queue.length === 0 ? (
                 <EmptyState
                   icon={ClipboardCheck}
-                  title="No live lots in the queue"
-                  description="When growers publish available lots, they appear here pending sampling at the destination. Results are never created by the platform."
+                  title="No produce waiting for a check"
+                  description="When farmers list produce, it appears here for sampling. We never make up results."
                   className="border-0 shadow-none"
                   action={<Button asChild variant="outline"><Link to="/commodities">Open the exchange</Link></Button>}
                 />
@@ -204,7 +203,7 @@ export default function QualityLab() {
                       <thead>
                         <tr>
                           <Th>Lot</Th>
-                          <Th>Grower & origin</Th>
+                          <Th>Farmer & origin</Th>
                           <Th>Harvested</Th>
                           <Th className="text-right">Volume</Th>
                           <Th>Protocol group</Th>
@@ -222,7 +221,7 @@ export default function QualityLab() {
                               <p className="whitespace-nowrap text-[10.5px] capitalize text-muted">Lot #{lot.id} · {lot.category}</p>
                             </Td>
                             <Td>
-                              <p className="break-words text-[11.5px]">{lot.farmer?.name || lot.user?.name || 'Grower'}</p>
+                              <p className="break-words text-[11.5px]">{lot.farmer?.name || lot.user?.name || 'Farmer'}</p>
                               <p className="flex items-center gap-1 text-[10px] text-muted">
                                 <MapPin size={9} /> {lot.location || [lot.farmer?.lga, lot.farmer?.state].filter(Boolean).join(', ') || 'Origin not set'}
                               </p>
@@ -254,7 +253,7 @@ export default function QualityLab() {
                             <Link to={`/commodities/${lot.id}`} className="block break-words text-[13px] font-bold text-ink">
                               {lot.commodity_name}
                             </Link>
-                            <p className="break-words text-[10.5px] text-muted">{lot.farmer?.name || 'Grower'} · {lot.location || 'Origin not set'}</p>
+                            <p className="break-words text-[10.5px] text-muted">{lot.farmer?.name || 'Farmer'} · {lot.location || 'Origin not set'}</p>
                           </div>
                           <Badge tone="pending" size="sm">Awaiting sample</Badge>
                         </div>
@@ -312,15 +311,14 @@ export default function QualityLab() {
 
             <div className="rounded-card border border-line bg-forest-900 p-5 text-white shadow-card">
               <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-forest-200">
-                <Lock size={12} className="text-harvest-300" /> Hold authority
+                <Lock size={12} className="text-harvest-300" /> Who can pause a payment
               </p>
               <p className="mt-2 text-[11.5px] leading-5 text-forest-100/80">
-                An off-spec result freezes the 60% weighbridge tranche immediately. Only a signed re-test or an
-                arbitration award can lift the hold.
+                If a test fails, the 60% payment stops at once. Only a signed re-test or a review decision can release it.
               </p>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                <Badge tone="dark" size="sm"><ShieldCheck size={10} /> NAFDAC-aligned</Badge>
-                <Badge tone="dark" size="sm"><Scale size={10} /> SON methods</Badge>
+                <Badge tone="dark" size="sm"><ShieldCheck size={10} /> Clear rules</Badge>
+                <Badge tone="dark" size="sm"><Scale size={10} /> Same test for everyone</Badge>
               </div>
             </div>
 
@@ -350,17 +348,17 @@ export default function QualityLab() {
                 </span>
                 <div>
                   <h2 className="font-display text-[14.5px] font-bold text-ink">{group.group}</h2>
-                  <p className="text-[10.5px] text-muted">Default contract template · binding band disclosed on the order</p>
+                  <p className="text-[10.5px] text-muted">Default check levels · the agreed levels are shown on each order</p>
                 </div>
               </div>
               <Table minWidth={760}>
                 <thead>
                   <tr>
                     <Th>Commodity</Th>
-                    <Th className="text-right">Moisture band</Th>
-                    <Th className="text-right">Weight variance</Th>
-                    <Th className="text-right">Aflatoxin ceiling</Th>
-                    <Th>Release gate</Th>
+                    <Th className="text-right">Moisture</Th>
+                    <Th className="text-right">Allowed weight difference</Th>
+                    <Th className="text-right">Aflatoxin limit</Th>
+                    <Th>What it unlocks</Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -371,7 +369,7 @@ export default function QualityLab() {
                       <Td className="text-right tnum">{item.tolerance}</Td>
                       <Td className="text-right tnum">{item.aflatoxin}</Td>
                       <Td>
-                        <Badge tone="verified" size="sm"><ShieldCheck size={10} /> 60% tranche</Badge>
+                        <Badge tone="verified" size="sm"><ShieldCheck size={10} /> 60% payment</Badge>
                       </Td>
                     </Tr>
                   ))}
@@ -382,14 +380,14 @@ export default function QualityLab() {
 
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
-              <Scale size={16} className="text-forest-500" /> Tolerance rules
+              <Scale size={16} className="text-forest-500" /> Limit rules
             </h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { title: 'Within band', body: 'Result inside the contracted band advances the weighbridge tranche automatically.', tone: 'verified' },
-                { title: 'Marginal variance', body: 'A result just outside the band triggers a sealed re-test before any hold is applied.', tone: 'pending' },
-                { title: 'Off-spec', body: 'Balance is frozen, buyer is notified and the exception queue opens an arbitration file.', tone: 'critical' },
-                { title: 'Missing evidence', body: 'No sealed sample means no release. The balance stays in custody until the evidence exists.', tone: 'neutral' },
+                { title: 'Inside the range', body: 'The result is inside the agreed range, so the 60% payment can be approved.', tone: 'verified' },
+                { title: 'Just outside', body: 'A result slightly outside the range gets a second sealed test before anything is held.', tone: 'pending' },
+                { title: 'Failed', body: 'The rest of the money is held, the buyer is told and a complaint file is opened.', tone: 'critical' },
+                { title: 'No proof', body: 'Without a sealed sample, no money is released. The rest stays on hold until the proof exists.', tone: 'neutral' },
               ].map((rule) => (
                 <div key={rule.title} className="rounded-xl border border-line bg-canvas p-3.5">
                   <Badge tone={rule.tone} size="sm">{rule.title}</Badge>
@@ -405,10 +403,10 @@ export default function QualityLab() {
         <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_330px]">
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
-              <Beaker size={16} className="text-forest-500" /> Chain of custody
+              <Beaker size={16} className="text-forest-500" /> How a check works
             </h2>
             <p className="mt-1 text-[11.5px] leading-5 text-muted">
-              Each stage produces an evidence record. A missing record stops the chain — it is never backfilled.
+              Each step leaves a record. If a record is missing, the process stops. We never fill it in later.
             </p>
             <ol className="mt-5 space-y-4">
               {STAGES.map((stage, index) => (
@@ -433,21 +431,19 @@ export default function QualityLab() {
           <aside className="space-y-4">
             <div className="rounded-xl border border-line bg-white p-4">
               <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
-                <FlaskConical size={12} /> Accredited partners
+                <FlaskConical size={12} /> Who does the tests
               </p>
               <p className="mt-1.5 text-[11px] leading-5 text-muted">
-                Assays are performed by laboratories accredited to ISO/IEC 17025. The partner is recorded on each
-                order record so the result can be independently traced.
+                A qualified lab does the test. The lab name is saved on the order so anyone can check where the result came from.
               </p>
             </div>
 
             <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
               <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
-                <Check size={13} /> Why this matters
+                <Check size={13} /> Why it matters
               </p>
               <p className="mt-1 text-[10.5px] leading-4 text-forest-700/75">
-                Buyers deploy capital against a grade they have not physically inspected. The assay is the only
-                instrument that makes remote procurement safe.
+                Buyers often pay for goods they have not seen. The test is what makes buying from far away safe.
               </p>
             </div>
           </aside>

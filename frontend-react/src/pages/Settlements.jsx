@@ -77,7 +77,7 @@ export default function Settlements() {
     const rows = orders.map((order) => ({
       order_id: order.id,
       date: order.order_date || order.created_at,
-      grower: order.farmer?.name || '',
+      farmer: order.farmer?.name || '',
       commodity: order.produce?.commodity_name || order.items?.[0]?.produce?.commodity_name || '',
       total: order.total_price,
       payment_status: order.payment_status,
@@ -93,9 +93,9 @@ export default function Settlements() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Settlement ledger"
-        title="Escrow reconciliation"
-        description="Every committed naira, its custody state and the milestone that released it."
+        eyebrow="Payments"
+        title="Payments and escrow"
+        description="Every naira you paid, where it is, and what released it."
         actions={
           <>
             <Button variant="outline" size="md" onClick={load} disabled={loading}>
@@ -119,10 +119,10 @@ export default function Settlements() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Wallet} label="Committed capital" value={money(totals.committed)} hint={`${orders.length} ${orders.length === 1 ? 'order' : 'orders'} in the ledger`} size="lg" />
-            <Stat icon={Landmark} label="Currently in custody" value={money(totals.held)} tone="gold" hint="Funded but not yet released" size="lg" />
-            <Stat icon={CheckCircle2} label="Released to growers" value={money(totals.released)} tone="sprout" hint="Across all settled tranches" size="lg" />
-            <Stat icon={Snowflake} label="Frozen / reversed" value={money(totals.frozen)} tone={totals.frozen > 0 ? 'critical' : 'neutral'} hint="Cancelled or rejected orders" size="lg" />
+            <Stat icon={Wallet} label="Total paid" value={money(totals.committed)} hint={`${orders.length} ${orders.length === 1 ? 'order' : 'orders'}`} size="lg" />
+            <Stat icon={Landmark} label="Still in escrow" value={money(totals.held)} tone="gold" hint="Paid but not released" size="lg" />
+            <Stat icon={CheckCircle2} label="Paid to farmers" value={money(totals.released)} tone="sprout" hint="All released parts" size="lg" />
+            <Stat icon={Snowflake} label="On hold / returned" value={money(totals.frozen)} tone={totals.frozen > 0 ? 'critical' : 'neutral'} hint="Cancelled or rejected orders" size="lg" />
           </>
         )}
       </div>
@@ -132,8 +132,8 @@ export default function Settlements() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">{isAdmin ? 'Platform order ledger' : 'Your order ledger'}</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Amounts in NGN. Release state is derived from the order milestone record.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">{isAdmin ? 'All orders' : 'Your orders'}</h2>
+                <p className="mt-0.5 text-[11px] text-muted">All amounts in naira. Each step follows the order record.</p>
               </div>
               <div className="flex rounded-lg border border-line bg-canvas p-0.5">
                 {[
@@ -162,10 +162,10 @@ export default function Settlements() {
               orders.length === 0 ? (
                 <EmptyState
                   icon={Wallet}
-                  title="No settlement records yet"
-                  description="Fund an order to open its escrow ledger. Every tranche will be tracked here."
+                  title="No payments yet"
+                  description="When you pay for an order, every step will show here."
                   className="border-0 shadow-none"
-                  action={<Button asChild><Link to="/commodities">Procure a lot</Link></Button>}
+                  action={<Button asChild><Link to="/commodities">Buy produce</Link></Button>}
                 />
               ) : (
                 <>
@@ -174,12 +174,12 @@ export default function Settlements() {
                       <thead>
                         <tr>
                           <Th>Order</Th>
-                          <Th>Grower</Th>
-                          <Th className="text-right">Commitment</Th>
+                          <Th>Farmer</Th>
+                          <Th className="text-right">Paid</Th>
                           <Th className="text-right">Released</Th>
                           <Th className="text-right">Held</Th>
-                          <Th>Custody</Th>
-                          <Th>Order state</Th>
+                          <Th>Money held</Th>
+                          <Th>Order status</Th>
                           <Th />
                         </tr>
                       </thead>
@@ -202,7 +202,7 @@ export default function Settlements() {
                               <Td className="text-right text-muted tnum">{money(frozen ? 0 : Math.max(0, total - released))}</Td>
                               <Td>
                                 <Badge tone={frozen ? 'critical' : order.payment_status === 'paid' ? 'verified' : 'pending'} size="sm">
-                                  {frozen ? 'Frozen' : order.payment_status === 'paid' ? 'In custody' : 'Unfunded'}
+                                  {frozen ? 'On hold' : order.payment_status === 'paid' ? 'Held safely' : 'Not paid'}
                                 </Badge>
                               </Td>
                               <Td><StatusBadge status={order.status} size="sm" /></Td>
@@ -224,14 +224,14 @@ export default function Settlements() {
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <p className="text-[13px] font-bold text-ink">Order #{order.id}</p>
-                                <p className="break-words text-[10.5px] text-muted">{order.farmer?.name || 'Grower'} · {fmtDate(order.order_date)}</p>
+                                <p className="break-words text-[10.5px] text-muted">{order.farmer?.name || 'Farmer'} · {fmtDate(order.order_date)}</p>
                               </div>
                               <StatusBadge status={order.status} size="sm" />
                             </div>
                             <div className="mt-2 grid grid-cols-3 gap-2 text-[10.5px]">
-                              <div><p className="text-muted">Commitment</p><p className="font-semibold text-ink tnum">{money(total)}</p></div>
-                              <div><p className="text-muted">Released</p><p className="font-semibold text-forest-600 tnum">{money(released)}</p></div>
-                              <div><p className="text-muted">Held</p><p className="font-semibold text-muted tnum">{money(Math.max(0, total - released))}</p></div>
+                              <div><p className="text-muted">Total</p><p className="font-semibold text-ink tnum">{money(total)}</p></div>
+                              <div><p className="text-muted">Paid out</p><p className="font-semibold text-forest-600 tnum">{money(released)}</p></div>
+                              <div><p className="text-muted">On hold</p><p className="font-semibold text-muted tnum">{money(Math.max(0, total - released))}</p></div>
                             </div>
                           </Link>
                         </li>
@@ -243,8 +243,8 @@ export default function Settlements() {
             ) : payments.length === 0 ? (
               <EmptyState
                 icon={Banknote}
-                title="No gateway payments"
-                description="Paystack references appear here once the first escrow commitment is funded."
+                title="No card or bank payments yet"
+                description="Paystack payments will show here after your first order."
                 className="border-0 shadow-none"
               />
             ) : (
@@ -283,9 +283,9 @@ export default function Settlements() {
 
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
-              <Lock size={15} className="text-forest-500" /> Tranche reconciliation
+              <Lock size={15} className="text-forest-500" /> Payment parts
             </h2>
-            <p className="mt-0.5 text-[11px] text-muted">Aggregated across the ledger. Held amounts are still inside custodial escrow.</p>
+            <p className="mt-0.5 text-[11px] text-muted">Money on hold is still in the escrow account.</p>
             <div className="mt-4 space-y-3">
               {trancheSummary.map((tranche) => {
                 const total = tranche.settled + tranche.held
@@ -314,29 +314,28 @@ export default function Settlements() {
         <aside className="space-y-4">
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
-              <Landmark size={12} /> Custody notice
+              <Landmark size={12} /> Where your money sits
             </p>
             <p className="mt-2 text-[12px] leading-5 text-ink-soft/80">
-              RALMP does not hold settlement balances in its operating account. Funds rest in the Providus Bank
-              custodial trust and the Stanbic IBTC guarantee buffer until a milestone event is verified.
+              Your money is not kept in the account we use to run RALMP. It sits in a separate trust account until each payment step is proven.
             </p>
             <dl className="mt-3 space-y-1.5 border-t border-line pt-3 text-[11.5px]">
-              <div className="flex justify-between"><dt className="text-muted">Custodian</dt><dd className="font-semibold text-ink">Providus Trust</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Settlement rail</dt><dd className="font-semibold text-ink">NIBSS</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Custody fee</dt><dd className="font-semibold text-forest-600">Waived</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Release authority</dt><dd className="font-semibold text-ink">Evidence event</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">Money held in</dt><dd className="font-semibold text-ink">RALMP escrow account</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">Paid through</dt><dd className="font-semibold text-ink">Bank transfer</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">Holding fee</dt><dd className="font-semibold text-forest-600">No charge</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">Money released by</dt><dd className="font-semibold text-ink">Delivery proof</dd></div>
             </dl>
           </div>
 
           <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
             <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
-              <ShieldCheck size={13} /> Freeze conditions
+              <ShieldCheck size={13} /> When payment pauses
             </p>
             <ul className="mt-2 space-y-2 text-[11px] leading-5 text-forest-700/80">
-              <li>Destination weight variance beyond 1.0%</li>
-              <li>Moisture assay outside the contracted band</li>
-              <li>Missing silo receiving receipt</li>
-              <li>Open arbitration file on the order</li>
+              <li>The weight on arrival is more than 1.0% off</li>
+              <li>Moisture outside the agreed range</li>
+              <li>Buyer has not signed for the goods</li>
+              <li>There is an open complaint</li>
             </ul>
           </div>
 
@@ -345,7 +344,7 @@ export default function Settlements() {
               <Clock3 size={12} /> Pending action
             </p>
             {orders.filter((order) => order.payment_status !== 'paid' && !['cancelled', 'rejected'].includes(order.status)).length === 0 ? (
-              <p className="mt-2 text-[11.5px] leading-5 text-muted">No unfunded commitments. Every active order is fully secured.</p>
+              <p className="mt-2 text-[11.5px] leading-5 text-muted">Every active order is fully paid.</p>
             ) : (
               <ul className="mt-2 divide-y divide-line">
                 {orders

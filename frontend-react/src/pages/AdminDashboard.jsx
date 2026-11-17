@@ -9,7 +9,7 @@ import { PageHeader, Stat, Table, Th, Td, Tr, Skeleton, Progress } from '../comp
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { adminService } from '../lib/services'
-import { money, num, relativeDate } from '../lib/format'
+import { money, num, relativeDate, roleLabel } from '../lib/format'
 import { parseError } from '../lib/utils'
 
 const ROLE_META = {
@@ -49,9 +49,9 @@ export default function AdminDashboard() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Administration"
-        title="Platform oversight"
-        description="Participants, listings, order flow and revenue across the RALMP exchange."
+        eyebrow="Admin"
+        title="Dashboard"
+        description="People, produce, orders and money across RALMP."
         actions={
           <>
             <Button variant="outline" size="md" onClick={load} disabled={loading}>
@@ -75,10 +75,10 @@ export default function AdminDashboard() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Users} label="Registered participants" value={num(data?.total_users)} hint={`${data?.total_farmers || 0} growers · ${data?.total_buyers || 0} buyers`} />
-            <Stat icon={Sprout} label="Live listings" value={num(data?.total_listings)} tone="sprout" hint="Available produce lots" />
-            <Stat icon={Package} label="Orders in ledger" value={num(data?.total_orders)} tone="gold" hint="All time, all participants" />
-            <Stat icon={Wallet} label="Settled revenue" value={money(data?.total_revenue ?? 0)} tone="neutral" hint="Delivered and completed orders" size="lg" />
+            <Stat icon={Users} label="People" value={num(data?.total_users)} hint={`${data?.total_farmers || 0} farmers · ${data?.total_buyers || 0} buyers`} />
+            <Stat icon={Sprout} label="Produce for sale" value={num(data?.total_listings)} tone="sprout" hint="Available listings" />
+            <Stat icon={Package} label="Orders" value={num(data?.total_orders)} tone="gold" hint="All time, everyone" />
+            <Stat icon={Wallet} label="Money settled" value={money(data?.total_revenue ?? 0)} tone="neutral" hint="Orders paid and delivered" size="lg" />
           </>
         )}
       </div>
@@ -88,13 +88,13 @@ export default function AdminDashboard() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-card border border-line bg-white p-5 shadow-card">
               <div className="flex items-center justify-between">
-                <h2 className="font-display text-[14.5px] font-bold text-ink">Participants by role</h2>
+                <h2 className="font-display text-[14.5px] font-bold text-ink">People by role</h2>
                 <Users size={15} className="text-forest-500" />
               </div>
               {loading ? (
                 <div className="mt-4 space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-6" />)}</div>
               ) : roles.length === 0 ? (
-                <p className="mt-4 text-[11.5px] text-muted">No participant data.</p>
+                <p className="mt-4 text-[11.5px] text-muted">No people yet.</p>
               ) : (
                 <div className="mt-4 space-y-3">
                   {roles.map(([role, value]) => {
@@ -102,8 +102,8 @@ export default function AdminDashboard() {
                     return (
                       <div key={role}>
                         <div className="flex items-center justify-between text-[11.5px]">
-                          <span className="flex items-center gap-1.5 capitalize text-muted">
-                            <meta.icon size={11} /> {role.replace('_', ' ')}
+                          <span className="flex items-center gap-1.5 text-muted">
+                            <meta.icon size={11} /> {roleLabel(role)}
                           </span>
                           <span className="font-bold text-ink tnum">{value}</span>
                         </div>
@@ -117,13 +117,13 @@ export default function AdminDashboard() {
 
             <div className="rounded-card border border-line bg-white p-5 shadow-card">
               <div className="flex items-center justify-between">
-                <h2 className="font-display text-[14.5px] font-bold text-ink">Order states</h2>
+                <h2 className="font-display text-[14.5px] font-bold text-ink">Order status</h2>
                 <BarChart3 size={15} className="text-forest-500" />
               </div>
               {loading ? (
                 <div className="mt-4 space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-6" />)}</div>
               ) : statuses.length === 0 ? (
-                <p className="mt-4 text-[11.5px] text-muted">No orders in the ledger.</p>
+                <p className="mt-4 text-[11.5px] text-muted">No orders yet.</p>
               ) : (
                 <div className="mt-4 space-y-3">
                   {statuses.map(([status, value]) => (
@@ -143,11 +143,11 @@ export default function AdminDashboard() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Top commodities by order count</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Demand concentration across the exchange.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">Top crops</h2>
+                <p className="mt-0.5 text-[11px] text-muted">What buyers order most.</p>
               </div>
               <Button asChild variant="ghost" size="sm">
-                <Link to="/admin/analytics">Full analytics <ArrowRight size={13} /></Link>
+                <Link to="/admin/analytics">Full reports <ArrowRight size={13} /></Link>
               </Button>
             </div>
             {loading ? (
@@ -176,13 +176,13 @@ export default function AdminDashboard() {
                 </tbody>
               </Table>
             ) : (
-              <p className="px-5 py-10 text-center text-[12px] text-muted">No commodity demand recorded yet.</p>
+              <p className="px-5 py-10 text-center text-[12px] text-muted">No orders yet.</p>
             )}
           </div>
 
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-[15px] font-bold text-ink">Top origins</h2>
+              <h2 className="font-display text-[15px] font-bold text-ink">Top places</h2>
               <span className="text-[10.5px] text-muted">{data?.top_locations?.length || 0} locations</span>
             </div>
             {loading ? (
@@ -200,7 +200,7 @@ export default function AdminDashboard() {
                 ))}
               </ul>
             ) : (
-              <p className="mt-4 text-[11.5px] text-muted">No origin clusters yet.</p>
+              <p className="mt-4 text-[11.5px] text-muted">No places yet.</p>
             )}
           </div>
         </div>
@@ -229,18 +229,18 @@ export default function AdminDashboard() {
                 ))}
               </ul>
             ) : (
-              <p className="px-4 py-8 text-center text-[11.5px] text-muted">No activity recorded.</p>
+              <p className="px-4 py-8 text-center text-[11.5px] text-muted">No activity yet.</p>
             )}
           </div>
 
           <div className="rounded-card border border-line bg-white p-4 shadow-card">
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Control surfaces</p>
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Admin tools</p>
             <div className="mt-2 space-y-1">
               {[
-                { to: '/admin/users', icon: Users, label: 'User & role registry', note: 'Roles, suspension, verification' },
-                { to: '/admin/analytics', icon: BarChart3, label: 'Market analytics', note: 'Volume, revenue, origins' },
-                { to: '/admin/disputes', icon: FileWarning, label: 'Exception & arbitration', note: 'Freeze review queue' },
-                { to: '/admin/quality', icon: FlaskConical, label: 'Quality protocol', note: 'Assay and weighbridge standards' },
+                { to: '/admin/users', icon: Users, label: 'People and roles', note: 'Change roles, pause accounts' },
+                { to: '/admin/analytics', icon: BarChart3, label: 'Reports', note: 'Sales, money, places' },
+                { to: '/admin/disputes', icon: FileWarning, label: 'Complaints', note: 'Orders on hold' },
+                { to: '/admin/quality', icon: FlaskConical, label: 'Quality checks', note: 'Tests and weight rules' },
               ].map((item) => (
                 <Link key={item.to} to={item.to} className="flex items-center gap-2.5 rounded-lg px-2 py-2 transition hover:bg-sage-50">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-forest-50 text-forest-600">
@@ -258,16 +258,15 @@ export default function AdminDashboard() {
 
           <div className="rounded-card border border-line bg-white p-4">
             <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
-              <Landmark size={12} /> Custody posture
+              <Landmark size={12} /> Where the money sits
             </p>
             <p className="mt-2 text-[11px] leading-5 text-ink-soft/80">
-              Escrow custody is external to platform operating funds. Freeze authority sits with the settlement
-              committee, not individual administrators.
+              Escrow money is kept apart from the money we use to run RALMP. Only a two-person approval can pause or release it.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <Badge tone="verified" size="sm"><ShieldCheck size={10} /> CBN circular</Badge>
-              <Badge tone="neutral" size="sm">NIBSS rail</Badge>
-              <Badge tone="gold" size="sm">Dual sign-off</Badge>
+              <Badge tone="verified" size="sm"><ShieldCheck size={10} /> Separate account</Badge>
+              <Badge tone="neutral" size="sm">Bank transfer</Badge>
+              <Badge tone="gold" size="sm">Two approvals</Badge>
             </div>
           </div>
 
@@ -276,11 +275,10 @@ export default function AdminDashboard() {
               <CircleAlert size={13} /> Data note
             </p>
             <p className="mt-1 text-[10.5px] leading-4 text-harvest-600/85">
-              Dispute and lab modules present the control framework. Case records only appear where an order in the
-              ledger raises an exception.
+              These pages show how complaints and quality checks work. A case only appears when a real order needs attention.
             </p>
             <Button asChild variant="outline" size="sm" className="mt-2.5 w-full">
-              <Link to="/admin/disputes">Open exception queue</Link>
+              <Link to="/admin/disputes">See complaints</Link>
             </Button>
           </div>
         </aside>

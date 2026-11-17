@@ -74,10 +74,10 @@ export function initials(name = '') {
 }
 
 const ROLE_LABELS = {
-  farmer: 'Farmer / Co-op',
-  buyer: 'Industrial buyer',
-  logistics_provider: 'Logistics carrier',
-  admin: 'Platform admin',
+  farmer: 'Farmer',
+  buyer: 'Buyer',
+  logistics_provider: 'Transporter',
+  admin: 'Admin',
 }
 
 export function roleLabel(role) {

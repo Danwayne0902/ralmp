@@ -92,12 +92,12 @@ export default function Orders() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow={isFarmer ? 'Sales & waybills' : 'Procurement'}
-        title="Orders & waybills"
+        eyebrow={isFarmer ? 'My sales' : 'My orders'}
+        title="Orders"
         description={
           isFarmer
-            ? 'Every order against your lots, with buyer, settlement and haulage state.'
-            : 'Track escrow commitments, carrier milestones and silo acceptance in one ledger.'
+            ? 'Every order for your produce, with the buyer, payment and delivery state.'
+            : 'Track payments, transport and delivery in one place.'
         }
         actions={
           isFarmer ? (
@@ -119,10 +119,10 @@ export default function Orders() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {stats ? (
           <>
-            <Stat icon={Package} label="Total orders" value={stats.total_orders ?? 0} hint="All time on the platform" />
-            <Stat icon={CreditCard} label="Pending settlement" value={stats.pending_orders ?? 0} tone="gold" hint="Awaiting confirmation or funding" />
-            <Stat icon={Truck} label="Completed" value={stats.completed_orders ?? 0} tone="sprout" hint="Silo-accepted orders" />
-            <Stat icon={CalendarDays} label="Gross order value" value={money(stats.total_revenue ?? 0)} tone="neutral" hint="Across the selected position" />
+            <Stat icon={Package} label="All orders" value={stats.total_orders ?? 0} hint="Every order you have" />
+            <Stat icon={CreditCard} label="Waiting to pay" value={stats.pending_orders ?? 0} tone="gold" hint="Not paid or not confirmed" />
+            <Stat icon={Truck} label="Finished" value={stats.completed_orders ?? 0} tone="sprout" hint="Delivered and accepted" />
+            <Stat icon={CalendarDays} label="Total value" value={money(stats.total_revenue ?? 0)} tone="neutral" hint="Value of these orders" />
           </>
         ) : (
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[104px] rounded-card" />)
@@ -142,7 +142,7 @@ export default function Orders() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Filter this page"
+            placeholder="Search this page"
             aria-label="Filter orders on this page"
             className="h-full w-40 bg-transparent text-[12px] outline-none placeholder:text-muted/60"
           />
@@ -168,15 +168,15 @@ export default function Orders() {
             title={status ? `No ${status} orders` : 'No orders yet'}
             description={
               isFarmer
-                ? 'When a buyer commits escrow against one of your lots, the order appears here with settlement state.'
-                : 'Stage a verified lot from the spot exchange to open your first escrow commitment.'
+                ? 'When a buyer pays for your produce, the order appears here with the payment state.'
+                : 'Pick produce from the marketplace to place your first order.'
             }
             className="border-0 shadow-none"
             action={
               isFarmer ? (
-                <Button asChild variant="outline"><Link to="/farmer/listings">Review my lots</Link></Button>
+                <Button asChild variant="outline"><Link to="/farmer/listings">See my produce</Link></Button>
               ) : (
-                <Button asChild><Link to="/commodities">Browse the exchange</Link></Button>
+                <Button asChild><Link to="/commodities">See what is for sale</Link></Button>
               )
             }
           />
@@ -188,7 +188,7 @@ export default function Orders() {
                 <thead>
                   <tr>
                     <Th>Order</Th>
-                    <Th>{isFarmer ? 'Buyer' : 'Grower'}</Th>
+                    <Th>{isFarmer ? 'Buyer' : 'Farmer'}</Th>
                     <Th>Commodity</Th>
                     <Th className="text-right">Value</Th>
                     <Th>Payment</Th>
@@ -223,7 +223,7 @@ export default function Orders() {
                         </Td>
                         <Td className="text-right">
                           <p className="font-semibold text-ink tnum">{money(order.total_price)}</p>
-                          <p className="text-[10.5px] text-muted tnum">freight {money(order.delivery_fee)}</p>
+                          <p className="text-[10.5px] text-muted tnum">delivery {money(order.delivery_fee)}</p>
                         </Td>
                         <Td>
                           <Badge tone={order.payment_status === 'paid' ? 'verified' : 'pending'} size="sm">
@@ -301,9 +301,9 @@ export default function Orders() {
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         {[
-          { icon: CreditCard, title: 'Escrow funded', body: 'Buyer capital locked before the grower dispatches.' },
-          { icon: Truck, title: 'Waybill issued', body: 'Carrier identity and weight evidence bound to the order.' },
-          { icon: MapPin, title: 'Silo acceptance', body: 'Final tranche releases on the buyer receiving receipt.' },
+          { icon: CreditCard, title: 'Payment made', body: 'The buyer pays before the farmer sends the goods.' },
+          { icon: Truck, title: 'Delivery note', body: 'The transporter and the weight are added to the order.' },
+          { icon: MapPin, title: 'Goods received', body: 'The last part is paid when the buyer signs for the goods.' },
         ].map((item) => (
           <div key={item.title} className="flex items-start gap-2.5 rounded-xl border border-line bg-white px-3.5 py-3">
             <item.icon size={14} className="mt-0.5 shrink-0 text-forest-500" />

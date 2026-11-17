@@ -24,7 +24,7 @@ function sameThread(prev, next) {
 export default function Messages() {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
-  const [conversations, setConversations] = useState([])
+  const [conversations, setChats] = useState([])
   const [messages, setMessages] = useState([])
   const [loadingList, setLoadingList] = useState(true)
   const [loadingThread, setLoadingThread] = useState(false)
@@ -37,11 +37,11 @@ export default function Messages() {
   const activeId = searchParams.get('to') ? Number(searchParams.get('to')) : null
   const activeConversation = conversations.find((item) => item.user?.id === activeId)
 
-  async function loadConversations({ silent = false } = {}) {
+  async function loadChats({ silent = false } = {}) {
     if (!silent) setLoadingList(true)
     try {
       const res = await messageService.conversations()
-      setConversations(res.data?.conversations || [])
+      setChats(res.data?.conversations || [])
       setError('')
     } catch (err) {
       if (!silent) setError(parseError(err))
@@ -51,7 +51,7 @@ export default function Messages() {
   }
 
   useEffect(() => {
-    loadConversations()
+    loadChats()
   }, [])
 
   // The API has no websocket transport in this deployment (broadcasting is
@@ -65,7 +65,7 @@ export default function Messages() {
         // conversation list fetched afterwards shows the correct badge.
         const threadRes = activeId ? await messageService.conversation(activeId) : null
         const listRes = await messageService.conversations()
-        setConversations(listRes.data?.conversations || [])
+        setChats(listRes.data?.conversations || [])
         if (threadRes) {
           const next = threadRes.data?.messages || []
           setMessages((prev) => (sameThread(prev, next) ? prev : next))
@@ -129,7 +129,7 @@ export default function Messages() {
       const created = res.data?.data
       if (created) setMessages((prev) => [...prev, created])
       setText('')
-      await loadConversations({ silent: true })
+      await loadChats({ silent: true })
     } catch (err) {
       toast.error(parseError(err))
     } finally {
@@ -151,16 +151,16 @@ export default function Messages() {
   const threadName =
     activeConversation?.user?.name ||
     searchParams.get('name') ||
-    (activeId ? `Recipient #${activeId}` : 'Select a conversation')
+    (activeId ? `Recipient #${activeId}` : 'Choose a chat')
 
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Secure messaging"
-        title="Grower & buyer inbox"
-        description="Negotiate volume, grade and collection directly. Keep agreements on the platform record."
+        eyebrow="Messages"
+        title="Your messages"
+        description="Talk about amount, quality and pickup. Keep it here so there is a record."
         actions={
-          <Button variant="outline" size="md" onClick={loadConversations} disabled={loadingList}>
+          <Button variant="outline" size="md" onClick={loadChats} disabled={loadingList}>
             <RefreshCw size={15} className={loadingList ? 'animate-spin' : ''} /> Refresh
             {unreadTotal > 0 && (
               <span className="ml-1 rounded-full bg-harvest-300 px-1.5 text-[10px] font-bold text-ink">{unreadTotal}</span>
@@ -184,15 +184,15 @@ export default function Messages() {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search conversations"
-                aria-label="Search conversations"
+                placeholder="Search messages"
+                aria-label="Search messages"
                 className="h-full w-full bg-transparent text-[12px] outline-none placeholder:text-muted/60"
               />
             </div>
           </div>
 
           <div className="flex items-center justify-between px-4 py-2.5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Conversations</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Chats</p>
             <span className="text-[10px] text-muted">{filtered.length}</span>
           </div>
 
@@ -205,12 +205,12 @@ export default function Messages() {
               <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-sage-100 text-muted">
                 <Inbox size={18} />
               </span>
-              <p className="mt-3 text-[12.5px] font-semibold text-ink">No conversations</p>
+              <p className="mt-3 text-[12.5px] font-semibold text-ink">No messages yet</p>
               <p className="mt-1 text-[11px] leading-4 text-muted">
                 Start a thread from an order or lot record. Messages stay attached to the trade.
               </p>
               <Button asChild variant="outline" size="sm" className="mt-3">
-                <Link to="/orders">Go to orders</Link>
+                <Link to="/orders">Go to my orders</Link>
               </Button>
             </div>
           ) : (
@@ -259,10 +259,10 @@ export default function Messages() {
               <span className="grid h-14 w-14 place-items-center rounded-2xl bg-forest-50 text-forest-500">
                 <MessageSquare size={24} />
               </span>
-              <h2 className="mt-4 font-display text-[18px] font-bold text-ink">Select a conversation</h2>
+              <h2 className="mt-4 font-display text-[18px] font-bold text-ink">Choose a chat</h2>
               <p className="mt-1.5 max-w-sm text-[12.5px] leading-5 text-muted">
-                Threads are created from orders and lot records so the counterparty and trade context are always
-                verifiable.
+                Chats start from a real order or listing, so you always know who you are talking to and which trade
+                it is about.
               </p>
               <div className="mt-4 flex gap-2">
                 <Button asChild variant="outline" size="sm"><Link to="/orders">Orders</Link></Button>
@@ -276,7 +276,7 @@ export default function Messages() {
                   <button
                     type="button"
                     onClick={closeThread}
-                    aria-label="Back to conversations"
+                    aria-label="Back to chats"
                     className="grid h-8 w-8 place-items-center rounded-lg text-muted hover:bg-sage-100 md:hidden"
                   >
                     <ArrowLeft size={16} />
@@ -284,7 +284,7 @@ export default function Messages() {
                   <Avatar name={activeConversation?.user?.name || 'Member'} src={activeConversation?.user?.profile_image} size="sm" />
                   <div className="min-w-0">
                     <p className="break-words text-[13px] font-bold text-ink">{threadName}</p>
-                    <p className="text-[10px] text-muted">Platform-secured thread</p>
+                    <p className="text-[10px] text-muted">Private on RALMP</p>
                   </div>
                 </div>
                 <Badge tone="verified" size="sm"><ShieldCheck size={10} /> Logged</Badge>
@@ -300,7 +300,7 @@ export default function Messages() {
                     <span className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-white text-forest-500 shadow-card">
                       <MessageSquare size={19} />
                     </span>
-                    <p className="mt-3 text-[12.5px] font-semibold text-ink">Start the conversation</p>
+                    <p className="mt-3 text-[12.5px] font-semibold text-ink">Say hello</p>
                     <p className="mx-auto mt-1 max-w-xs text-[11px] leading-5 text-muted">
                       Introduce your volume requirement, grade expectation or collection window.
                     </p>
@@ -347,7 +347,7 @@ export default function Messages() {
                     }}
                     rows={1}
                     maxLength={2000}
-                    placeholder="Write a message… (Enter to send)"
+                    placeholder="Write a message… (press Enter to send)"
                     aria-label="Message body"
                     className="max-h-32 min-h-[44px] flex-1 resize-y rounded-xl border border-line bg-canvas px-3.5 py-2.5 text-[12.5px] outline-none transition placeholder:text-muted/60 focus:border-forest-500"
                   />

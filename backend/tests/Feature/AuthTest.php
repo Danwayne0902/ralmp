@@ -24,8 +24,10 @@ class AuthTest extends TestCase
         }
     }
 
-    public function test_unverified_users_cannot_log_in(): void
+    public function test_unverified_users_cannot_log_in_when_verification_is_required(): void
     {
+        config(['auth.email_verification' => true]);
+
         $user = User::factory()->unverified()->create(['password' => Hash::make('password')]);
 
         $this->postJson('/api/v1/auth/login', [
@@ -61,9 +63,37 @@ class AuthTest extends TestCase
             ->assertJsonPath('code', 'account_suspended');
     }
 
+    public function test_registration_signs_the_member_in_when_verification_is_off(): void
+    {
+        Mail::fake();
+        config(['auth.email_verification' => false]);
+
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name' => 'New Farmer',
+            'email' => 'new-farmer@example.test',
+            'phone' => '+2348000009999',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'farmer',
+            'address' => '2 Test Street',
+            'state' => 'Oyo',
+            'lga' => 'Ibadan North',
+        ])->assertCreated()
+            ->assertJsonStructure(['token', 'user' => ['id', 'email', 'role']])
+            ->assertJsonPath('needs_verification', false);
+
+        $this->assertNotEmpty($response->json('token'));
+
+        $user = User::where('email', 'new-farmer@example.test')->firstOrFail();
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertTrue($user->hasRole('farmer'));
+        Mail::assertNothingSent();
+    }
+
     public function test_verification_tokens_are_hashed_and_can_be_used(): void
     {
         Mail::fake();
+        config(['auth.email_verification' => true]);
 
         $this->postJson('/api/v1/auth/register', [
             'name' => 'New Buyer',

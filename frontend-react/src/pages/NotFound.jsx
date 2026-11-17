@@ -5,9 +5,9 @@ import { useAuth } from '../store/auth'
 import { roleHome } from '../lib/format'
 
 const LINKS = [
-  { to: '/commodities', label: 'Spot exchange', note: 'Verified farm-gate lots' },
-  { to: '/escrow', label: 'Escrow model', note: 'How milestone release works' },
-  { to: '/login', label: 'Sign in', note: 'Open your workspace' },
+  { to: '/commodities', label: 'Marketplace', note: 'Produce for sale now' },
+  { to: '/escrow', label: 'How escrow works', note: 'How the money is paid out' },
+  { to: '/login', label: 'Sign in', note: 'Open your dashboard' },
 ]
 
 export default function NotFound() {
@@ -20,24 +20,23 @@ export default function NotFound() {
           <p className="font-display text-[64px] font-extrabold leading-none tracking-[-0.04em] text-sage-400 sm:text-[88px]">
             404
           </p>
-          <p className="label-caps mt-2 text-forest-500">Page not on the board</p>
+          <p className="label-caps mt-2 text-forest-500">Page not found</p>
           <h1 className="mt-2 max-w-lg font-display text-[28px] font-extrabold leading-9 tracking-[-0.02em] text-ink sm:text-[36px] sm:leading-[44px]">
-            This route does not exist in the exchange.
+            We could not find this page.
           </h1>
           <p className="mt-3 max-w-md text-[13.5px] leading-6 text-muted">
-            The link may be outdated, or the record may have been withdrawn. Nothing in the ledger has changed —
-            use one of the routes below to get back to a live view.
+            The link may be old, or the page may have moved. Nothing has changed in your account. Try one of the links below.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2.5">
             <Button asChild size="lg">
               <Link to={isLoggedIn ? roleHome(user?.role) : '/'}>
-                <Home size={15} /> {isLoggedIn ? 'Back to my workspace' : 'Back to the homepage'}
+                <Home size={15} /> {isLoggedIn ? 'Go to my dashboard' : 'Back to home'}
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
               <Link to="/commodities">
-                <Search size={15} /> Browse the exchange
+                <Search size={15} /> See what is for sale
               </Link>
             </Button>
           </div>
@@ -46,7 +45,7 @@ export default function NotFound() {
             to="/"
             className="mt-5 inline-flex items-center gap-1.5 text-[12px] font-semibold text-muted transition hover:text-forest-600"
           >
-            <ArrowLeft size={13} /> Return to the landing page
+            <ArrowLeft size={13} /> Back to the home page
           </Link>
         </div>
 
@@ -56,8 +55,8 @@ export default function NotFound() {
               <Compass size={19} />
             </span>
             <div>
-              <p className="font-display text-[14px] font-bold text-ink">Where to next</p>
-              <p className="text-[10.5px] text-muted">Live routes on the platform</p>
+              <p className="font-display text-[14px] font-bold text-ink">Try one of these</p>
+              <p className="text-[10.5px] text-muted">Popular pages</p>
             </div>
           </div>
 
@@ -84,8 +83,7 @@ export default function NotFound() {
           </ul>
 
           <p className="mt-4 border-t border-line pt-3 text-[10.5px] leading-4 text-muted">
-            If you followed a link from an order email, the record may require sign-in with the account that
-            placed it.
+            If you opened a link from an email about an order, sign in with the account that placed it.
           </p>
         </div>
       </div>

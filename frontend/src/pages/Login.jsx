@@ -6,8 +6,6 @@ import { useAuth } from '../store/auth'
 import { roleHome } from '../lib/format'
 import { Button, Field, Input } from '../components/ui'
 
-const demoAccounts = ['buyer@ramlp.com', 'farmer@ramlp.com', 'admin@ramlp.com']
-
 const features = [
   { icon: ShieldCheck, text: 'Escrow-backed payments on every order' },
   { icon: Truck, text: 'Live logistics tracking from farm gate' },
@@ -160,23 +158,6 @@ export default function Login() {
                 {loading ? 'Signing in…' : 'Sign in'}
               </Button>
             </form>
-          </div>
-
-          <div className="mt-6 rounded-xl border border-[color:var(--hairline)] bg-white p-4">
-            <p className="text-2xs font-bold uppercase tracking-[.16em] text-sand-400">Demo accounts</p>
-            <div className="mt-2 grid gap-1.5 sm:grid-cols-3">
-              {demoAccounts.map((e) => (
-                <button
-                  key={e}
-                  type="button"
-                  onClick={() => setForm({ email: e, password: 'password' })}
-                  className="rounded-lg border border-[color:var(--hairline)] bg-white px-2 py-1.5 text-left text-[11px] font-medium text-sand-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
-                >
-                  {e}
-                </button>
-              ))}
-            </div>
-            <p className="mt-2 text-[10px] text-sand-400">Password: <span className="font-mono">password</span></p>
           </div>
         </motion.div>
       </div>

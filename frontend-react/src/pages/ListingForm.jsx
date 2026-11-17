@@ -591,8 +591,7 @@ export default function ListingForm() {
               <Check size={13} /> Free to list
             </p>
             <p className="mt-1 text-[10.5px] leading-4 text-forest-700/75">
-              RALMP charges no listing fee. Platform settlement costs are waived at checkout under the current
-              pilot framework.
+              RALMP does not charge you to list. There is no platform fee at checkout during the pilot.
             </p>
           </div>
         </aside>

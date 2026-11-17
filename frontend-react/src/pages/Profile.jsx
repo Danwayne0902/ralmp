@@ -128,9 +128,9 @@ export default function Profile() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Account"
-        title="Profile & verification"
-        description="Identity, origin and security settings used across procurement, listing and settlement."
+        eyebrow="My account"
+        title="My profile"
+        description="Your details, address and password."
         actions={
           <Button variant="outline" size="md" onClick={signOut}>
             <LogOut size={15} /> Sign out
@@ -223,7 +223,7 @@ export default function Profile() {
           {tab === 'identity' && (
             <Card>
               <div className="border-b border-line px-5 py-4">
-                <h2 className="font-display text-[15px] font-bold text-ink">Identity & farm-gate origin</h2>
+                <h2 className="font-display text-[15px] font-bold text-ink">Your details and address</h2>
                 <p className="mt-0.5 text-[11px] text-muted">
                   Origin is attached to every lot you publish and every order you place.
                 </p>
@@ -238,10 +238,10 @@ export default function Profile() {
                     <Field label="Full name" required>
                       <Input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} required />
                     </Field>
-                    <Field label="Email address" hint="Contact the desk to change">
+                    <Field label="Email" hint="Ask the trade desk to change this">
                       <Input value={profile?.email || ''} disabled className="bg-canvas text-muted" />
                     </Field>
-                    <Field label="Phone number" required>
+                    <Field label="Phone" required>
                       <Input
                         type="tel"
                         value={form.phone}
@@ -260,10 +260,10 @@ export default function Profile() {
                         {NIGERIA_STATES.map((state) => <option key={state} value={state}>{state}</option>)}
                       </select>
                     </Field>
-                    <Field label="LGA / district" required>
+                    <Field label="Local government area" required>
                       <Input value={form.lga} onChange={(e) => setForm((prev) => ({ ...prev, lga: e.target.value }))} required />
                     </Field>
-                    <Field label="Physical address" required>
+                    <Field label="Address" required>
                       <Input
                         value={form.address}
                         onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
@@ -295,8 +295,8 @@ export default function Profile() {
           {tab === 'security' && (
             <Card>
               <div className="border-b border-line px-5 py-4">
-                <h2 className="font-display text-[15px] font-bold text-ink">Password & session</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Use a unique password. Sessions expire when you sign out.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">Password</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Use a password that only you know.</p>
               </div>
               <form onSubmit={changePassword} className="space-y-4 p-5">
                 <Field label="Current password" required>
@@ -319,7 +319,7 @@ export default function Profile() {
                       onChange={(e) => setPasswords((prev) => ({ ...prev, next: e.target.value }))}
                     />
                   </Field>
-                  <Field label="Confirm new password" required>
+                  <Field label="Type new password again" required>
                     <Input
                       type="password"
                       autoComplete="new-password"
@@ -342,7 +342,7 @@ export default function Profile() {
               <div className="border-t border-line px-5 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="text-[12.5px] font-semibold text-ink">Active session</p>
+                    <p className="text-[12.5px] font-semibold text-ink">This device</p>
                     <p className="text-[10.5px] text-muted">This browser · authenticated with a Sanctum token</p>
                   </div>
                   <Button variant="danger" size="sm" onClick={signOut}>
@@ -356,16 +356,16 @@ export default function Profile() {
           {tab === 'verification' && (
             <Card>
               <div className="border-b border-line px-5 py-4">
-                <h2 className="font-display text-[15px] font-bold text-ink">Verification & limits</h2>
-                <p className="mt-0.5 text-[11px] text-muted">The trade desk reviews identity, origin and payout instructions.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">Verification</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Our team checks your name, address and payment details.</p>
               </div>
               <div className="space-y-4 p-5">
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
                     { label: 'Email address', done: verified, note: verified ? `Verified ${fmtDate(profile?.email_verified_at)}` : 'Verification link pending' },
                     { label: 'Phone number', done: Boolean(profile?.phone), note: profile?.phone || 'Not supplied' },
-                    { label: 'Physical address', done: Boolean(profile?.address), note: profile?.address || 'Not supplied' },
-                    { label: 'Email verification (KYC)', done: verified, note: verified ? 'Identity record active' : 'Required before first settlement' },
+                    { label: 'Address', done: Boolean(profile?.address), note: profile?.address || 'Not supplied' },
+                    { label: 'Email and identity check', done: verified, note: verified ? 'Your ID is on file' : 'Needed before your first payment' },
                   ].map((item) => (
                     <div key={item.label} className="rounded-xl border border-line bg-canvas p-3.5">
                       <div className="flex items-center justify-between gap-2">
@@ -384,9 +384,9 @@ export default function Profile() {
                   ))}
                 </div>
 
-                <Callout tone="sage" icon={ShieldCheck} title="Why verification matters">
-                  Unverified accounts can list and browse, but escrow release and payout instructions are held until
-                  identity is confirmed. This protects both counterparties under the platform trade rules.
+                <Callout tone="sage" icon={ShieldCheck} title="Why we check">
+                  You can list and browse before you are verified, but payments are held until we confirm who you are.
+                  This keeps both sides safe.
                 </Callout>
 
                 <div className="rounded-xl border border-line bg-white p-4">
@@ -406,14 +406,14 @@ export default function Profile() {
 
         <aside className="space-y-4">
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Account summary</p>
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Account details</p>
             <dl className="mt-2.5 space-y-0.5">
               <KeyValue label="Role">{roleLabel(profile?.role)}</KeyValue>
               <KeyValue label="Email">
                 <span className="inline-flex items-center gap-1"><Mail size={11} className="text-muted" /> {profile?.email}</span>
               </KeyValue>
-              <KeyValue label="Member since">{fmtDate(profile?.created_at)}</KeyValue>
-              <KeyValue label="Account state">
+              <KeyValue label="Joined">{fmtDate(profile?.created_at)}</KeyValue>
+              <KeyValue label="Status">
                 <Badge tone={verified ? 'verified' : 'pending'} size="sm">{verified ? 'Active' : 'Limited'}</Badge>
               </KeyValue>
             </dl>
@@ -438,15 +438,15 @@ export default function Profile() {
           {profile?.role === 'farmer' && (
             <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
               <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
-                <Wallet size={13} /> Payout readiness
+                <Wallet size={13} /> Getting paid
               </p>
               <ul className="mt-2 space-y-1.5 text-[10.5px] leading-4 text-forest-700/80">
-                <li className="flex items-center gap-1.5"><Check size={10} /> NIBSS rail available</li>
-                <li className="flex items-center gap-1.5"><Check size={10} /> Bank details held by settlement desk</li>
-                <li className="flex items-center gap-1.5"><Phone size={10} /> USSD payout authorisation enabled</li>
+                <li className="flex items-center gap-1.5"><Check size={10} /> Bank transfers supported</li>
+                <li className="flex items-center gap-1.5"><Check size={10} /> Bank details kept private by our team</li>
+                <li className="flex items-center gap-1.5"><Phone size={10} /> We call you to confirm large payments</li>
               </ul>
               <Button asChild variant="outline" size="sm" className="mt-3 w-full">
-                <Link to="/farmer/payouts">Open payout statement</Link>
+                <Link to="/farmer/payouts">See payment statement</Link>
               </Button>
             </div>
           )}
@@ -456,8 +456,8 @@ export default function Profile() {
               <Lock size={12} /> Data handling
             </p>
             <p className="mt-1.5 text-[10.5px] leading-4 text-muted">
-              Your contact and address details are shared only with counterparties on an active order and with the
-              settlement desk. Public listings expose name, LGA and state only.
+              Your contact and address details are shared only with the other person on an active order and with our
+              team. Public listings show only your name, local area and state.
             </p>
           </div>
         </aside>

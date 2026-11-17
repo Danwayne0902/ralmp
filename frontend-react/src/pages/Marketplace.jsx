@@ -39,7 +39,7 @@ function FilterControls({ filters, setFilters, onReset, onApply }) {
   return (
     <div className="space-y-5">
       <div>
-        <p className="mb-2 text-[12px] font-bold text-ink">Commodity category</p>
+        <p className="mb-2 text-[12px] font-bold text-ink">Type of produce</p>
         <div className="grid grid-cols-2 gap-1.5">
           <button
             type="button"
@@ -73,12 +73,12 @@ function FilterControls({ filters, setFilters, onReset, onApply }) {
       </div>
 
       <div>
-        <p className="mb-2 text-[12px] font-bold text-ink">Origin state</p>
+        <p className="mb-2 text-[12px] font-bold text-ink">Where it comes from</p>
         <select
           value={filters.state}
           onChange={(e) => setFilters((prev) => ({ ...prev, state: e.target.value }))}
           className="select h-10 text-[12.5px]"
-          aria-label="Filter by origin state"
+          aria-label="Filter by state"
         >
           <option value="">All states</option>
           {NIGERIA_STATES.map((state) => (
@@ -116,8 +116,8 @@ function FilterControls({ filters, setFilters, onReset, onApply }) {
       <Checkbox
         checked={filters.freshOnly}
         onCheckedChange={(checked) => setFilters((prev) => ({ ...prev, freshOnly: Boolean(checked) }))}
-        label="Harvested in the last 7 days"
-        description="Only show lots with a recent harvest date."
+        label="Fresh this week"
+        description="Only show produce harvested in the last 7 days."
       />
 
       <div className="space-y-2 border-t border-line pt-4">
@@ -154,9 +154,9 @@ function BasketRail({ onCheckout }) {
           <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-sage-100 text-muted">
             <Package size={18} />
           </span>
-          <p className="mt-3 text-[12.5px] font-semibold text-ink">No lots committed yet</p>
+          <p className="mt-3 text-[12.5px] font-semibold text-ink">Nothing in your basket yet</p>
           <p className="mt-1 text-[11.5px] leading-4 text-muted">
-            Add a lot to stage an escrow commitment. Funds move only at checkout.
+            Add produce to your basket. You only pay at checkout.
           </p>
         </div>
       ) : (
@@ -182,15 +182,15 @@ function BasketRail({ onCheckout }) {
 
           <div className="space-y-2 border-t border-line px-4 py-3.5 text-[12px]">
             <div className="flex justify-between text-muted">
-              <span>Produce subtotal</span>
+              <span>Produce total</span>
               <span className="font-semibold text-ink tnum">{money(subtotal || total)}</span>
             </div>
             <div className="flex justify-between text-muted">
-              <span>Freight (est.)</span>
+              <span>Delivery (est.)</span>
               <span className="font-semibold text-ink tnum">{money(deliveryFee)}</span>
             </div>
             <div className="flex justify-between border-t border-line pt-2">
-              <span className="font-semibold text-ink">Escrow commitment</span>
+              <span className="font-semibold text-ink">Total to pay</span>
               <span className="font-display text-[15px] font-extrabold text-forest-600 tnum">
                 {money((subtotal || total) + deliveryFee)}
               </span>
@@ -206,13 +206,13 @@ function BasketRail({ onCheckout }) {
           disabled={items.length === 0 || loading}
           onClick={onCheckout}
         >
-          Review escrow checkout <ArrowRight size={14} />
+          Go to checkout <ArrowRight size={14} />
         </Button>
         <Link
           to="/escrow"
           className="mt-2.5 block text-center text-[10.5px] font-semibold text-muted hover:text-forest-600"
         >
-          How milestone settlement works
+          How payment works
         </Link>
       </div>
     </aside>
@@ -323,12 +323,12 @@ export default function Marketplace() {
 
   async function addToBasket(lot) {
     if (!user) {
-      toast.info('Sign in to stage an escrow commitment')
+      toast.info('Sign in to add this to your basket')
       navigate('/login', { state: { from: '/commodities' } })
       return
     }
     if (user.role !== 'buyer') {
-      toast.error('Only buyer accounts can commit escrow')
+      toast.error('Only buyer accounts can place orders')
       return
     }
     setAddingId(lot.id)
@@ -353,9 +353,9 @@ export default function Marketplace() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Spot exchange"
-        title="Verified agricultural lots"
-        description="Farm-gate pricing from registered growers and co-operatives. Every lot settles through milestone escrow."
+        eyebrow="Marketplace"
+        title="Fresh produce for sale"
+        description="Real prices from real farmers. Every order is paid through safe escrow."
         actions={
           <>
             <div className="hidden items-center gap-2 rounded-btn border border-line bg-white px-3 md:flex">
@@ -366,8 +366,8 @@ export default function Marketplace() {
                   setFilters((prev) => ({ ...prev, q: e.target.value }))
                   setPage(1)
                 }}
-                placeholder="Search commodity or description"
-                aria-label="Search lots"
+                placeholder="Search produce"
+                aria-label="Search produce"
                 className="h-10 w-56 bg-transparent text-[13px] outline-none placeholder:text-muted/60 lg:w-64"
               />
               {filters.q && (
@@ -391,7 +391,7 @@ export default function Marketplace() {
           </span>
           <p className="text-[12.5px] text-muted">
             <span className="font-semibold text-ink">{meta.total}</span> lots available ·{' '}
-            farm-gate pricing inclusive of escrow protection
+            farm prices, with payment protection
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -441,7 +441,7 @@ export default function Marketplace() {
               <MapPin size={13} /> Origin-linked supply
             </p>
             <p className="mt-1.5 text-[11px] leading-5 text-forest-700/75">
-              State filters match the farm-gate location recorded by the grower, not the carrier&apos;s depot.
+              Filters use the farm's state, not the transporter's depot.
             </p>
           </div>
         </aside>
@@ -462,8 +462,8 @@ export default function Marketplace() {
           ) : lots.length === 0 ? (
             <EmptyState
               icon={Sprout}
-              title="No lots match this board view"
-              description="Try a wider price range or clear the origin filter. New harvest lots are published throughout the day."
+              title="Nothing matches your search"
+              description="Try a different price range or clear the filters. New produce is added every day."
               action={
                 <Button variant="outline" onClick={reset}>
                   <RotateCcw size={14} /> Reset filters
@@ -498,8 +498,7 @@ export default function Marketplace() {
 
           <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-muted">
             <ChevronDown size={13} className="mt-0.5 shrink-0" />
-            Prices are set by the grower per stated unit at the farm gate. Freight is estimated at checkout from
-            the destination LGA and confirmed against the carrier e-Waybill.
+            Farmers set the price per unit at the farm. Delivery is estimated at checkout from the delivery area and confirmed with the transporter.
           </p>
         </div>
 
@@ -511,8 +510,8 @@ export default function Marketplace() {
       <Sheet
         open={mobileFilters}
         onOpenChange={setMobileFilters}
-        title="Refine the board"
-        description="Filters apply to live availability and farm-gate origin."
+        title="Filter the list"
+        description="Narrow down what you see."
         side="bottom"
       >
         <FilterControls

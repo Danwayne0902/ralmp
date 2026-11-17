@@ -13,6 +13,7 @@ const Checkout = lazy(() => import('./pages/Checkout'))
 const Payment = lazy(() => import('./pages/Payment'))
 const Orders = lazy(() => import('./pages/Orders'))
 const OrderDetail = lazy(() => import('./pages/OrderDetail'))
+const DashboardRedirect = lazy(() => import('./pages/DashboardRedirect'))
 const BuyerDashboard = lazy(() => import('./pages/BuyerDashboard'))
 const Settlements = lazy(() => import('./pages/Settlements'))
 const FarmerDashboard = lazy(() => import('./pages/FarmerDashboard'))
@@ -80,6 +81,7 @@ export default function App() {
           {/* <Route path="ussd" element={<UssdGateway />} /> */}
 
           {/* Shared authenticated workspace */}
+          <Route path="dashboard" element={guard(<DashboardRedirect />)} />
           <Route path="orders" element={guard(<Orders />)} />
           <Route path="orders/:id" element={guard(<OrderDetail />)} />
           <Route path="messages" element={guard(<Messages />, TRADING_ROLES)} />

@@ -62,14 +62,14 @@ export default function BuyerDashboard() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Procurement desk"
+        eyebrow="Buying"
         title={`Good day, ${user?.name?.split(' ')[0] || 'buyer'}`}
-        description="Your escrow exposure, inbound deliveries and settlement position at a glance."
+        description="Your orders, deliveries and payments in one place."
         actions={
           <>
             <Button asChild variant="outline" size="md">
               <Link to="/settlements">
-                <Wallet size={15} /> Settlement ledger
+                <Wallet size={15} /> My payments
               </Link>
             </Button>
             <Button asChild size="md">
@@ -92,10 +92,10 @@ export default function BuyerDashboard() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Package} label="Total orders" value={dashboard?.total_orders ?? orders.length} hint="Across all procurement cycles" />
-            <Stat icon={Truck} label="Pending deliveries" value={dashboard?.pending_deliveries ?? inTransit.length} tone="gold" hint="Confirmed, processing or in transit" />
-            <Stat icon={CreditCard} label="Committed capital" value={money(dashboard?.total_spent ?? 0)} tone="sprout" hint="Delivered and settled orders" size="lg" />
-            <Stat icon={ShoppingBag} label="Basket lines" value={count} tone="neutral" hint="Staged, not yet committed" />
+            <Stat icon={Package} label="My orders" value={dashboard?.total_orders ?? orders.length} hint="All your orders" />
+            <Stat icon={Truck} label="On the way" value={dashboard?.pending_deliveries ?? inTransit.length} tone="gold" hint="Orders not yet delivered" />
+            <Stat icon={CreditCard} label="Money paid" value={money(dashboard?.total_spent ?? 0)} tone="sprout" hint="Orders you have paid for" size="lg" />
+            <Stat icon={ShoppingBag} label="In your basket" value={count} tone="neutral" hint="Not paid yet" />
           </>
         )}
       </div>
@@ -105,8 +105,8 @@ export default function BuyerDashboard() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Recent orders</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Escrow state and carrier milestone per order.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">My orders</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Where each order is right now.</p>
               </div>
               <Button asChild variant="ghost" size="sm">
                 <Link to="/orders">All orders <ArrowRight size={13} /></Link>
@@ -120,10 +120,10 @@ export default function BuyerDashboard() {
             ) : recent.length === 0 ? (
               <EmptyState
                 icon={Sprout}
-                title="No procurement history yet"
-                description="Verified lots are live on the exchange. Your first escrow commitment will appear here."
+                title="No orders yet"
+                description="When you buy something, it will show here."
                 className="border-0 shadow-none"
-                action={<Button asChild><Link to="/commodities">Enter the exchange</Link></Button>}
+                action={<Button asChild><Link to="/commodities">See what is for sale</Link></Button>}
               />
             ) : (
               <>
@@ -133,9 +133,9 @@ export default function BuyerDashboard() {
                       <tr>
                         <Th>Order</Th>
                         <Th>Commodity</Th>
-                        <Th>Grower</Th>
+                        <Th>Farmer</Th>
                         <Th className="text-right">Value</Th>
-                        <Th>Escrow</Th>
+                        <Th>Paid</Th>
                         <Th>Status</Th>
                       </tr>
                     </thead>
@@ -153,7 +153,7 @@ export default function BuyerDashboard() {
                           <Td className="text-right font-semibold text-ink tnum">{money(order.total_price)}</Td>
                           <Td>
                             <Badge tone={order.payment_status === 'paid' ? 'verified' : 'pending'} size="sm">
-                              {order.payment_status === 'paid' ? 'Funded' : 'Unfunded'}
+                              {order.payment_status === 'paid' ? 'Paid' : 'Not paid'}
                             </Badge>
                           </Td>
                           <Td><StatusBadge status={order.status} size="sm" /></Td>
@@ -172,7 +172,7 @@ export default function BuyerDashboard() {
                             {order.produce?.commodity_name || `Order #${order.id}`}
                           </p>
                           <p className="mt-0.5 text-[10.5px] text-muted">
-                            #{order.id} · {order.farmer?.name || 'Grower'}
+                            #{order.id} · {order.farmer?.name || 'Farmer'}
                           </p>
                           <div className="mt-1.5"><StatusBadge status={order.status} size="sm" /></div>
                         </div>
@@ -190,7 +190,7 @@ export default function BuyerDashboard() {
               <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
                 <BarChart3 size={16} className="text-forest-500" /> Order pipeline
               </h2>
-              <p className="text-[10.5px] text-muted">{orders.length} {orders.length === 1 ? 'order' : 'orders'} in the ledger</p>
+              <p className="text-[10.5px] text-muted">{orders.length} {orders.length === 1 ? 'order' : 'orders'} in total</p>
             </div>
             {orders.length === 0 ? (
               <p className="mt-4 rounded-xl border border-dashed border-sage-400 bg-canvas px-4 py-5 text-center text-[12px] text-muted">
@@ -212,11 +212,11 @@ export default function BuyerDashboard() {
           <section>
             <div className="mb-3 flex items-center justify-between">
               <div>
-                <h2 className="font-display text-[17px] font-bold text-ink">Lots worth a look</h2>
-                <p className="text-[11.5px] text-muted">Fresh availability from verified growers.</p>
+                <h2 className="font-display text-[17px] font-bold text-ink">Fresh listings</h2>
+                <p className="text-[11.5px] text-muted">New produce from real farmers.</p>
               </div>
               <Button asChild variant="ghost" size="sm">
-                <Link to="/commodities">Browse all <ArrowRight size={13} /></Link>
+                <Link to="/commodities">See all <ArrowRight size={13} /></Link>
               </Button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
@@ -231,43 +231,43 @@ export default function BuyerDashboard() {
           <div className="rounded-card border border-line bg-forest-900 p-5 text-white shadow-card">
             <div className="flex items-center justify-between">
               <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-forest-200">
-                <Landmark size={13} className="text-harvest-300" /> Escrow exposure
+                <Landmark size={13} className="text-harvest-300" /> Money in escrow
               </p>
               <ShieldCheck size={15} className="text-harvest-300" />
             </div>
             <p className="mt-3 font-display text-[30px] font-extrabold leading-9 tracking-tight tnum">{money(exposure)}</p>
             <p className="mt-1 text-[11px] leading-5 text-forest-100/65">
-              Across {unpaid.length} unfunded {unpaid.length === 1 ? 'order' : 'orders'}. Fund before the carrier is
-              matched to avoid cancellation.
+              Across {unpaid.length} unpaid {unpaid.length === 1 ? 'order' : 'orders'}. Pay before a transporter is
+              found, or the order may be cancelled.
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-3">
               <div>
-                <p className="text-[9.5px] font-bold uppercase tracking-wide text-forest-300">Funded</p>
+                <p className="text-[9.5px] font-bold uppercase tracking-wide text-forest-300">Paid</p>
                 <p className="mt-0.5 text-[13px] font-bold tnum">{funded.length} orders</p>
               </div>
               <div>
-                <p className="text-[9.5px] font-bold uppercase tracking-wide text-forest-300">In transit</p>
+                <p className="text-[9.5px] font-bold uppercase tracking-wide text-forest-300">On the way</p>
                 <p className="mt-0.5 text-[13px] font-bold tnum">{inTransit.length} orders</p>
               </div>
             </div>
             {unpaid.length > 0 && (
               <Button asChild variant="accent" size="sm" className="mt-4 w-full">
                 <Link to={`/payment/${unpaid[0].id}`}>
-                  Fund next order · {money(unpaid[0].total_price)}
+                  Pay for next order · {money(unpaid[0].total_price)}
                 </Link>
               </Button>
             )}
           </div>
 
           <div className="rounded-card border border-line bg-white p-4 shadow-card">
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Procurement shortcuts</p>
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">Quick links</p>
             <div className="mt-2.5 space-y-1">
               {[
-                { to: '/commodities', icon: ShoppingBag, label: 'Spot exchange', note: 'Verified lots live now' },
-                { to: '/cart', icon: CreditCard, label: 'Escrow basket', note: `${count} staged ${count === 1 ? 'line' : 'lines'}` },
-                { to: '/orders', icon: Truck, label: 'Waybills & deliveries', note: 'Track carrier milestones' },
-                { to: '/settlements', icon: Wallet, label: 'Settlement ledger', note: 'Milestone release history' },
-                { to: '/messages', icon: MessageSquare, label: 'Grower messages', note: 'Negotiate volume directly' },
+                { to: '/commodities', icon: ShoppingBag, label: 'Marketplace', note: 'Produce for sale now' },
+                { to: '/cart', icon: CreditCard, label: 'Basket', note: `${count} item${count === 1 ? '' : 's'} waiting` },
+                { to: '/orders', icon: Truck, label: 'Orders', note: 'Track every delivery' },
+                { to: '/settlements', icon: Wallet, label: 'Payments', note: 'See what you have paid' },
+                { to: '/messages', icon: MessageSquare, label: 'Messages', note: 'Talk to the farmer' },
               ].map((item) => (
                 <Link
                   key={item.to}
@@ -293,7 +293,7 @@ export default function BuyerDashboard() {
             </p>
             {inTransit.length === 0 ? (
               <p className="mt-2 text-[11.5px] leading-5 text-muted">
-                No shipments in motion. Confirmed orders appear here until silo acceptance.
+                No deliveries on the way. Orders show here until the buyer signs for the goods.
               </p>
             ) : (
               <ul className="mt-2 divide-y divide-line">

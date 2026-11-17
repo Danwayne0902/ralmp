@@ -85,9 +85,9 @@ export default function Payouts() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Farm hub · payouts"
-        title="Payout statement"
-        description="Milestone releases from escrow, pending balances and the settlement trail for every order."
+        eyebrow="My money"
+        title="My payments"
+        description="Money we have paid you, money still on hold, and the record for each order."
         actions={
           <>
             <Button asChild variant="outline" size="md">
@@ -111,10 +111,10 @@ export default function Payouts() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Banknote} label="Released to you" value={money(released)} tone="sprout" hint="Settled milestone tranches" size="lg" />
-            <Stat icon={Lock} label="Still in escrow" value={money(held)} tone="gold" hint="Awaiting weight, lab or silo evidence" size="lg" />
-            <Stat icon={Clock3} label="Pending confirmation" value={money(earnings?.pending_earnings ?? 0)} hint="Orders not yet accepted" />
-            <Stat icon={CheckCircle2} label="Completed orders" value={completed} tone="neutral" hint={`${paid} funded orders in total`} />
+            <Stat icon={Banknote} label="Paid to you" value={money(released)} tone="sprout" hint="Payments already sent" size="lg" />
+            <Stat icon={Lock} label="On hold" value={money(held)} tone="gold" hint="Waiting for delivery proof" size="lg" />
+            <Stat icon={Clock3} label="Not confirmed yet" value={money(earnings?.pending_earnings ?? 0)} hint="Orders you have not accepted" />
+            <Stat icon={CheckCircle2} label="Finished orders" value={completed} tone="neutral" hint={`${paid} paid orders in total`} />
           </>
         )}
       </div>
@@ -124,8 +124,8 @@ export default function Payouts() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Milestone release events</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Each line is a tranche the platform has released to you.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">Payments sent to you</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Each line is money we sent to your account.</p>
               </div>
               <Badge tone="verified" size="sm"><ShieldCheck size={11} /> Evidence-backed</Badge>
             </div>
@@ -135,10 +135,10 @@ export default function Payouts() {
             ) : events.length === 0 ? (
               <EmptyState
                 icon={Wallet}
-                title="No releases yet"
-                description="The first 10% tranche releases when the carrier files the origin weighbridge slip. Ensure your orders are confirmed and funded."
+                title="No payments yet"
+                description="The first 10% is paid when the transporter sends the pickup weight note. Make sure your orders are confirmed and paid."
                 className="border-0 shadow-none"
-                action={<Button asChild><Link to="/orders">Review orders</Link></Button>}
+                action={<Button asChild><Link to="/orders">See my orders</Link></Button>}
               />
             ) : (
               <>
@@ -148,8 +148,8 @@ export default function Payouts() {
                       <tr>
                         <Th>Released</Th>
                         <Th>Order</Th>
-                        <Th>Tranche</Th>
-                        <Th>Trigger</Th>
+                        <Th>Part</Th>
+                        <Th>Why we paid</Th>
                         <Th className="text-right">Amount</Th>
                         <Th>State</Th>
                       </tr>
@@ -172,7 +172,7 @@ export default function Payouts() {
                           </Td>
                           <Td className="text-[10.5px] leading-4 text-muted">{event.tranche.trigger}</Td>
                           <Td className="text-right font-semibold text-forest-600 tnum">{money(event.tranche.amount)}</Td>
-                          <Td><Badge tone="verified" size="sm">Settled</Badge></Td>
+                          <Td><Badge tone="verified" size="sm">Paid</Badge></Td>
                         </Tr>
                       ))}
                     </tbody>
@@ -203,8 +203,8 @@ export default function Payouts() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Balances by order</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Released versus still-held value, per order.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">Order balances</h2>
+                <p className="mt-0.5 text-[11px] text-muted">What we paid and what is still on hold.</p>
               </div>
               <span className="text-[10.5px] text-muted">{orders.length} orders</span>
             </div>
@@ -214,10 +214,10 @@ export default function Payouts() {
             ) : orders.length === 0 ? (
               <EmptyState
                 icon={Sprout}
-                title="No orders on record"
-                description="Publish a harvest lot and confirm incoming orders to open your payout ledger."
+                title="No orders yet"
+                description="Add produce and accept orders to start getting paid."
                 className="border-0 shadow-none"
-                action={<Button asChild><Link to="/farmer/listings/create">Add harvest</Link></Button>}
+                action={<Button asChild><Link to="/farmer/listings/create">Add produce</Link></Button>}
               />
             ) : (
               <ul className="divide-y divide-line">
@@ -259,33 +259,32 @@ export default function Payouts() {
               <Landmark size={12} /> Payout destination
             </p>
             <div className="mt-3 rounded-xl border border-line bg-canvas px-4 py-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-muted">Account holder</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted">Account name</p>
               <p className="mt-0.5 text-[12.5px] font-bold text-ink">{user?.name}</p>
-              <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Settlement rail</p>
-              <p className="mt-0.5 text-[11.5px] text-ink-soft">NIBSS instant transfer to verified bank account</p>
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Paid through</p>
+              <p className="mt-0.5 text-[11.5px] text-ink-soft">Fast bank transfer to your verified account</p>
               <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Verification</p>
               <Badge tone={user?.verification_status ? 'verified' : 'pending'} size="sm" className="mt-1">
-                {user?.verification_status ? 'Verified' : 'Pending KYC'}
+                {user?.verification_status ? 'Verified' : 'Not verified yet'}
               </Badge>
             </div>
             <p className="mt-2.5 text-[10.5px] leading-4 text-muted">
-              Bank details are held by the settlement desk and are never displayed in the workspace. Update them
-              through a verified support request.
+              We keep your bank details private and never show them here. To change them, send us a message.
             </p>
             <Button asChild variant="outline" size="sm" className="mt-3 w-full">
               <Link to={`/messages?to=1`}>
-                <MessageSquare size={13} /> Contact settlement desk
+                <MessageSquare size={13} /> Message our team
               </Link>
             </Button>
           </div>
 
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">How release works</p>
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">How payment works</p>
             <ol className="mt-2.5 space-y-3">
               {[
-                { label: 'Origin weighbridge', note: '10% dispatch advance' },
-                { label: 'Destination lab & weight', note: '60% on tolerance pass' },
-                { label: 'Silo acceptance', note: '30% on receiving receipt' },
+                { label: 'Goods picked up', note: '10% on pickup' },
+                { label: 'Weight and quality checked', note: '60% when the check passes' },
+                { label: 'Goods delivered', note: '30% when the buyer signs' },
               ].map((step, index) => (
                 <li key={step.label} className="flex gap-2.5">
                   <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-forest-50 text-[9px] font-bold text-forest-600">
@@ -302,11 +301,11 @@ export default function Payouts() {
 
           <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
             <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-700">
-              <Phone size={13} /> Offline authorisation
+              <Phone size={13} /> Need help with a payment?
             </p>
             <p className="mt-1 text-[10.5px] leading-4 text-forest-700/75">
-              Dial <span className="font-mono font-semibold">*347*44#</span> to confirm orders and authorise payout
-              release when data is unavailable.
+              Call the trade desk on <a href="tel:+2348000725670" className="font-semibold underline">+234 800 072 5670</a>.
+              We can check any payment with you.
             </p>
           </div>
 

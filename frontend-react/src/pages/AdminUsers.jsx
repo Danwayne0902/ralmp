@@ -133,9 +133,9 @@ export default function AdminUsers() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Administration · participants"
-        title="User & role registry"
-        description="Every account on the exchange, its verified origin and its operating role. Role changes take effect on next sign-in."
+        eyebrow="People"
+        title="People and roles"
+        description="Every account, its address and its role. A role change applies the next time the person signs in."
         actions={
           <Button variant="outline" size="md" onClick={load} disabled={loading}>
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
@@ -213,8 +213,8 @@ export default function AdminUsers() {
         ) : filtered.length === 0 ? (
           <EmptyState
             icon={Users}
-            title="No accounts match this view"
-            description="Adjust the role or verification filter. Participant records persist even after suspension."
+            title="No accounts match"
+            description="Change the role or verification filter. Accounts stay on record even when paused."
             className="border-0 shadow-none"
           />
         ) : (
@@ -344,8 +344,7 @@ export default function AdminUsers() {
       <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-line bg-white p-4">
         <CircleAlert size={15} className="mt-0.5 shrink-0 text-harvest-500" />
         <p className="text-[11px] leading-5 text-muted">
-          Role changes reassign the participant&apos;s workspace and permissions. Suspension revokes access without
-          deleting order, settlement or message records — the audit trail must stay intact for arbitration.
+          A role change gives the person a different workspace and different permissions. Pausing an account blocks access but keeps its orders and messages on record, because a complaint may need them.
         </p>
       </div>
 
@@ -353,7 +352,7 @@ export default function AdminUsers() {
         open={Boolean(target)}
         onOpenChange={(open) => !open && setTarget(null)}
         title={target ? `Manage ${target.name}` : 'Manage account'}
-        description="Role and access changes are recorded against your administrator identity."
+        description="Every role change is saved with your admin name."
         footer={
           <>
             <Button variant="ghost" onClick={() => setTarget(null)} disabled={busy}>Close</Button>

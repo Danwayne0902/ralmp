@@ -155,7 +155,7 @@ export default function SettlementReceipt() {
   const schedule = useMemo(() => escrowSchedule(active), [active])
   const settledAmount = escrowReleased(active)
   const reference = active?.payment_reference || (active ? `RAMLP-${active.id}` : 'RAMLP')
-  const txRef = `NIBSS/PRV/${reference}-${String(active?.id ?? 0).padStart(4, '0')}`
+  const txRef = `RCPT/${reference}-${String(active?.id ?? 0).padStart(4, '0')}`
   const seal = fingerprint(txRef, 64)
   const node = String(active?.id ?? 0).padStart(4, '0')
 
@@ -195,9 +195,9 @@ export default function SettlementReceipt() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Farm hub · settlement"
-        title="NIBSS settlement receipts"
-        description="Verified electronic receipts for every escrow milestone released into your wallet, with the switch reference and clearance seal on record."
+        eyebrow="My money"
+        title="Payment receipts"
+        description="A receipt for each payment released to you, with the bank reference."
         actions={
           <>
             <Button asChild variant="outline" size="md">
@@ -212,7 +212,7 @@ export default function SettlementReceipt() {
 
       {error && (
         <div className="mb-5">
-          <Callout tone="critical" icon={CircleAlert} title="Settlement feed unavailable">
+          <Callout tone="critical" icon={CircleAlert} title="We cannot load your receipts">
             {error}
           </Callout>
         </div>
@@ -227,26 +227,26 @@ export default function SettlementReceipt() {
               <BadgeCheck size={15} className="text-forest-500" />
             </p>
             <p className="mt-0.5 text-[12.5px] text-muted">
-              {user?.email || 'Verified producer'} · NIBSS Instant Payment beneficiary
+              {user?.email || 'Farmer'} · payment recipient
             </p>
           </div>
-          <Badge tone="verified" size="md"><ShieldCheck size={11} /> CBN-regulated custody</Badge>
+          <Badge tone="verified" size="md"><ShieldCheck size={11} /> Held in escrow</Badge>
         </CardBody>
       </Card>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat icon={Banknote} label="Total disbursed" value={money(disbursed)} hint="Completed & delivered lots" />
-        <Stat icon={CheckCircle2} label="Cleared settlements" value={num(settled.length)} hint="Receipts on record" tone="sprout" />
-        <Stat icon={Wallet} label="Held in escrow" value={money(pending)} hint="Funded, awaiting evidence" tone="gold" />
-        <Stat icon={CalendarDays} label="Last settlement" value={lastSettlement ? fmtDate(lastSettlement) : '—'} hint="T+0 instant payout" tone="neutral" />
+        <Stat icon={Banknote} label="Total paid" value={money(disbursed)} hint="Finished and delivered orders" />
+        <Stat icon={CheckCircle2} label="Payments" value={num(settled.length)} hint="Receipts on record" tone="sprout" />
+        <Stat icon={Wallet} label="Still on hold" value={money(pending)} hint="Waiting for delivery proof" tone="gold" />
+        <Stat icon={CalendarDays} label="Last payment" value={lastSettlement ? fmtDate(lastSettlement) : '—'} hint="Most recent payment" tone="neutral" />
       </div>
 
       {settled.length === 0 && !error ? (
         <div className="mt-5">
           <EmptyState
             icon={Banknote}
-            title="No settlement receipts yet"
-            description="Once a buyer's escrow milestone unlocks against your consignment — at dispatch, destination weighbridge or silo acceptance — the NIBSS receipt is archived here."
+            title="No receipts yet"
+            description="When a payment is released to you, the receipt is saved here."
             action={
               <Button asChild>
                 <Link to="/farmer/listings">Manage my lots <ArrowRight size={15} /></Link>
@@ -265,36 +265,36 @@ export default function SettlementReceipt() {
                       <Banknote size={15} />
                     </span>
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/85">Central Bank of Nigeria &amp; NIBSS</p>
-                      <p className="text-[11px] text-white/90">Verified electronic settlement receipt</p>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/85">RALMP payment receipt</p>
+                      <p className="text-[11px] text-white/90">Money released to you</p>
                     </div>
                   </div>
                   <span className="inline-flex items-center gap-1.5 rounded border border-white/25 bg-forest-700 px-2 py-1 font-mono text-[10px] font-bold">
-                    <span className="h-1.5 w-1.5 rounded-full bg-sprout-300" /> NODE #{node}
+                    <span className="h-1.5 w-1.5 rounded-full bg-sprout-300" /> RECEIPT #{node}
                   </span>
                 </div>
 
                 <CardBody className="space-y-4">
                   <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-3">
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Clearing gateway</p>
-                      <p className="mt-1 font-display text-[16px] font-bold text-forest-600">NIBSS Instant Payment</p>
-                      <p className="text-[11.5px] text-muted">e-BillsPay direct settlement · RAMLP custody vault</p>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Paid through</p>
+                      <p className="mt-1 font-display text-[16px] font-bold text-forest-600">Bank transfer</p>
+                      <p className="text-[11.5px] text-muted">Paid from the RALMP escrow account</p>
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted">Date &amp; timestamp</p>
                       <p className="mt-1 text-[12.5px] font-semibold text-ink">{fmtDateTime(active.paid_at || active.updated_at || active.order_date)}</p>
-                      <p className="font-mono text-[10.5px] text-muted">Switch ref: {txRef}</p>
+                      <p className="font-mono text-[10.5px] text-muted">Reference: {txRef}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between gap-2 rounded-lg border border-line bg-canvas p-2.5 text-[12px]">
-                    <span className="text-muted">Tx reference</span>
+                    <span className="text-muted">Payment reference</span>
                     <span className="break-words font-mono font-bold text-ink">{reference}</span>
                   </div>
 
                   <div className="rounded-xl border border-line bg-canvas px-4 py-4 text-center">
-                    <Badge tone="verified" size="sm" className="mb-1.5"><CheckCircle2 size={11} /> Cleared &amp; liquidated · T+0 instant</Badge>
+                    <Badge tone="verified" size="sm" className="mb-1.5"><CheckCircle2 size={11} /> Paid in full</Badge>
                     <p className="font-display text-[27px] font-extrabold tracking-tight text-forest-600 tnum sm:text-[32px]">
                       {money(settledAmount, 2)}
                     </p>
@@ -310,26 +310,26 @@ export default function SettlementReceipt() {
                     </div>
                     <div className="min-w-0 flex-1 space-y-1.5">
                       <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-forest-600">
-                        <ShieldCheck size={13} /> Ledger reference fingerprint
+                        <ShieldCheck size={13} /> Receipt check code
                       </p>
                       <p className="break-all rounded border border-line bg-canvas p-1.5 font-mono text-[10px] leading-tight text-ink-soft">
                         {seal}
                       </p>
                       <p className="text-[11px] leading-4 text-muted">
-                        Scan to verify this milestone directly against the regulated banking node and the RAMLP produce registry.
+                        Keep this code. Our team can use it to check the payment with you.
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-muted">Structured settlement ledger</p>
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-muted">Payment details</p>
                     <Table minWidth={520}>
                       <thead>
                         <tr>
-                          <Th>Milestone</Th>
-                          <Th>Trigger</Th>
+                          <Th>Part</Th>
+                          <Th>Why we paid</Th>
                           <Th className="text-right">Amount</Th>
-                          <Th>State</Th>
+                          <Th>Status</Th>
                         </tr>
                       </thead>
                       <tbody>
@@ -363,13 +363,13 @@ export default function SettlementReceipt() {
                 </CardFooter>
               </Card>
             ) : (
-              <EmptyState icon={QrCode} title="Select a settlement" description="Choose a liquidation from the list to view its NIBSS clearance receipt." />
+              <EmptyState icon={QrCode} title="Choose a payment" description="Choose a payment from the list to see its receipt." />
             )}
           </div>
 
           <aside className="space-y-4">
             <Card>
-              <CardHeader icon={QrCode} title="Recent liquidations" description={`${settled.length} cleared milestones`} />
+              <CardHeader icon={QrCode} title="Recent payments" description={`${settled.length} payments`} />
               <ul className="divide-y divide-line">
                 {settled.map((order) => {
                   const isActive = order.id === activeId
@@ -407,20 +407,19 @@ export default function SettlementReceipt() {
             </Card>
 
             <Card>
-              <CardHeader icon={Banknote} title="Wallet totals" description="Across every cleared milestone" />
+              <CardHeader icon={Banknote} title="Your totals" description="Across every payment" />
               <CardBody>
                 <dl className="divide-y divide-line">
-                  <KeyValue label="Total disbursed" mono>{money(disbursed)}</KeyValue>
-                  <KeyValue label="Still held in escrow" mono>{money(pending)}</KeyValue>
-                  <KeyValue label="Lots completed" mono>{num(earnings?.completed_orders || 0)}</KeyValue>
+                  <KeyValue label="Total paid" mono>{money(disbursed)}</KeyValue>
+                  <KeyValue label="Still on hold" mono>{money(pending)}</KeyValue>
+                  <KeyValue label="Finished orders" mono>{num(earnings?.completed_orders || 0)}</KeyValue>
                   <KeyValue label="Orders on record" mono>{num(earnings?.total_orders || 0)}</KeyValue>
                 </dl>
               </CardBody>
             </Card>
 
-            <Callout tone="sage" icon={ShieldCheck} title="Instant settlement">
-              Milestones settle T+0 over NIBSS Instant Payment the moment the trigger condition is signed — no manual
-              withdrawal step is required.
+            <Callout tone="sage" icon={ShieldCheck} title="Fast payment">
+              We send the money as soon as each payment step is proven. You do not need to ask for a withdrawal.
             </Callout>
           </aside>
         </div>

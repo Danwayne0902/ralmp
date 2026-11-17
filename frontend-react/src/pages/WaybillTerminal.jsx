@@ -16,11 +16,11 @@ import { fmtDate, fmtDateTime, money, num, qtyUnit } from '../lib/format'
 import { cn, parseError } from '../lib/utils'
 
 const DELIVERY_META = {
-  pending: { label: 'Awaiting carrier', tone: 'neutral', pct: 6 },
-  assigned: { label: 'Carrier accepted', tone: 'pending', pct: 22 },
-  picked_up: { label: 'Picked up at origin', tone: 'gold', pct: 48 },
-  in_transit: { label: 'In transit', tone: 'transit', pct: 74 },
-  delivered: { label: 'Gated in & delivered', tone: 'verified', pct: 100 },
+  pending: { label: 'Not started', tone: 'neutral', pct: 6 },
+  assigned: { label: 'Accepted', tone: 'pending', pct: 22 },
+  picked_up: { label: 'Picked up', tone: 'gold', pct: 48 },
+  in_transit: { label: 'On the way', tone: 'transit', pct: 74 },
+  delivered: { label: 'Delivered', tone: 'verified', pct: 100 },
   cancelled: { label: 'Cancelled', tone: 'critical', pct: 0 },
 }
 
@@ -85,7 +85,7 @@ export default function WaybillTerminal() {
     setWorking(true)
     try {
       await logisticsService.setStatus(detail.id, { status: 'delivered' })
-      toast.success('Destination gate-in recorded · escrow milestone released')
+      toast.success('Delivery recorded. The payment step is updated.')
       await load()
       const res = await logisticsService.delivery(detail.id)
       setDetail(res.data?.delivery || null)
@@ -114,17 +114,17 @@ export default function WaybillTerminal() {
     return (
       <div className="page-wrap page-pad">
         <PageHeader
-          eyebrow="Dispatch · carrier terminal"
-          title="Electronic waybill & gate-in"
-          description="The field terminal for the active haulage leg: route telemetry, consignment integrity and destination gate-in capture."
+          eyebrow="Transporter"
+          title="Delivery notes"
+          description="The paperwork for your current trip: pickup, stops and drop-off."
         />
         <EmptyState
           icon={Truck}
-          title="No haulage legs assigned"
-          description="Once a buyer's escrow commitment is funded and a carrier is assigned, the live e-Waybill appears here with its gate-in controls."
+          title="No jobs yet"
+          description="When a buyer has paid and a transporter is chosen, the delivery note appears here."
           action={
             <Button asChild>
-              <Link to="/dispatch">Back to fleet board <ArrowRight size={15} /></Link>
+              <Link to="/dispatch">Back to my jobs <ArrowRight size={15} /></Link>
             </Button>
           }
         />
@@ -135,13 +135,13 @@ export default function WaybillTerminal() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Dispatch · carrier terminal"
-        title="Electronic waybill & gate-in"
-        description="Route telemetry, consignment integrity and the destination gate-in capture for the active haulage leg."
+        eyebrow="Transporter"
+        title="Delivery notes"
+        description="What happened on this trip, from pickup to drop-off."
         actions={
           <>
             <select
-              aria-label="Select haulage leg"
+              aria-label="Select trip"
               value={activeId ?? ''}
               onChange={(e) => setActiveId(Number(e.target.value) || null)}
               className="select"
@@ -174,15 +174,15 @@ export default function WaybillTerminal() {
           value={order ? qtyUnit(order.quantity, 'units') : '—'}
           hint={order ? `Order #${order.id}` : 'Not linked to an order'}
         />
-        <Stat icon={Wallet} label="Waybill value" value={money(order?.total_price)} hint="Escrow-backed" />
+        <Stat icon={Wallet} label="Order value" value={money(order?.total_price)} hint="Already paid into escrow" />
         <Stat
           icon={ShieldCheck}
           label="Released from escrow"
           value={money(released)}
-          hint={order ? `${schedule.filter((t) => t.state === 'settled').length} of ${schedule.length} milestones` : '—'}
+          hint={order ? `${schedule.filter((t) => t.state === 'settled').length} of ${schedule.length} payments` : '—'}
           tone="sprout"
         />
-        <Stat icon={Satellite} label="Checkpoints logged" value={num(checkpoints.length)} hint="Telematics trail" tone="neutral" />
+        <Stat icon={Satellite} label="Stops recorded" value={num(checkpoints.length)} hint="Every update you sent" tone="neutral" />
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -191,7 +191,7 @@ export default function WaybillTerminal() {
             <CardHeader
               icon={RouteIcon}
               title={detail?.tracking_number || `Leg #${detail?.id}`}
-              description="Origin farm gate to destination weighbridge"
+              description="From the farm to the drop-off"
               action={
                 <Badge tone={meta.tone} size="md">
                   <Truck size={11} strokeWidth={2.4} /> {meta.label}
@@ -214,7 +214,7 @@ export default function WaybillTerminal() {
               <div className="flex flex-wrap justify-between gap-2 text-[11.5px] text-muted">
                 <span>Pickup {fmtDate(detail?.pickup_date)}</span>
                 <span>ETA {detail?.estimated_delivery_time ? fmtDateTime(detail.estimated_delivery_time) : '—'}</span>
-                <span>{detail?.actual_delivery_time ? `Delivered ${fmtDate(detail.actual_delivery_time)}` : 'Gate-in pending'}</span>
+                <span>{detail?.actual_delivery_time ? `Delivered ${fmtDate(detail.actual_delivery_time)}` : 'Drop-off pending'}</span>
               </div>
             </CardBody>
           </Card>
@@ -222,8 +222,8 @@ export default function WaybillTerminal() {
           <Card>
             <CardHeader
               icon={Truck}
-              title="Carrier & vehicle asset"
-              description="Fleet operator, rig identity and driver on record"
+              title="Vehicle and driver"
+              description="Your truck and driver for this job"
               action={detail?.driver_name ? <Badge tone="verified" size="sm"><BadgeCheck size={11} /> Driver on file</Badge> : null}
             />
             <CardBody className="space-y-1">
@@ -249,27 +249,26 @@ export default function WaybillTerminal() {
           <Card>
             <CardHeader
               icon={ClipboardCheck}
-              title="Consignment manifest"
-              description="Declared load captured against the order record"
+              title="What you are carrying"
+              description="The load saved on this order"
             />
             <CardBody className="space-y-1">
-              <KeyValue label="Declared net load">{order ? qtyUnit(order.quantity, 'units') : '—'}</KeyValue>
-              <KeyValue label="Commodity">{order?.produce?.commodity_name || `Order #${order?.id ?? '—'}`}</KeyValue>
+              <KeyValue label="Load">{order ? qtyUnit(order.quantity, 'units') : '—'}</KeyValue>
+              <KeyValue label="Produce">{order?.produce?.commodity_name || `Order #${order?.id ?? '—'}`}</KeyValue>
               <KeyValue label="Buyer">{order?.buyer?.name || '—'}</KeyValue>
-              <KeyValue label="Producer">{order?.farmer?.name || '—'}</KeyValue>
+              <KeyValue label="Farmer">{order?.farmer?.name || '—'}</KeyValue>
               <KeyValue label="Delivery fee" mono>{money(order?.delivery_fee)}</KeyValue>
               <KeyValue label="Order placed">{fmtDate(order?.order_date)}</KeyValue>
             </CardBody>
             <CardFooter>
               <Callout tone="gold" icon={Gauge} className="w-full">
-                Origin weighbridge capture is reconciled at the destination gate — variances above 1.0% of the declared
-                net load are escalated to the inspection desk before the balance tranche unlocks.
+                We weigh the load at pickup and again at drop-off. If the two weights differ by more than 1.0%, the next payment waits for a check.
               </Callout>
             </CardFooter>
           </Card>
 
           <Card>
-            <CardHeader icon={Satellite} title="Tracking checkpoints" description="Immutable trail recorded by the carrier" />
+            <CardHeader icon={Satellite} title="Trip updates" description="Every update you sent on this trip" />
             <CardBody>
               {checkpoints.length ? (
                 <ol className="space-y-0">
@@ -293,7 +292,7 @@ export default function WaybillTerminal() {
                   ))}
                 </ol>
               ) : (
-                <p className="py-6 text-center text-[13px] text-muted">No checkpoint has been recorded for this leg yet.</p>
+                <p className="py-6 text-center text-[13px] text-muted">No update has been sent for this trip yet.</p>
               )}
             </CardBody>
           </Card>
@@ -301,7 +300,7 @@ export default function WaybillTerminal() {
 
         <aside className="space-y-4">
           <Card>
-            <CardHeader icon={Wallet} title="Haulage escrow" description={`Contract ${money(order?.total_price)}`} />
+            <CardHeader icon={Wallet} title="Delivery payment" description={`Order ${money(order?.total_price)}`} />
             <CardBody className="space-y-2.5">
               {schedule.map((tranche) => (
                 <div
@@ -329,17 +328,17 @@ export default function WaybillTerminal() {
               ))}
             </CardBody>
             <CardFooter className="justify-between text-[11.5px] text-muted">
-              <span>Guaranteed by RAMLP transit escrow</span>
-              <span className="font-semibold text-forest-600">T+0 payout</span>
+              <span>Paid from the order&apos;s escrow account</span>
+              <span className="font-semibold text-forest-600">After delivery</span>
             </CardFooter>
           </Card>
 
           <Card>
-            <CardHeader icon={Recycle} title="Zero-waste backhaul" description="Match the empty return leg to a nearby load" />
+            <CardHeader icon={Recycle} title="No empty return trip" description="Find a nearby load for the journey back" />
             <CardBody>
               <p className="text-[12.5px] leading-5 text-muted">
-                After offloading, this rig can be matched to a verified return consignment on the fleet board, cutting
-                empty mileage and turning the return leg into revenue.
+                After you drop the goods, we can match your truck to a checked load near you for the trip back. You earn
+                on the way home instead of driving empty.
               </p>
             </CardBody>
             <CardFooter>
@@ -350,7 +349,7 @@ export default function WaybillTerminal() {
           </Card>
 
           <Card>
-            <CardHeader icon={Compass} title="Terminal actions" description="Close the leg or escalate" />
+            <CardHeader icon={Compass} title="What you can do" description="Finish the trip or report a problem" />
             <CardBody className="space-y-2.5">
               <Button
                 className="w-full"
@@ -358,14 +357,14 @@ export default function WaybillTerminal() {
                 disabled={working || !detail || detail.status === 'delivered'}
               >
                 <Navigation size={15} />
-                {detail?.status === 'delivered' ? 'Gate-in recorded' : working ? 'Recording…' : 'Confirm destination gate-in'}
+                {detail?.status === 'delivered' ? 'Drop-off recorded' : working ? 'Recording…' : 'Confirm drop-off'}
               </Button>
               <Button
                 variant="outline"
                 className="w-full border-critical-200 text-critical-600 hover:bg-critical-50"
-                onClick={() => toast.info('Route anomaly flagged for the dispatch desk')}
+                onClick={() => toast.info('The transport team has been told about the problem')}
               >
-                <CircleAlert size={15} /> Report route anomaly
+                <CircleAlert size={15} /> Report a problem
               </Button>
             </CardBody>
           </Card>

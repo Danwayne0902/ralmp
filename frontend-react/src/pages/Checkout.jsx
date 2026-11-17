@@ -90,7 +90,7 @@ export default function Checkout() {
       await cart.clear().catch(() => cart.clearLocal())
       toast.success(
         created.length > 1
-          ? `${created.length} orders created — one per grower`
+          ? `${created.length} orders created — one for each farmer`
           : 'Order created. Fund escrow to dispatch.',
       )
       if (created.length > 1) navigate('/orders')
@@ -105,11 +105,11 @@ export default function Checkout() {
   if (cart.items.length === 0 && !cart.loading) {
     return (
       <div className="page-wrap page-pad">
-        <PageHeader eyebrow="Escrow checkout" title="Procurement basket" />
+        <PageHeader eyebrow="Checkout" title="Your basket" />
         <EmptyState
           icon={ShoppingCart}
           title="Your basket is empty"
-          description="Stage one or more verified lots from the spot exchange, then return here to authorise the escrow commitment."
+          description="Add produce from the marketplace, then come back here to place your order."
           action={
             <Button asChild>
               <Link to="/commodities">
@@ -125,9 +125,9 @@ export default function Checkout() {
   return (
     <div className="page-wrap page-pad">
       <PageHeader
-        eyebrow="Escrow checkout"
-        title="Review the commitment"
-        description="Funds are not captured yet. Confirm the basket, delivery window and milestone split before creating the order."
+        eyebrow="Checkout"
+        title="Check your order"
+        description="No money is taken yet. Check the items, delivery date and payment steps before you place the order."
         actions={
           <Button asChild variant="ghost" size="md">
             <Link to="/commodities">
@@ -172,7 +172,7 @@ export default function Checkout() {
                           {item.commodity_name}
                         </Link>
                         <p className="mt-0.5 text-[11px] text-muted">
-                          {item.farmer_name || 'Registered grower'} · {money(item.unit_price)} / {item.unit}
+                          {item.farmer_name || 'Farmer'} · {money(item.unit_price)} / {item.unit}
                         </p>
                       </div>
                       <button
@@ -230,7 +230,7 @@ export default function Checkout() {
               <Truck size={16} className="text-forest-500" /> Delivery & settlement instructions
             </h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field label="Requested delivery date" htmlFor="delivery-date" hint="Carrier confirms against capacity" required>
+              <Field label="Delivery date" htmlFor="delivery-date" hint="We confirm with the transporter" required>
                 <div className="relative">
                   <CalendarDays size={15} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
                   <Input
@@ -261,7 +261,7 @@ export default function Checkout() {
               </div>
 
               <Field
-                label="Instructions for the grower or carrier"
+                label="Notes for the farmer or transporter"
                 htmlFor="order-notes"
                 hint="Optional"
                 className="sm:col-span-2"
@@ -272,7 +272,7 @@ export default function Checkout() {
                   maxLength={1000}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Bagging preference, gate access, weighbridge contact, acceptable harvest window…"
+                  placeholder="How you want the goods packed, gate directions, best pickup time…"
                 />
               </Field>
             </div>
@@ -281,7 +281,7 @@ export default function Checkout() {
               <ShieldCheck size={16} className="mt-0.5 shrink-0 text-forest-600" />
               <p className="text-[11.5px] leading-5 text-forest-700/85">
                 Creating the order reserves the lot and holds your commitment. Stock is deducted at order creation;
-                escrow is funded on the next screen. Cancellation before dispatch restores the grower&apos;s stock.
+                escrow is funded on the next screen. If you cancel before pickup, the farmer gets the stock back.
               </p>
             </div>
           </div>
@@ -297,14 +297,14 @@ export default function Checkout() {
 
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <h2 className="flex items-center gap-2 font-display text-[14px] font-bold text-ink">
-              <Landmark size={15} className="text-forest-500" /> Custody & release
+              <Landmark size={15} className="text-forest-500" /> How your money is handled
             </h2>
             <ul className="mt-3 space-y-2.5 text-[11.5px] text-muted">
               {[
-                'Funds held in a CBN-regulated custodial vault',
-                'Grower notified only after escrow is funded',
-                'Release against weight, lab and silo evidence',
-                'Disputed balances frozen pending arbitration',
+                'Money held in a safe escrow account',
+                'Farmer told only after you pay',
+                'Paid out as weight and quality are checked',
+                'Disagreements put the money on hold for review',
               ].map((line) => (
                 <li key={line} className="flex items-start gap-2">
                   <span className="mt-0.5 grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full bg-forest-50">
@@ -332,10 +332,10 @@ export default function Checkout() {
 
           <div className="flex items-center justify-center gap-3 rounded-xl border border-line bg-white px-4 py-3">
             <CreditCard size={15} className="text-forest-500" />
-            <span className="text-[10.5px] text-muted">Paystack · NIBSS</span>
+            <span className="text-[10.5px] text-muted">Paystack</span>
             <span className="h-3 w-px bg-line" />
             <Warehouse size={15} className="text-forest-500" />
-            <span className="text-[10.5px] text-muted">Silo settlement</span>
+            <span className="text-[10.5px] text-muted">Final payment</span>
           </div>
         </aside>
       </form>
