@@ -301,7 +301,7 @@ export default function Checkout() {
             </h2>
             <ul className="mt-3 space-y-2.5 text-[11.5px] text-muted">
               {[
-                'Money held in a safe escrow account',
+                'Money held in escrow until each step is checked',
                 'Farmer told only after you pay',
                 'Paid out as weight and quality are checked',
                 'Disagreements put the money on hold for review',

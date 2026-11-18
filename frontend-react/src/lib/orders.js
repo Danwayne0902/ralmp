@@ -53,11 +53,43 @@ export const TRANCHE_SPLIT = [
   },
 ]
 
-// Escrow state follows evidence, not optimism: a tranche is only "settled" once the
-// order has reached the milestone that releases it. Funding alone never releases money.
+const RELEASE_BY_TRANCHE = { t1: 'pickup', t2: 'quality', t3: 'final' }
+
+function releaseState(release) {
+  if (!release) return { state: 'held', stateLabel: 'Not set up yet' }
+  if (release.status === 'released') {
+    return {
+      state: 'settled',
+      stateLabel: release.payout?.status === 'paid' ? 'Sent to you' : 'Ready to send',
+    }
+  }
+  if (release.status === 'held' || release.status === 'cancelled') {
+    return { state: 'frozen', stateLabel: release.status === 'cancelled' ? 'Not paid' : 'On hold' }
+  }
+  return { state: 'in_progress', stateLabel: release.trigger || 'Waiting for proof' }
+}
+
+// Escrow state follows evidence, not optimism. When the API has a real escrow
+// schedule we use it; otherwise the order status is only a display fallback.
 export function escrowSchedule(order) {
   if (!order) return []
   const total = Number(order.total_price ?? order.total_amount ?? 0)
+  const base = Number(order.subtotal ?? 0) > 0 ? Number(order.subtotal) : total
+  const releases = Array.isArray(order.escrow?.releases) ? order.escrow.releases : []
+
+  if (releases.length > 0) {
+    return TRANCHE_SPLIT.map((tranche) => {
+      const release = releases.find((row) => row.milestone === RELEASE_BY_TRANCHE[tranche.key])
+      const state = releaseState(release)
+      return {
+        ...tranche,
+        amount: release ? Number(release.amount) : Math.round(base * tranche.share),
+        ...state,
+        release,
+      }
+    })
+  }
+
   const status = order.status
   const paid = order.payment_status === 'paid'
   const dispatched = ['shipped', 'delivered', 'completed'].includes(status)
@@ -94,7 +126,7 @@ export function escrowSchedule(order) {
 
     return {
       ...tranche,
-      amount: Math.round(total * tranche.share),
+      amount: Math.round(base * tranche.share),
       state,
       stateLabel,
     }
@@ -105,6 +137,41 @@ export function escrowReleased(order) {
   return escrowSchedule(order)
     .filter((t) => t.state === 'settled')
     .reduce((sum, t) => sum + t.amount, 0)
+}
+
+export function escrowHeld(order) {
+  return escrowSchedule(order)
+    .filter((t) => t.state === 'held' || t.state === 'in_progress')
+    .reduce((sum, t) => sum + t.amount, 0)
+}
+
+export function escrowBase(order) {
+  if (!order) return 0
+  const subtotal = Number(order.subtotal ?? 0)
+  return subtotal > 0 ? subtotal : Number(order.total_price ?? 0)
+}
+
+// Whole-order money movement, including the delivery payment. The 10/60/30
+// schedule above covers the farmer only; these helpers are for the payments
+// desk, where every part of the order matters.
+export function escrowReleasedAll(order) {
+  const releases = order?.escrow?.releases
+  if (Array.isArray(releases) && releases.length > 0) {
+    return releases
+      .filter((release) => release.status === 'released')
+      .reduce((sum, release) => sum + Number(release.amount || 0), 0)
+  }
+  return escrowReleased(order)
+}
+
+export function escrowHeldAll(order) {
+  const releases = order?.escrow?.releases
+  if (Array.isArray(releases) && releases.length > 0) {
+    return releases
+      .filter((release) => ['pending', 'held'].includes(release.status))
+      .reduce((sum, release) => sum + Number(release.amount || 0), 0)
+  }
+  return escrowHeld(order)
 }
 
 export const TRANCHE_STATE_META = {

@@ -143,8 +143,8 @@ export default function Payment() {
         title={paid ? 'Payment received' : 'Pay for this order'}
         description={
           paid
-            ? 'Your money is held safely and paid out step by step as the order moves.'
-            : 'The order is reserved. The money goes into a safe escrow account. It does not go to the farmer or the transporter yet.'
+            ? 'Your payment is recorded and paid out step by step as the order moves.'
+            : 'The order is reserved. Your payment goes into escrow and is not sent to the farmer or the transporter yet.'
         }
         actions={
           <Button asChild variant="ghost" size="md">
@@ -213,9 +213,9 @@ export default function Payment() {
 
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              { icon: Landmark, title: 'Safe account', body: 'The money is held in a separate trust account. We cannot spend it on the business.' },
-              { icon: ShieldCheck, title: 'Two approvals', body: 'No one person can move the money. Each payment needs its proof.' },
-              { icon: Wallet, title: 'Refund', body: 'If the goods are not delivered or are rejected, the farmer keeps the stock and you get your money back.' },
+              { icon: Landmark, title: 'Escrow record', body: 'The money is recorded against the order and released only when its proof is in.' },
+              { icon: ShieldCheck, title: 'Proof first', body: 'Each payment needs its own proof: pickup, checks, or delivery.' },
+              { icon: Wallet, title: 'Refund', body: 'If an order is cancelled or rejected, any money not yet released is put on hold for review.' },
             ].map((item) => (
               <div key={item.title} className="rounded-card border border-line bg-white p-4">
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest-50 text-forest-600">

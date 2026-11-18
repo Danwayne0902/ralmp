@@ -8,7 +8,7 @@ import { Stat, Table, Th, Td, Tr, Skeleton, EmptyState } from '../components/ui/
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
 import { produceService, orderService } from '../lib/services'
-import { escrowReleased } from '../lib/orders'
+import { escrowHeld, escrowReleased } from '../lib/orders'
 import { fmtDate, money, qtyUnit, unitOne } from '../lib/format'
 import { useAuth } from '../store/auth'
 import { parseError } from '../lib/utils'
@@ -47,9 +47,7 @@ export default function FarmerDashboard() {
 
   const availableLots = listings.filter((lot) => lot.availability_status === 'available')
   const stockValue = availableLots.reduce((sum, lot) => sum + Number(lot.price || 0) * Number(lot.quantity || 0), 0)
-  const inEscrow = orders
-    .filter((order) => order.payment_status === 'paid' && !['cancelled', 'rejected'].includes(order.status))
-    .reduce((sum, order) => sum + Math.max(0, Number(order.total_price || 0) - escrowReleased(order)), 0)
+  const inEscrow = orders.reduce((sum, order) => sum + escrowHeld(order), 0)
   const released = orders.reduce((sum, order) => sum + escrowReleased(order), 0)
   const pendingOrders = orders.filter((order) => order.status === 'pending')
 
@@ -116,8 +114,8 @@ export default function FarmerDashboard() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Banknote} label="Money received" value={money(earnings?.total_earnings ?? 0)} tone="sprout" hint="Paid after the buyer receives the goods" size="lg" />
-            <Stat icon={Lock2} label="Money on hold" value={money(inEscrow)} tone="gold" hint="Waiting for delivery proof" size="lg" />
+            <Stat icon={Banknote} label="Money received" value={money(earnings?.total_earnings ?? 0)} tone="sprout" hint="Sent to your bank account" size="lg" />
+            <Stat icon={Lock2} label="Money on hold" value={money(inEscrow)} tone="gold" hint="Waiting for pickup, checks or delivery" size="lg" />
             <Stat icon={Sprout} label="For sale" value={availableLots.length} hint={`${listings.length} listings in total`} />
             <Stat icon={Truck} label="Orders" value={earnings?.total_orders ?? orders.length} tone="neutral" hint={`${earnings?.completed_orders ?? 0} finished`} />
           </>
@@ -266,11 +264,11 @@ export default function FarmerDashboard() {
             </p>
             <div className="mt-4 space-y-2 border-t border-line pt-3">
               <div className="flex justify-between text-[11.5px]">
-                <span className="text-muted">Released to date</span>
+                <span className="text-muted">Released from escrow</span>
                 <span className="font-semibold text-forest-600 tnum">{money(released)}</span>
               </div>
               <div className="flex justify-between text-[11.5px]">
-                <span className="text-muted">Pending earnings</span>
+                <span className="text-muted">Released, not sent yet</span>
                 <span className="font-semibold text-harvest-600 tnum">{money(earnings?.pending_earnings ?? 0)}</span>
               </div>
             </div>

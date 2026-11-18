@@ -26,7 +26,7 @@ const PROCESS = [
     step: '02',
     icon: Lock,
     title: 'Buyer pays first',
-    body: 'The buyer pays the full amount into a safe escrow account before the goods move. No credit. No waiting on promises.',
+    body: 'The buyer pays the full amount into escrow before the goods move. No credit. No waiting on promises.',
     note: '100% paid upfront',
   },
   {
@@ -91,7 +91,7 @@ const STAKEHOLDERS = [
 ]
 
 const ASSURANCE = [
-  { icon: Landmark, title: 'Money kept safe', body: 'Buyer money sits in a separate trust account. We do not use it for anything else.' },
+  { icon: Landmark, title: 'Money kept safe', body: 'Buyer money is held in escrow until each step is proven. Both sides can see the record.' },
   { icon: Scale, title: 'Honest weights', body: 'Goods are weighed at pickup and at delivery. A big difference puts the payment on hold.' },
   { icon: FlaskConical, title: 'Quality checks', body: 'Moisture and grade are checked. Bad stock stops payment and goes to a review.' },
   { icon: ShieldCheck, title: 'Fair dispute process', body: 'If both sides disagree, a neutral person looks at the evidence and decides.' },
@@ -415,16 +415,16 @@ export default function Home() {
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-harvest-300">Safe payments</p>
             <h2 className="mt-3 max-w-lg font-display text-[30px] font-extrabold leading-9 tracking-[-0.02em] text-white sm:text-[38px] sm:leading-[46px]">
-              The money is held by a trusted third party.
+              The money is held until each step is proven.
             </h2>
             <p className="mt-4 max-w-xl text-[14px] leading-6 text-forest-100/75">
-              The buyer pays into a separate trust account. The money leaves that account only
-              when the agreed proof is uploaded. If the two sides disagree, a neutral review decides.
+              The buyer pays into escrow. The money is released only when the agreed proof is
+              uploaded. If the two sides disagree, a neutral review decides.
             </p>
 
             <div className="mt-7 space-y-4">
               {[
-                { icon: Landmark, title: 'Separate account', body: 'Customer money is kept apart from the money we use to run the platform.' },
+                { icon: Landmark, title: 'Clear record', body: 'Every order keeps its own payment record, so both sides can see what is held and what has been paid.' },
                 { icon: Weight, title: 'Two weight records', body: 'Weight at pickup is compared with weight at delivery. A big gap puts the money on hold.' },
                 { icon: ClipboardCheck, title: 'Clear order history', body: 'Every status change, payment and delivery note is saved on the order.' },
               ].map((item) => (

@@ -46,14 +46,14 @@ const FREEZE = [
 
 const CUSTODY = [
   {
-    title: 'Separate trust account',
+    title: 'Held in escrow',
     icon: Landmark,
-    body: 'Buyer money sits in its own trust account, separate from the money we use to run the platform. We cannot spend it on the business.',
+    body: 'Buyer money is held in escrow against the order. It is released only when the matching proof is in.',
   },
   {
-    title: 'Two people must approve',
+    title: 'Proof before payment',
     icon: ShieldCheck,
-    body: 'Money moves only after a proof is uploaded and our team approves. No single staff member can move it alone.',
+    body: 'Money moves only after its proof arrives: pickup by the transporter, checks by our team, or delivery by the buyer.',
   },
   {
     title: 'Written record',
@@ -63,7 +63,7 @@ const CUSTODY = [
   {
     title: 'Money back if cancelled',
     icon: Banknote,
-    body: 'If an order is cancelled or rejected, the goods stay with the farmer and the buyer gets the money back in full.',
+    body: 'If an order is cancelled or rejected, the goods stay with the farmer and any money not yet released is put on hold for review.',
   },
 ]
 
@@ -74,7 +74,7 @@ const FAQ = [
   },
   {
     q: 'Who can release the escrow?',
-    a: 'No one person can do it. The transporter sends the weight note, the lab sends the test result, and the buyer signs for the goods. Each one releases a fixed part of the money.',
+    a: 'Each part has its own proof. The transporter marks pickup for the first 10%. Our payments team checks the weight and quality for 60%. The buyer confirms delivery for the last 30%. The delivery fee is paid when the goods arrive.',
   },
   {
     q: 'What happens if the goods are not as agreed?',
@@ -142,8 +142,8 @@ export default function EscrowTrust() {
                 Your money moves only when the job is done.
               </h1>
               <p className="mt-4 max-w-xl text-[14px] leading-7 text-forest-100/75">
-                We keep the buyer's money in a separate trust account. It is paid out in three parts as each
-                proof is uploaded. Never on a phone call. Never on a handshake.
+                We hold the buyer's money in escrow. It is paid out in three parts as each proof is
+                uploaded. Never on a phone call. Never on a handshake.
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">

@@ -133,6 +133,13 @@ class PaymentTest extends TestCase
         $this->assertSame('success', $payment->fresh()->status);
         $this->assertSame('paid', $order->fresh()->payment_status);
 
+        // Paid money is split into a real escrow schedule exactly once.
+        $this->assertDatabaseHas('escrow_accounts', [
+            'order_id' => $order->id,
+            'status' => 'funded',
+        ]);
+        $this->assertSame(4, \App\Models\EscrowRelease::where('order_id', $order->id)->count());
+
         // A second call must not fail or double-charge.
         $this->postJson('/api/v1/payment/verify', ['reference' => 'RAMLP_TEST_REF'])
             ->assertOk();

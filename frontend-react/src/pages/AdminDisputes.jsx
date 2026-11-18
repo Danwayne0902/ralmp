@@ -370,11 +370,11 @@ export default function AdminDisputes() {
               <Lock size={12} className="text-harvest-300" /> Who can pause a payment
             </p>
             <p className="mt-2 text-[12px] leading-5 text-forest-100/80">
-              No one admin can move the money. Pausing or paying out needs two people to approve.
+              An admin can pause a payment or release the next part. Every action is saved on the order record.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <Badge tone="dark" size="sm"><Scale size={10} /> Two approvals</Badge>
-              <Badge tone="dark" size="sm"><Landmark size={10} /> Trust account</Badge>
+              <Badge tone="dark" size="sm"><Scale size={10} /> Admin approval</Badge>
+              <Badge tone="dark" size="sm"><Landmark size={10} /> Escrow record</Badge>
             </div>
           </div>
 

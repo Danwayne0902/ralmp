@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ProduceListing;
 use App\Models\Order;
+use App\Models\Payout;
+use App\Models\EscrowRelease;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -256,15 +258,20 @@ class ProduceListingController extends Controller
 
         $userId = $request->user()->id;
 
-        // Total earnings from completed/delivered orders
-        $totalEarnings = Order::where('farmer_id', $userId)
-            ->whereIn('status', ['completed', 'delivered'])
-            ->sum('total_price');
+        // Money that has actually been sent to the farmer.
+        $totalEarnings = Payout::where('user_id', $userId)
+            ->where('status', 'paid')
+            ->sum('amount');
 
-        // Pending earnings
-        $pendingEarnings = Order::where('farmer_id', $userId)
+        // Money released from escrow but not sent yet.
+        $pendingEarnings = Payout::where('user_id', $userId)
             ->where('status', 'pending')
-            ->sum('total_price');
+            ->sum('amount');
+
+        // Money still waiting on a proof or review.
+        $heldEarnings = EscrowRelease::where('payee_id', $userId)
+            ->whereIn('status', ['pending', 'held'])
+            ->sum('amount');
 
         // Orders count
         $totalOrders = Order::where('farmer_id', $userId)->count();
@@ -272,10 +279,9 @@ class ProduceListingController extends Controller
             ->whereIn('status', ['completed', 'delivered'])
             ->count();
 
-        // Recent earnings breakdown
-        $recentEarnings = Order::where('farmer_id', $userId)
-            ->whereIn('status', ['completed', 'delivered'])
-            ->with('produce', 'buyer')
+        // Recent payouts
+        $recentEarnings = Payout::where('user_id', $userId)
+            ->with('order.produce', 'order.buyer', 'release')
             ->orderByDesc('created_at')
             ->limit(10)
             ->get();
@@ -283,6 +289,7 @@ class ProduceListingController extends Controller
         return response()->json([
             'total_earnings' => $totalEarnings,
             'pending_earnings' => $pendingEarnings,
+            'held_earnings' => $heldEarnings,
             'total_orders' => $totalOrders,
             'completed_orders' => $completedOrders,
             'recent_earnings' => $recentEarnings,

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\OrderStatusNotification;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\EscrowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -117,9 +118,11 @@ class PaymentController extends Controller
 
         // Idempotent: a verified payment is never charged twice.
         if ($payment->status === 'success' && $order->payment_status === 'paid') {
+            app(EscrowService::class)->fund($order->fresh());
+
             return response()->json([
                 'message' => 'Payment already verified',
-                'order' => $order->fresh()->load('buyer', 'farmer'),
+                'order' => $order->fresh()->load('buyer', 'farmer', 'escrow.releases'),
                 'payment' => $payment,
             ], 200);
         }
@@ -159,7 +162,7 @@ class PaymentController extends Controller
 
         return response()->json([
             'message' => 'Payment verified successfully',
-            'order' => $order->load('buyer', 'farmer'),
+            'order' => $order->load('buyer', 'farmer', 'escrow.releases'),
             'payment' => $payment->fresh(),
         ], 200);
     }
@@ -247,9 +250,12 @@ class PaymentController extends Controller
                 'status' => 'confirmed',
                 'paid_at' => now(),
             ]);
+
+            // Split the money into its payment parts as soon as it is safe.
+            app(EscrowService::class)->fund($order->fresh());
         });
 
-        $fresh = $order->fresh()->load('buyer', 'farmer');
+        $fresh = $order->fresh()->load('buyer', 'farmer', 'escrow.releases');
 
         try {
             if ($fresh->buyer) {

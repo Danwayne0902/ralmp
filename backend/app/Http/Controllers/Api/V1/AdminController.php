@@ -191,8 +191,9 @@ class AdminController extends Controller
             ->toArray();
 
         // Revenue
-        $totalRevenue = Order::where('status', 'completed')->sum('total_price') + 
-                       Order::where('status', 'delivered')->sum('total_price');
+        $totalRevenue = Order::where('payment_status', 'paid')
+            ->whereIn('status', ['completed', 'delivered'])
+            ->sum('total_price');
 
         // Listings
         $totalListings = ProduceListing::where('availability_status', 'available')->count();
@@ -209,8 +210,8 @@ class AdminController extends Controller
                     'category' => $commodity->category,
                     'unit' => $commodity->unit,
                     'total_orders' => $commodity->orders_count,
-                    'total_revenue' => $commodity->orders()->where('status', 'completed')->sum('total_price') +
-                                     $commodity->orders()->where('status', 'delivered')->sum('total_price'),
+                    'total_revenue' => $commodity->orders()->where('payment_status', 'paid')
+                                     ->whereIn('status', ['completed', 'delivered'])->sum('total_price'),
                     'total_quantity' => $commodity->orders()->sum('quantity')
                 ];
             });
@@ -309,6 +310,7 @@ class AdminController extends Controller
         // Revenue over time
         $revenueOverTime = Order::selectRaw('DATE(created_at) as date, sum(total_price) as total')
             ->where('created_at', '>=', $startDate)
+            ->where('payment_status', 'paid')
             ->whereIn('status', ['completed', 'delivered'])
             ->groupBy('date')
             ->orderBy('date')

@@ -116,6 +116,20 @@ export default function OrderDetail() {
     }
   }
 
+  async function confirmDelivery() {
+    setUpdating(true)
+    try {
+      await orderService.confirmDelivery(id)
+      await load()
+      toast.success('Delivery confirmed. The final payment is released.')
+      setConfirm(null)
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   async function cancelOrder() {
     setUpdating(true)
     try {
@@ -421,7 +435,7 @@ export default function OrderDetail() {
                 </p>
               )}
               {isBuyer && paid && order.status === 'delivered' && (
-                <Button variant="secondary" className="w-full" onClick={() => setConfirm({ type: 'status', status: 'completed', label: 'Accept delivery & close order' })}>
+                <Button variant="secondary" className="w-full" onClick={() => setConfirm({ type: 'delivery', label: 'Accept delivery & close order' })}>
                   <CheckCircle2 size={14} /> Accept delivery
                 </Button>
               )}
@@ -464,16 +478,18 @@ export default function OrderDetail() {
         description={
           confirm?.type === 'cancel'
             ? 'This returns the stock to the farmer and closes the order. If you have not paid, no refund is needed.'
-            : confirm?.status === 'rejected'
-              ? 'Rejecting returns the stock to the farmer and closes the order.'
-              : 'The change is saved on the order and the other person is told by email.'
+            : confirm?.type === 'delivery'
+              ? 'This closes the order and releases the final payment to the farmer and the delivery payment to the transporter.'
+              : confirm?.status === 'rejected'
+                ? 'Rejecting returns the stock to the farmer and closes the order.'
+                : 'The change is saved on the order and the other person is told by email.'
         }
         footer={
           <>
             <Button variant="ghost" onClick={() => setConfirm(null)} disabled={updating}>Keep as is</Button>
             <Button
               variant={confirm?.type === 'cancel' || confirm?.status === 'rejected' ? 'danger' : 'primary'}
-              onClick={() => (confirm.type === 'cancel' ? cancelOrder() : setStatus(confirm.status))}
+              onClick={() => (confirm.type === 'cancel' ? cancelOrder() : confirm.type === 'delivery' ? confirmDelivery() : setStatus(confirm.status))}
               disabled={updating}
             >
               {updating ? 'Updating…' : confirm?.label}
@@ -484,7 +500,7 @@ export default function OrderDetail() {
         <dl className="space-y-1 rounded-xl border border-line bg-canvas px-4 py-3">
           <KeyValue label="Order" mono>#{order.id}</KeyValue>
           <KeyValue label="Current status">{order.status}</KeyValue>
-          <KeyValue label="Requested change">{confirm?.status || 'cancelled'}</KeyValue>
+          <KeyValue label="Requested change">{confirm?.type === 'delivery' ? 'Delivery confirmed' : (confirm?.status || 'cancelled')}</KeyValue>
           <KeyValue label="Escrow value" mono>{money(order.total_price)}</KeyValue>
         </dl>
       </Modal>

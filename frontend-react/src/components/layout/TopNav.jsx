@@ -262,7 +262,7 @@ export default function TopNav() {
               ))}
               <span className="ml-auto hidden items-center gap-1.5 text-[10.5px] text-muted lg:flex">
                 <ShieldCheck size={12} className="text-forest-500" />
-                Your money is held safely until delivery
+                Money is released step by step
               </span>
             </div>
           </div>

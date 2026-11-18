@@ -6,6 +6,7 @@ use App\Events\DeliveryStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Delivery;
 use App\Models\DeliveryTracking;
+use App\Services\EscrowService;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -96,7 +97,21 @@ class LogisticsController extends Controller
             'status' => 'required|in:pending,assigned,picked_up,in_transit,delivered,cancelled',
         ]);
 
+        $previous = $delivery->status;
         $delivery->update($validated);
+
+        $order = $delivery->order;
+        $escrow = app(EscrowService::class);
+
+        if ($order && $validated['status'] === 'picked_up' && $previous !== 'picked_up') {
+            $escrow->syncDeliveryPayee($order);
+            $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Transporter marked the goods as picked up');
+        }
+
+        if ($order && $validated['status'] === 'delivered' && $order->status !== 'completed') {
+            $order->update(['status' => 'delivered']);
+        }
+
         event(new DeliveryStatusUpdated($delivery->fresh()));
 
         return response()->json([
@@ -255,6 +270,18 @@ class LogisticsController extends Controller
         $delivery->update([
             'status' => $validated['status']
         ]);
+
+        $order = $delivery->order;
+        $escrow = app(EscrowService::class);
+
+        if ($order && $validated['status'] === 'picked_up') {
+            $escrow->syncDeliveryPayee($order);
+            $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Transporter marked the goods as picked up');
+        }
+
+        if ($order && $validated['status'] === 'delivered' && $order->status !== 'completed') {
+            $order->update(['status' => 'delivered']);
+        }
 
         event(new DeliveryStatusUpdated($delivery->fresh()));
 

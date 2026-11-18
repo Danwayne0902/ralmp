@@ -86,6 +86,20 @@ export const orderService = {
   create: (data) => api.post('/orders', data),
   setStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
   cancel: (id) => api.post(`/orders/${id}/cancel`),
+  confirmDelivery: (id) => api.post(`/orders/${id}/confirm-delivery`),
+}
+
+export const escrowService = {
+  list: (params) => api.get('/escrow', { params }),
+  forOrder: (orderId) => api.get(`/escrow/orders/${orderId}`),
+  pending: () => api.get('/admin/escrow/pending'),
+  release: (id, note) => api.post(`/admin/escrow/releases/${id}/release`, { note }),
+  hold: (id, note) => api.post(`/admin/escrow/releases/${id}/hold`, { note }),
+}
+
+export const payoutService = {
+  list: (params) => api.get('/payouts', { params }),
+  markPaid: (id, note) => api.post(`/admin/payouts/${id}/paid`, { note }),
 }
 
 export const adminService = {

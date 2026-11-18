@@ -261,12 +261,12 @@ export default function AdminDashboard() {
               <Landmark size={12} /> Where the money sits
             </p>
             <p className="mt-2 text-[11px] leading-5 text-ink-soft/80">
-              Escrow money is kept apart from the money we use to run RALMP. Only a two-person approval can pause or release it.
+              Every order keeps a payment record. An admin can pause a payment or release the next part after its proof.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <Badge tone="verified" size="sm"><ShieldCheck size={10} /> Separate account</Badge>
+              <Badge tone="verified" size="sm"><ShieldCheck size={10} /> Escrow record</Badge>
               <Badge tone="neutral" size="sm">Bank transfer</Badge>
-              <Badge tone="gold" size="sm">Two approvals</Badge>
+              <Badge tone="gold" size="sm">Admin approval</Badge>
             </div>
           </div>
 

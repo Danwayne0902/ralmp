@@ -8,6 +8,7 @@ use App\Mail\OrderStatusNotification;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProduceListing;
+use App\Services\EscrowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -40,7 +41,7 @@ class OrderController extends Controller
             $query->whereBetween('order_date', [$request->from_date, $request->to_date]);
         }
 
-        $orders = $query->with('buyer', 'farmer', 'produce', 'items', 'delivery')
+        $orders = $query->with('buyer', 'farmer', 'produce', 'items', 'delivery', 'escrow.releases.payout')
             ->orderByDesc('created_at')
             ->paginate($request->get('per_page', 15));
 
@@ -59,6 +60,8 @@ class OrderController extends Controller
             'items.produce',
             'delivery.trackingHistory',
             'payments',
+            'escrow.releases.payout',
+            'payouts',
         ])->find($id);
 
         if (!$order) {
@@ -231,17 +234,31 @@ class OrderController extends Controller
             'status' => ['required', 'in:pending,accepted,confirmed,rejected,processing,shipped,delivered,completed,cancelled'],
         ]);
 
+        $escrow = app(EscrowService::class);
+
         if (in_array($validated['status'], ['cancelled', 'rejected'], true)
             && !in_array($order->status, ['cancelled', 'rejected'], true)) {
             DB::transaction(function () use ($order, $validated) {
                 $this->restoreStock($order);
                 $order->update($validated);
             });
+
+            $escrow->holdRemaining($order, 'The order was closed before the remaining money was released.');
         } else {
             $order->update($validated);
         }
 
-        $order = $order->fresh()->load('buyer', 'farmer');
+        if (in_array($validated['status'], ['shipped'], true)) {
+            $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Order marked as shipped');
+        }
+
+        if ($validated['status'] === 'completed') {
+            $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Order marked as shipped');
+            $escrow->releaseMilestone($order, 'final', $request->user(), 'Order closed after delivery');
+            $escrow->releaseMilestone($order, 'delivery', $request->user(), 'Delivery completed');
+        }
+
+        $order = $order->fresh()->load('buyer', 'farmer', 'escrow.releases');
 
         Mail::to($order->buyer->email)->send(new OrderStatusNotification($order, 'buyer'));
         Mail::to($order->farmer->email)->send(new OrderStatusNotification($order, 'farmer'));
@@ -249,6 +266,57 @@ class OrderController extends Controller
 
         return response()->json([
             'message' => 'Order status updated successfully',
+            'order' => $order,
+        ], 200);
+    }
+
+    /**
+     * The buyer confirms the goods arrived. This closes the order and
+     * releases the final part of the money plus the delivery payment.
+     */
+    public function confirmDelivery(Request $request, $id)
+    {
+        $order = Order::with('delivery')->find($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        if ($order->buyer_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($order->status === 'completed') {
+            return response()->json([
+                'message' => 'Delivery already confirmed',
+                'order' => $order->load('buyer', 'farmer', 'escrow.releases'),
+            ], 200);
+        }
+
+        if (!in_array($order->status, ['shipped', 'delivered'], true)) {
+            return response()->json([
+                'message' => 'You can confirm delivery once the goods are on the way or delivered.',
+            ], 422);
+        }
+
+        if ($order->payment_status !== 'paid') {
+            return response()->json([
+                'message' => 'This order has not been paid yet.',
+            ], 422);
+        }
+
+        $order->update(['status' => 'completed']);
+
+        $escrow = app(EscrowService::class);
+        $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Buyer confirmed the goods');
+        $escrow->releaseMilestone($order, 'final', $request->user(), 'Buyer confirmed the goods arrived');
+        $escrow->releaseMilestone($order, 'delivery', $request->user(), 'Delivery completed');
+
+        $order = $order->fresh()->load('buyer', 'farmer', 'escrow.releases');
+        event(new OrderStatusUpdated($order));
+
+        return response()->json([
+            'message' => 'Delivery confirmed. The final payment is released.',
             'order' => $order,
         ], 200);
     }
@@ -269,7 +337,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        if (!in_array($order->status, ['pending', 'accepted', 'processing'], true)) {
+        if (!in_array($order->status, ['pending', 'accepted', 'confirmed', 'processing'], true)) {
             return response()->json(['message' => 'Cannot cancel this order'], 400);
         }
 
@@ -277,6 +345,8 @@ class OrderController extends Controller
             $this->restoreStock($order);
             $order->update(['status' => 'cancelled']);
         });
+
+        app(EscrowService::class)->holdRemaining($order, 'The order was cancelled before the remaining money was released.');
 
         $order = $order->fresh()->load('buyer', 'farmer');
 

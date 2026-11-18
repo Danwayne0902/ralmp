@@ -22,7 +22,7 @@ export function EscrowLedger({ order, className, showTitle = true }) {
       )}
       <dl className="divide-y divide-line px-4 text-[12.5px]">
         <div className="flex items-center justify-between gap-3 py-2.5">
-          <dt className="text-muted">Base produce value</dt>
+          <dt className="text-muted">Produce value</dt>
           <dd className="font-semibold text-ink tnum">{money(subtotal)}</dd>
         </div>
         <div className="flex items-center justify-between gap-3 py-2.5">
@@ -35,24 +35,64 @@ export function EscrowLedger({ order, className, showTitle = true }) {
         </div>
         <div className="flex items-center justify-between gap-3 py-2.5">
           <dt className="text-muted">Escrow holding fee</dt>
-          <dd className="font-semibold text-forest-600">Waived</dd>
+          <dd className="font-semibold text-forest-600">Free</dd>
         </div>
       </dl>
       <div className="border-t border-line px-4 py-3.5">
-        <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">Total to pay</p>
+        <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">Total order value</p>
         <p className="mt-0.5 font-display text-[26px] font-extrabold leading-8 tracking-tight text-forest-600 tnum">
           {money(total)}
         </p>
         <p className="mt-1 text-[11px] leading-4 text-muted">
-          Your money is held safely. It is paid out only after the weight, moisture and delivery are confirmed.
+          It is paid out step by step as pickup, checks and delivery are confirmed.
         </p>
       </div>
     </div>
   )
 }
 
+function deliveryPart(order) {
+  const fee = Number(order?.delivery_fee ?? 0)
+  const release = order?.escrow?.releases?.find((row) => row.milestone === 'delivery')
+
+  if (!release && fee <= 0) return null
+
+  const paid = order?.payment_status === 'paid'
+  let state = 'unfunded'
+  let stateLabel = 'Not paid yet'
+
+  if (release) {
+    if (release.status === 'released') {
+      state = 'settled'
+      stateLabel = release.payout?.status === 'paid' ? 'Sent to transporter' : 'Ready to send'
+    } else if (release.status === 'held' || release.status === 'cancelled') {
+      state = 'frozen'
+      stateLabel = release.status === 'cancelled' ? 'Not paid' : 'On hold'
+    } else {
+      state = paid ? 'in_progress' : 'unfunded'
+      stateLabel = release.trigger || 'Waiting for delivery'
+    }
+  } else if (paid) {
+    state = 'in_progress'
+    stateLabel = 'Waiting for delivery'
+  }
+
+  return {
+    key: 'delivery',
+    index: 'D',
+    share: 0,
+    title: 'Delivery payment',
+    short: 'Delivery',
+    trigger: 'Paid to the transporter when the goods are delivered.',
+    amount: release ? Number(release.amount) : fee,
+    state,
+    stateLabel,
+  }
+}
+
 export function MilestoneSchedule({ order, compact = false, className, title = 'Payment plan' }) {
-  const schedule = escrowSchedule(order)
+  const delivery = deliveryPart(order)
+  const schedule = delivery ? [...escrowSchedule(order), delivery] : escrowSchedule(order)
   const settled = schedule.filter((m) => m.state === 'settled').length
   const pct = Math.round((settled / schedule.length) * 100)
 
@@ -95,7 +135,7 @@ export function MilestoneSchedule({ order, compact = false, className, title = '
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-[13px] font-semibold text-ink">
-                    <span className="text-muted">{Math.round(m.share * 100)}%</span> — {m.title}
+                    <span className="text-muted">{m.share > 0 ? `${Math.round(m.share * 100)}%` : 'Delivery'}</span> — {m.title}
                   </p>
                   {!compact && <p className="mt-0.5 text-[11.5px] leading-4 text-muted">{m.trigger}</p>}
                 </div>
@@ -113,20 +153,21 @@ export function MilestoneSchedule({ order, compact = false, className, title = '
 
       <p className="flex items-start gap-2 border-t border-line px-5 py-3 text-[11px] leading-4 text-muted">
         <Snowflake size={13} className="mt-0.5 shrink-0 text-forest-500" />
-        Moisture above tolerance or weight variance beyond 1.0% freezes the remaining balance and escalates to arbitration.
+        If the moisture or weight is outside the agreed limit, the rest of the money stays on hold for review.
       </p>
     </div>
   )
 }
 
 export function SettlementTimeline({ order, className }) {
+  const arrived = ['delivered', 'completed'].includes(order?.status)
   const steps = [
     { key: 'placed', label: 'Order placed', icon: ShieldCheck, note: order?.created_at },
-    { key: 'confirmed', label: 'Farmer confirmed', icon: Check, note: order?.updated_at },
+    { key: 'confirmed', label: 'Farmer confirmed', icon: Check, note: order?.paid_at || order?.updated_at },
     { key: 'transit', label: 'In transit', icon: Truck, note: order?.delivery_date },
-    { key: 'delivered', label: 'Delivered', icon: ArrowDownToLine, note: order?.status === 'delivered' ? order?.updated_at : null },
+    { key: 'delivered', label: 'Delivered', icon: ArrowDownToLine, note: arrived ? (order?.delivery?.actual_delivery_time || order?.updated_at) : null },
   ]
-  const activeIndex = order?.status === 'delivered' ? 3 : order?.status === 'shipped' ? 2 : ['confirmed', 'processing'].includes(order?.status) ? 1 : 0
+  const activeIndex = arrived ? 3 : order?.status === 'shipped' ? 2 : ['confirmed', 'processing'].includes(order?.status) ? 1 : 0
 
   return (
     <ol className={cn('grid gap-3 sm:grid-cols-4', className)}>

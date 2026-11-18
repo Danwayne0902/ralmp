@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\MessageController;
+use App\Http\Controllers\Api\V1\EscrowController;
+use App\Http\Controllers\Api\V1\PayoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +93,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/orders', [OrderController::class, 'store']);
         Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
         Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+        Route::post('/orders/{id}/confirm-delivery', [OrderController::class, 'confirmDelivery']);
+
+        // Escrow and payouts
+        Route::get('/escrow', [EscrowController::class, 'index']);
+        Route::get('/escrow/orders/{orderId}', [EscrowController::class, 'show']);
+        Route::get('/payouts', [PayoutController::class, 'index']);
 
         // Cart Routes
         Route::get('/cart', [CartController::class, 'getCart']);
@@ -130,6 +138,12 @@ Route::prefix('v1')->group(function () {
             Route::delete('/commodities/{id}', [AdminController::class, 'removeCommodity']);
             
             Route::get('/orders', [AdminController::class, 'getOrders']);
+
+            // Escrow release controls
+            Route::get('/escrow/pending', [EscrowController::class, 'pending']);
+            Route::post('/escrow/releases/{id}/release', [EscrowController::class, 'release']);
+            Route::post('/escrow/releases/{id}/hold', [EscrowController::class, 'hold']);
+            Route::post('/payouts/{id}/paid', [PayoutController::class, 'markPaid']);
             
             Route::get('/dashboard', [AdminController::class, 'getDashboard']);
             Route::get('/analytics', [AdminController::class, 'getAnalytics']);

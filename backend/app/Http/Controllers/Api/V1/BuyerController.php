@@ -148,7 +148,8 @@ class BuyerController extends Controller
 
         // Total spent
         $totalSpent = Order::where('buyer_id', $userId)
-            ->whereIn('status', ['completed', 'delivered'])
+            ->where('payment_status', 'paid')
+            ->whereNotIn('status', ['cancelled', 'rejected'])
             ->sum('total_price');
 
         // Pending deliveries

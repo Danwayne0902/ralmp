@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  ArrowUpRight, Banknote, CheckCircle2, Clock3, Download, Landmark,
+  Banknote, CheckCircle2, Clock3, Download, Landmark,
   Lock, RefreshCw, ShieldCheck, Snowflake, Wallet,
 } from 'lucide-react'
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
-import { orderService, paymentService } from '../lib/services'
-import { escrowSchedule, escrowReleased, TRANCHE_SPLIT } from '../lib/orders'
+import { escrowService, orderService, paymentService, payoutService } from '../lib/services'
+import { escrowSchedule, escrowReleasedAll, escrowHeldAll, TRANCHE_SPLIT } from '../lib/orders'
 import { fmtDate, fmtDateTime, money } from '../lib/format'
 import { downloadCsv, parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
+import { toast } from 'sonner'
 
 export default function Settlements() {
   const { user } = useAuth()
@@ -20,21 +21,59 @@ export default function Settlements() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [tab, setTab] = useState('orders')
+  const [pendingReleases, setPendingReleases] = useState([])
+  const [pendingPayouts, setPendingPayouts] = useState([])
+  const [acting, setActing] = useState(null)
+  const isAdmin = user?.role === 'admin'
 
   async function load() {
     setLoading(true)
     try {
-      const [orderRes, paymentRes] = await Promise.all([
+      const [orderRes, paymentRes, releasesRes, payoutsRes] = await Promise.all([
         orderService.list({ per_page: 100 }),
         paymentService.history().catch(() => ({ data: { payments: [] } })),
+        isAdmin
+          ? escrowService.pending().catch(() => ({ data: { releases: [] } }))
+          : Promise.resolve({ data: { releases: [] } }),
+        isAdmin
+          ? payoutService.list({ status: 'pending', per_page: 50 }).catch(() => ({ data: { data: [] } }))
+          : Promise.resolve({ data: { data: [] } }),
       ])
       setOrders(orderRes.data?.data || [])
       setPayments(paymentRes.data?.payments || [])
+      setPendingReleases(releasesRes.data?.releases || [])
+      setPendingPayouts(payoutsRes.data?.data || [])
       setError('')
     } catch (err) {
       setError(parseError(err))
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function releasePayment(id) {
+    setActing(id)
+    try {
+      await escrowService.release(id, 'Checked and approved in the payments desk.')
+      toast.success('Payment released from escrow')
+      await load()
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setActing(null)
+    }
+  }
+
+  async function sendPayout(id) {
+    setActing(id)
+    try {
+      await payoutService.markPaid(id, 'Bank transfer sent.')
+      toast.success('Payout marked as sent')
+      await load()
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setActing(null)
     }
   }
 
@@ -46,15 +85,12 @@ export default function Settlements() {
   const totals = useMemo(() => {
     const active = orders.filter((order) => !['cancelled', 'rejected'].includes(order.status))
     const committed = active.reduce((sum, order) => sum + Number(order.total_price || 0), 0)
-    const funded = active
-      .filter((order) => order.payment_status === 'paid')
-      .reduce((sum, order) => sum + Number(order.total_price || 0), 0)
-    const released = active.reduce((sum, order) => sum + escrowReleased(order), 0)
-    const held = Math.max(0, funded - released)
+    const released = active.reduce((sum, order) => sum + escrowReleasedAll(order), 0)
+    const held = active.reduce((sum, order) => sum + escrowHeldAll(order), 0)
     const frozen = orders
       .filter((order) => ['cancelled', 'rejected'].includes(order.status))
-      .reduce((sum, order) => sum + Number(order.total_price || 0), 0)
-    return { committed, funded, released, held, frozen }
+      .reduce((sum, order) => sum + escrowHeldAll(order), 0)
+    return { committed, released, held, frozen, activeCount: active.length }
   }, [orders])
 
   const trancheSummary = useMemo(
@@ -83,12 +119,10 @@ export default function Settlements() {
       payment_status: order.payment_status,
       reference: order.payment_reference || '',
       status: order.status,
-      released: escrowReleased(order),
+      released: escrowReleasedAll(order),
     }))
     downloadCsv(`ralmp-settlement-ledger-${new Date().toISOString().slice(0, 10)}.csv`, rows)
   }
-
-  const isAdmin = user?.role === 'admin'
 
   return (
     <div className="page-wrap page-pad">
@@ -119,9 +153,9 @@ export default function Settlements() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Wallet} label="Total paid" value={money(totals.committed)} hint={`${orders.length} ${orders.length === 1 ? 'order' : 'orders'}`} size="lg" />
+            <Stat icon={Wallet} label="Order value" value={money(totals.committed)} hint={`${totals.activeCount} ${totals.activeCount === 1 ? 'active order' : 'active orders'}`} size="lg" />
             <Stat icon={Landmark} label="Still in escrow" value={money(totals.held)} tone="gold" hint="Paid but not released" size="lg" />
-            <Stat icon={CheckCircle2} label="Paid to farmers" value={money(totals.released)} tone="sprout" hint="All released parts" size="lg" />
+            <Stat icon={CheckCircle2} label="Released from escrow" value={money(totals.released)} tone="sprout" hint="Paid to farmers and transporters" size="lg" />
             <Stat icon={Snowflake} label="On hold / returned" value={money(totals.frozen)} tone={totals.frozen > 0 ? 'critical' : 'neutral'} hint="Cancelled or rejected orders" size="lg" />
           </>
         )}
@@ -170,24 +204,28 @@ export default function Settlements() {
               ) : (
                 <>
                   <div className="hidden md:block">
-                    <Table minWidth={820}>
+                    <Table minWidth={760} className="[&_th]:px-3 [&_td]:px-3">
                       <thead>
                         <tr>
                           <Th>Order</Th>
                           <Th>Farmer</Th>
-                          <Th className="text-right">Paid</Th>
+                          <Th className="text-right">Value</Th>
                           <Th className="text-right">Released</Th>
-                          <Th className="text-right">Held</Th>
-                          <Th>Money held</Th>
+                          <Th>Held</Th>
                           <Th>Order status</Th>
-                          <Th />
                         </tr>
                       </thead>
                       <tbody>
                         {orders.map((order) => {
-                          const released = escrowReleased(order)
+                          const released = escrowReleasedAll(order)
+                          const held = escrowHeldAll(order)
                           const total = Number(order.total_price || 0)
                           const frozen = ['cancelled', 'rejected'].includes(order.status)
+                          const moneyState = order.payment_status !== 'paid'
+                            ? { label: 'Not paid', tone: 'pending' }
+                            : held > 0
+                              ? { label: frozen ? 'On hold' : 'Held safely', tone: frozen ? 'critical' : 'verified' }
+                              : { label: frozen ? 'Order closed' : 'All released', tone: 'neutral' }
                           return (
                             <Tr key={order.id}>
                               <Td>
@@ -199,14 +237,11 @@ export default function Settlements() {
                               <Td className="break-words">{order.farmer?.name || '—'}</Td>
                               <Td className="text-right font-semibold text-ink tnum">{money(total)}</Td>
                               <Td className="text-right text-forest-600 tnum">{money(released)}</Td>
-                              <Td className="text-right text-muted tnum">{money(frozen ? 0 : Math.max(0, total - released))}</Td>
                               <Td>
-                                <Badge tone={frozen ? 'critical' : order.payment_status === 'paid' ? 'verified' : 'pending'} size="sm">
-                                  {frozen ? 'On hold' : order.payment_status === 'paid' ? 'Held safely' : 'Not paid'}
-                                </Badge>
+                                <p className="text-muted tnum">{money(held)}</p>
+                                <Badge tone={moneyState.tone} size="sm" className="mt-1">{moneyState.label}</Badge>
                               </Td>
                               <Td><StatusBadge status={order.status} size="sm" /></Td>
-                              <Td className="text-right"><ArrowUpRight size={14} className="text-muted" /></Td>
                             </Tr>
                           )
                         })}
@@ -217,7 +252,8 @@ export default function Settlements() {
                   <ul className="divide-y divide-line md:hidden">
                     {orders.map((order) => {
                       const total = Number(order.total_price || 0)
-                      const released = escrowReleased(order)
+                      const released = escrowReleasedAll(order)
+                      const held = escrowHeldAll(order)
                       return (
                         <li key={order.id}>
                           <Link to={`/orders/${order.id}`} className="block px-4 py-3.5">
@@ -231,7 +267,7 @@ export default function Settlements() {
                             <div className="mt-2 grid grid-cols-3 gap-2 text-[10.5px]">
                               <div><p className="text-muted">Total</p><p className="font-semibold text-ink tnum">{money(total)}</p></div>
                               <div><p className="text-muted">Paid out</p><p className="font-semibold text-forest-600 tnum">{money(released)}</p></div>
-                              <div><p className="text-muted">On hold</p><p className="font-semibold text-muted tnum">{money(Math.max(0, total - released))}</p></div>
+                              <div><p className="text-muted">On hold</p><p className="font-semibold text-muted tnum">{money(held)}</p></div>
                             </div>
                           </Link>
                         </li>
@@ -312,12 +348,81 @@ export default function Settlements() {
         </div>
 
         <aside className="space-y-4">
+          {isAdmin && (
+            <div className="rounded-card border border-harvest-200 bg-harvest-50/60 p-5 shadow-card">
+              <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-harvest-700">
+                <CheckCircle2 size={12} /> Waiting for your approval
+              </p>
+              {pendingReleases.length === 0 ? (
+                <p className="mt-2 text-[11.5px] leading-5 text-muted">Nothing is waiting. Every check has been handled.</p>
+              ) : (
+                <ul className="mt-2 divide-y divide-harvest-200/70">
+                  {pendingReleases.slice(0, 5).map((release) => (
+                    <li key={release.id} className="py-2.5 first:pt-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="break-words text-[11.5px] font-semibold text-ink">
+                            Order #{release.order_id} · {release.label}
+                          </p>
+                          <p className="text-[10.5px] text-muted">
+                            {release.order?.farmer?.name || 'Farmer'} · {money(release.amount)}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-1.5"
+                        loading={acting === release.id}
+                        onClick={() => releasePayment(release.id)}
+                      >
+                        Release payment
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {isAdmin && (
+            <div className="rounded-card border border-line bg-white p-5 shadow-card">
+              <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
+                <Banknote size={12} /> Payouts to send
+              </p>
+              {pendingPayouts.length === 0 ? (
+                <p className="mt-2 text-[11.5px] leading-5 text-muted">No payout is waiting for a bank transfer.</p>
+              ) : (
+                <ul className="mt-2 divide-y divide-line">
+                  {pendingPayouts.slice(0, 5).map((payout) => (
+                    <li key={payout.id} className="flex items-center justify-between gap-2 py-2.5 first:pt-0">
+                      <div className="min-w-0">
+                        <p className="break-words text-[11.5px] font-semibold text-ink">
+                          {payout.user?.name || 'Payee'} · {money(payout.amount)}
+                        </p>
+                        <p className="font-mono text-[9.5px] text-muted">{payout.reference}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        loading={acting === payout.id}
+                        onClick={() => sendPayout(payout.id)}
+                      >
+                        Mark sent
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
               <Landmark size={12} /> Where your money sits
             </p>
             <p className="mt-2 text-[12px] leading-5 text-ink-soft/80">
-              Your money is not kept in the account we use to run RALMP. It sits in a separate trust account until each payment step is proven.
+              Every payment is recorded against the order and stays inside escrow until its step is proven. Our team sends payouts by bank transfer and marks each one as sent.
             </p>
             <dl className="mt-3 space-y-1.5 border-t border-line pt-3 text-[11.5px]">
               <div className="flex justify-between"><dt className="text-muted">Money held in</dt><dd className="font-semibold text-ink">RALMP escrow account</dd></div>

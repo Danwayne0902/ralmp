@@ -47,7 +47,7 @@ export default function Footer() {
             </div>
             <p className="mt-4 text-[13px] leading-6 text-forest-100/75">
               We link farmers to buyers across Nigeria. Every trade is checked and paid
-              through a safe escrow account, so both sides are protected.
+              step by step, so both sides know where the money is.
             </p>
             <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-forest-700 px-3 py-1.5 text-[11px] font-semibold text-forest-100">
               <ShieldCheck size={13} className="text-harvest-300" />
@@ -89,7 +89,7 @@ export default function Footer() {
           </p>
           <p className="flex items-start gap-2.5 text-[12px] leading-5 text-forest-100/70">
             <ShieldCheck size={14} className="mt-0.5 shrink-0 text-harvest-300" />
-            Your money stays in a separate escrow account until the job is done.
+            Your money is held in escrow and released step by step as the job is done.
           </p>
         </div>
       </div>

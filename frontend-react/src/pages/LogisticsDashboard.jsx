@@ -11,7 +11,7 @@ import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Field, Input, NativeSelect, Textarea } from '../components/ui/Form'
 import { Modal } from '../components/ui/Overlay'
-import { logisticsService } from '../lib/services'
+import { logisticsService, payoutService } from '../lib/services'
 import { fmtDate, money } from '../lib/format'
 import { parseError, cn } from '../lib/utils'
 import { useAuth } from '../store/auth'
@@ -34,6 +34,7 @@ export default function LogisticsDashboard() {
   const { user } = useAuth()
   const [dashboard, setDashboard] = useState(null)
   const [deliveries, setDeliveries] = useState([])
+  const [payouts, setPayouts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [active, setActive] = useState(null)
@@ -46,12 +47,14 @@ export default function LogisticsDashboard() {
   async function load() {
     setLoading(true)
     try {
-      const [dashRes, deliveryRes] = await Promise.all([
+      const [dashRes, deliveryRes, payoutRes] = await Promise.all([
         logisticsService.dashboard(),
         logisticsService.deliveries({ per_page: 50 }),
+        payoutService.list({ per_page: 50 }),
       ])
       setDashboard(dashRes.data)
       setDeliveries(deliveryRes.data?.data || [])
+      setPayouts(payoutRes.data?.data || [])
       setError('')
     } catch (err) {
       setError(parseError(err))
@@ -74,12 +77,12 @@ export default function LogisticsDashboard() {
     return map
   }, [deliveries])
 
-  const activeValue = deliveries
-    .filter((delivery) => delivery.status !== 'delivered')
-    .reduce((sum, delivery) => sum + Number(delivery.delivery_cost || 0), 0)
-  const completedValue = deliveries
-    .filter((delivery) => delivery.status === 'delivered')
-    .reduce((sum, delivery) => sum + Number(delivery.delivery_cost || 0), 0)
+  const paidToYou = payouts
+    .filter((payout) => payout.status === 'paid')
+    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
+  const readyToSend = payouts
+    .filter((payout) => payout.status === 'pending')
+    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
 
   function openUpdate(delivery, status) {
     setActive(delivery)
@@ -153,8 +156,8 @@ export default function LogisticsDashboard() {
           <>
             <Stat icon={Truck} label="Jobs in progress" value={dashboard?.active_deliveries ?? 0} hint="Accepted, picked up or moving" />
             <Stat icon={CheckCircle2} label="Delivered" value={dashboard?.completed_deliveries ?? 0} tone="sprout" hint="Dropped off at the buyer" />
-            <Stat icon={Wallet} label="Delivery money on the way" value={money(activeValue)} tone="gold" hint="Already paid into escrow" size="lg" />
-            <Stat icon={ShieldCheck} label="Money earned" value={money(completedValue)} tone="neutral" hint="Delivered and ready to pay out" size="lg" />
+            <Stat icon={Wallet} label="Ready to send" value={money(readyToSend)} tone="gold" hint="Released, waiting for the transfer" size="lg" />
+            <Stat icon={ShieldCheck} label="Paid to you" value={money(paidToYou)} tone="neutral" hint="Bank transfers sent to you" size="lg" />
           </>
         )}
       </div>
@@ -369,6 +372,34 @@ export default function LogisticsDashboard() {
                   This is only an estimate. The final delivery pay is fixed when the buyer pays at checkout.
                 </p>
               </div>
+            )}
+          </div>
+
+          <div className="rounded-card border border-line bg-white p-4 shadow-card">
+            <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
+              <Wallet size={12} /> Delivery payouts
+            </p>
+            {payouts.length === 0 ? (
+              <p className="mt-2 text-[11px] leading-4 text-muted">
+                No delivery payout yet. The delivery fee is released when the buyer confirms delivery.
+              </p>
+            ) : (
+              <ul className="mt-2 divide-y divide-line">
+                {payouts.slice(0, 5).map((payout) => (
+                  <li key={payout.id} className="flex items-center justify-between gap-2 py-2 first:pt-0">
+                    <div className="min-w-0">
+                      <p className="text-[11.5px] font-semibold text-ink">Order #{payout.order_id}</p>
+                      <p className="truncate font-mono text-[9.5px] text-muted">{payout.reference}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-[12px] font-bold text-forest-600 tnum">{money(payout.amount)}</p>
+                      <Badge tone={payout.status === 'paid' ? 'verified' : 'pending'} size="sm">
+                        {payout.status === 'paid' ? 'Sent' : 'Ready'}
+                      </Badge>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
 

@@ -7,26 +7,29 @@ import {
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
-import { produceService, orderService } from '../lib/services'
-import { escrowSchedule, escrowReleased } from '../lib/orders'
+import { orderService, payoutService } from '../lib/services'
+import { escrowHeld, escrowBase } from '../lib/orders'
 import { fmtDate, money } from '../lib/format'
 import { downloadCsv, parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
 
 export default function Payouts() {
   const { user } = useAuth()
-  const [earnings, setEarnings] = useState(null)
   const [orders, setOrders] = useState([])
+  const [payouts, setPayouts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
     let active = true
-    Promise.all([produceService.earnings(), orderService.list({ per_page: 100 })])
-      .then(([earnRes, orderRes]) => {
+    Promise.all([
+      orderService.list({ per_page: 100 }),
+      payoutService.list({ per_page: 100 }),
+    ])
+      .then(([orderRes, payoutRes]) => {
         if (!active) return
-        setEarnings(earnRes.data)
         setOrders(orderRes.data?.data || [])
+        setPayouts(payoutRes.data?.data || [])
       })
       .catch((err) => {
         if (active) setError(parseError(err))
@@ -39,33 +42,31 @@ export default function Payouts() {
     }
   }, [])
 
-  const heldOrders = orders.filter(
-    (order) =>
-      order.payment_status === 'paid' &&
-      !['cancelled', 'rejected'].includes(order.status) &&
-      Number(order.total_price || 0) > escrowReleased(order),
-  )
-  const held = heldOrders.reduce((sum, order) => sum + Math.max(0, Number(order.total_price || 0) - escrowReleased(order)), 0)
-  const released = orders.reduce((sum, order) => sum + escrowReleased(order), 0)
+  const held = orders.reduce((sum, order) => sum + escrowHeld(order), 0)
+  const paidToYou = payouts
+    .filter((payout) => payout.status === 'paid')
+    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
+  const readyToSend = payouts
+    .filter((payout) => payout.status === 'pending')
+    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
   const paid = orders.filter((order) => order.payment_status === 'paid').length
   const completed = orders.filter((order) => ['delivered', 'completed'].includes(order.status)).length
 
-  const events = useMemo(() => {
-    const rows = []
-    orders.forEach((order) => {
-      escrowSchedule(order)
-        .filter((tranche) => tranche.state === 'settled')
-        .forEach((tranche) => {
-          rows.push({
-            id: `${order.id}-${tranche.key}`,
-            order,
-            tranche,
-            date: order.paid_at || order.updated_at || order.created_at,
-          })
-        })
-    })
-    return rows.sort((a, b) => new Date(b.date) - new Date(a.date))
-  }, [orders])
+  const events = useMemo(
+    () =>
+      [...payouts]
+        .sort((a, b) => new Date(b.paid_at || b.created_at) - new Date(a.paid_at || a.created_at))
+        .map((payout) => ({
+          id: payout.id,
+          order: payout.order,
+          amount: Number(payout.amount || 0),
+          status: payout.status,
+          reference: payout.reference,
+          label: payout.release?.label || 'Payment',
+          date: payout.paid_at || payout.created_at,
+        })),
+    [payouts],
+  )
 
   function exportStatement() {
     const rows = orders.map((order) => ({
@@ -73,8 +74,11 @@ export default function Payouts() {
       buyer: order.buyer?.name || '',
       commodity: order.produce?.commodity_name || '',
       total: order.total_price,
-      released: escrowReleased(order),
-      held: Math.max(0, Number(order.total_price || 0) - escrowReleased(order)),
+      base: escrowBase(order),
+      released: payouts
+        .filter((payout) => payout.order_id === order.id)
+        .reduce((sum, payout) => sum + Number(payout.amount || 0), 0),
+      held: escrowHeld(order),
       order_status: order.status,
       payment_status: order.payment_status,
       date: order.order_date,
@@ -91,7 +95,7 @@ export default function Payouts() {
         actions={
           <>
             <Button asChild variant="outline" size="md">
-              <Link to="/orders"><Truck size={15} /> Waybills</Link>
+              <Link to="/orders"><Truck size={15} /> Delivery notes</Link>
             </Button>
             <Button variant="outline" size="md" onClick={exportStatement} disabled={!orders.length}>
               <Download size={15} /> Download statement
@@ -111,10 +115,10 @@ export default function Payouts() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Banknote} label="Paid to you" value={money(released)} tone="sprout" hint="Payments already sent" size="lg" />
-            <Stat icon={Lock} label="On hold" value={money(held)} tone="gold" hint="Waiting for delivery proof" size="lg" />
-            <Stat icon={Clock3} label="Not confirmed yet" value={money(earnings?.pending_earnings ?? 0)} hint="Orders you have not accepted" />
-            <Stat icon={CheckCircle2} label="Finished orders" value={completed} tone="neutral" hint={`${paid} paid orders in total`} />
+            <Stat icon={Banknote} label="Paid to you" value={money(paidToYou)} tone="sprout" hint="Bank transfers sent to you" size="lg" />
+            <Stat icon={Clock3} label="Ready to send" value={money(readyToSend)} tone="gold" hint="Released, waiting for the transfer" size="lg" />
+            <Stat icon={Lock} label="On hold" value={money(held)} hint="Waiting for pickup, checks or delivery" />
+            <Stat icon={CheckCircle2} label="Finished orders" value={completed} tone="neutral" hint={`${paid} paid ${paid === 1 ? 'order' : 'orders'} in total`} />
           </>
         )}
       </div>
@@ -124,10 +128,10 @@ export default function Payouts() {
           <div className="rounded-card border border-line bg-white shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
               <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Payments sent to you</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Each line is money we sent to your account.</p>
+                <h2 className="font-display text-[15px] font-bold text-ink">Your payouts</h2>
+                <p className="mt-0.5 text-[11px] text-muted">Each line is money released from escrow for you.</p>
               </div>
-              <Badge tone="verified" size="sm"><ShieldCheck size={11} /> Evidence-backed</Badge>
+              <Badge tone="verified" size="sm"><ShieldCheck size={11} /> Saved record</Badge>
             </div>
 
             {loading ? (
@@ -136,7 +140,7 @@ export default function Payouts() {
               <EmptyState
                 icon={Wallet}
                 title="No payments yet"
-                description="The first 10% is paid when the transporter sends the pickup weight note. Make sure your orders are confirmed and paid."
+                description="The first 10% is released when the transporter marks the goods as picked up. Make sure your orders are confirmed and paid."
                 className="border-0 shadow-none"
                 action={<Button asChild><Link to="/orders">See my orders</Link></Button>}
               />
@@ -146,10 +150,10 @@ export default function Payouts() {
                   <Table minWidth={720}>
                     <thead>
                       <tr>
-                        <Th>Released</Th>
+                        <Th>Date</Th>
                         <Th>Order</Th>
                         <Th>Part</Th>
-                        <Th>Why we paid</Th>
+                        <Th>Reference</Th>
                         <Th className="text-right">Amount</Th>
                         <Th>State</Th>
                       </tr>
@@ -166,13 +170,14 @@ export default function Payouts() {
                               {event.order.produce?.commodity_name || 'Lot'}
                             </p>
                           </Td>
-                          <Td className="text-[11.5px]">
-                            <span className="font-semibold text-ink">{Math.round(event.tranche.share * 100)}%</span>
-                            <span className="ml-1 text-muted">{event.tranche.short}</span>
+                          <Td className="text-[11.5px] font-semibold text-ink">{event.label}</Td>
+                          <Td className="font-mono text-[10px] text-muted">{event.reference}</Td>
+                          <Td className="text-right font-semibold text-forest-600 tnum">{money(event.amount)}</Td>
+                          <Td>
+                            {event.status === 'paid'
+                              ? <Badge tone="verified" size="sm">Sent</Badge>
+                              : <Badge tone="pending" size="sm">Ready to send</Badge>}
                           </Td>
-                          <Td className="text-[10.5px] leading-4 text-muted">{event.tranche.trigger}</Td>
-                          <Td className="text-right font-semibold text-forest-600 tnum">{money(event.tranche.amount)}</Td>
-                          <Td><Badge tone="verified" size="sm">Paid</Badge></Td>
                         </Tr>
                       ))}
                     </tbody>
@@ -184,14 +189,18 @@ export default function Payouts() {
                     <li key={event.id} className="px-4 py-3.5">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-[12.5px] font-semibold text-ink">
-                            {Math.round(event.tranche.share * 100)}% · {event.tranche.short}
-                          </p>
+                          <p className="text-[12.5px] font-semibold text-ink">{event.label}</p>
                           <p className="text-[10.5px] text-muted">
-                            Order #{event.order.id} · {fmtDate(event.date)}
+                            Order #{event.order?.id} · {fmtDate(event.date)}
                           </p>
+                          <p className="mt-0.5 font-mono text-[9.5px] text-muted">{event.reference}</p>
                         </div>
-                        <p className="shrink-0 text-[13px] font-bold text-forest-600 tnum">{money(event.tranche.amount)}</p>
+                        <div className="shrink-0 text-right">
+                          <p className="text-[13px] font-bold text-forest-600 tnum">{money(event.amount)}</p>
+                          <Badge tone={event.status === 'paid' ? 'verified' : 'pending'} size="sm" className="mt-1">
+                            {event.status === 'paid' ? 'Sent' : 'Ready'}
+                          </Badge>
+                        </div>
                       </div>
                     </li>
                   ))}
@@ -222,9 +231,11 @@ export default function Payouts() {
             ) : (
               <ul className="divide-y divide-line">
                 {orders.map((order) => {
-                  const total = Number(order.total_price || 0)
-                  const orderReleased = escrowReleased(order)
-                  const pct = total ? Math.round((orderReleased / total) * 100) : 0
+                  const total = escrowBase(order)
+                  const orderReleased = payouts
+                    .filter((payout) => payout.order_id === order.id)
+                    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
+                  const pct = total ? Math.min(100, Math.round((orderReleased / total) * 100)) : 0
                   return (
                     <li key={order.id} className="px-5 py-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -262,7 +273,7 @@ export default function Payouts() {
               <p className="text-[10px] font-bold uppercase tracking-wide text-muted">Account name</p>
               <p className="mt-0.5 text-[12.5px] font-bold text-ink">{user?.name}</p>
               <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Paid through</p>
-              <p className="mt-0.5 text-[11.5px] text-ink-soft">Fast bank transfer to your verified account</p>
+              <p className="mt-0.5 text-[11.5px] text-ink-soft">Bank transfer to your account</p>
               <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Verification</p>
               <Badge tone={user?.verification_status ? 'verified' : 'pending'} size="sm" className="mt-1">
                 {user?.verification_status ? 'Verified' : 'Not verified yet'}
