@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
-  BadgeCheck, Building2, Camera, Check, CircleAlert, Clock3, KeyRound, Loader2, Lock,
-  LogOut, Mail, MapPin, Phone, Save, ShieldCheck, Sprout, Truck, User as UserIcon, Wallet,
+  BadgeCheck, Building2, Camera, Check, CircleAlert, Clock3, CreditCard, KeyRound, Landmark,
+  Loader2, Lock, LogOut, Mail, MapPin, Phone, RefreshCw, Save, ShieldCheck, Sprout, Truck,
+  User as UserIcon, Wallet,
 } from 'lucide-react'
 import { PageHeader, Avatar, Skeleton } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Card, Callout, KeyValue } from '../components/ui/Card'
 import { Field, Input } from '../components/ui/Form'
-import { profileService } from '../lib/services'
+import { payoutService, profileService } from '../lib/services'
 import { NIGERIA_STATES } from '../data/nigeria'
 import { fmtDate, imgUrl, roleLabel } from '../lib/format'
 import { parseError, cn } from '../lib/utils'
@@ -25,6 +26,7 @@ const ROLE_ICONS = {
 
 export default function Profile() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { setUser, logout } = useAuth()
   const fileRef = useRef(null)
   const [profile, setProfile] = useState(null)
@@ -34,7 +36,14 @@ export default function Profile() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [tab, setTab] = useState('identity')
+  const [tab, setTab] = useState(() => (searchParams.get('tab') === 'payout' ? 'payout' : 'identity'))
+
+  const [banks, setBanks] = useState([])
+  const [banksLoading, setBanksLoading] = useState(true)
+  const [banksError, setBanksError] = useState('')
+  const [bankForm, setBankForm] = useState({ bank_code: '', bank_name: '', account_name: '', account_number: '' })
+  const [bankSaving, setBankSaving] = useState(false)
+  const [banksRetry, setBanksRetry] = useState(0)
 
   const [passwords, setPasswords] = useState({ current: '', next: '', confirm: '' })
   const [changing, setChanging] = useState(false)
@@ -54,6 +63,12 @@ export default function Profile() {
           lga: data.lga || '',
           address: data.address || '',
         })
+        setBankForm({
+          bank_code: data.bank_code || '',
+          bank_name: data.bank_name || '',
+          account_name: data.account_name || '',
+          account_number: data.account_number || '',
+        })
       })
       .catch((err) => {
         if (active) setError(parseError(err))
@@ -65,6 +80,28 @@ export default function Profile() {
       active = false
     }
   }, [])
+
+  useEffect(() => {
+    let active = true
+    setBanksLoading(true)
+    payoutService
+      .banks()
+      .then((res) => {
+        if (active) {
+          setBanks(res.data?.banks || [])
+          setBanksError('')
+        }
+      })
+      .catch(() => {
+        if (active) setBanksError('The bank list could not be loaded. Check your connection and try again.')
+      })
+      .finally(() => {
+        if (active) setBanksLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [banksRetry])
 
   useEffect(() => {
     if (!avatar) {
@@ -91,6 +128,31 @@ export default function Profile() {
       setError(parseError(err))
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function saveBank(event) {
+    event.preventDefault()
+    if (!bankForm.bank_code || !bankForm.bank_name || !bankForm.account_name) {
+      toast.error('Choose your bank and enter the account name.')
+      return
+    }
+    if (!/^\d{10}$/.test(bankForm.account_number)) {
+      toast.error('The account number must be 10 digits.')
+      return
+    }
+    setBankSaving(true)
+    setError('')
+    try {
+      const res = await profileService.update(bankForm)
+      const updated = res.data?.user || res.data
+      setProfile(updated)
+      setUser(updated)
+      toast.success('Payout account saved')
+    } catch (err) {
+      setError(parseError(err))
+    } finally {
+      setBankSaving(false)
     }
   }
 
@@ -201,6 +263,7 @@ export default function Profile() {
           <div className="flex flex-wrap gap-1.5">
             {[
               { value: 'identity', label: 'Identity & origin', icon: UserIcon },
+              { value: 'payout', label: 'Payout account', icon: Landmark },
               { value: 'security', label: 'Security', icon: KeyRound },
               { value: 'verification', label: 'Verification', icon: ShieldCheck },
             ].map((item) => (
@@ -289,6 +352,105 @@ export default function Profile() {
                   </div>
                 </form>
               )}
+            </Card>
+          )}
+
+          {tab === 'payout' && (
+            <Card>
+              <div className="border-b border-line px-5 py-4">
+                <h2 className="font-display text-[15px] font-bold text-ink">Payout account</h2>
+                <p className="mt-0.5 text-[11px] text-muted">
+                  This is the bank account where your money is sent. Use an account in your own name.
+                </p>
+              </div>
+
+              <form onSubmit={saveBank} className="space-y-4 p-5">
+                <div className="rounded-xl border border-line bg-canvas p-3.5">
+                  <p className="flex items-center gap-1.5 text-[11px] font-semibold text-ink">
+                    <CreditCard size={13} className="text-forest-500" /> {profile?.account_number ? 'Saved account' : 'No account saved yet'}
+                  </p>
+                  <p className="mt-1 text-[11px] leading-5 text-muted">
+                    {profile?.account_number
+                      ? `${profile.bank_name || 'Your bank'} · ${profile.account_name || 'Account name not set'} · ****${String(profile.account_number).slice(-4)}`
+                      : 'Money released from escrow can only be transferred after you add your account here.'}
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Bank" required hint={banksError ? 'Bank list unavailable' : 'The bank that holds the account'}>
+                    <select
+                      value={bankForm.bank_code}
+                      onChange={(e) => {
+                        const bank = banks.find((item) => item.code === e.target.value)
+                        setBankForm((prev) => ({
+                          ...prev,
+                          bank_code: e.target.value,
+                          bank_name: bank?.name || '',
+                        }))
+                      }}
+                      className="select"
+                      required
+                      disabled={banksLoading || Boolean(banksError)}
+                    >
+                      <option value="">{banksLoading ? 'Loading banks…' : 'Select bank'}</option>
+                      {banks.map((bank) => (
+                        <option key={bank.code} value={bank.code}>{bank.name}</option>
+                      ))}
+                    </select>
+                  </Field>
+
+                  <Field label="Account number" required hint="10 digits, no spaces">
+                    <Input
+                      inputMode="numeric"
+                      pattern="[0-9]{10}"
+                      maxLength={10}
+                      value={bankForm.account_number}
+                      onChange={(e) => setBankForm((prev) => ({
+                        ...prev,
+                        account_number: e.target.value.replace(/\D/g, '').slice(0, 10),
+                      }))}
+                      placeholder="0123456789"
+                      required
+                    />
+                  </Field>
+
+                  <div className="sm:col-span-2">
+                    <Field label="Account name" required hint="Exactly as it appears on the bank account">
+                      <Input
+                        value={bankForm.account_name}
+                        onChange={(e) => setBankForm((prev) => ({ ...prev, account_name: e.target.value }))}
+                        placeholder="e.g. Adewale Okafor"
+                        required
+                      />
+                    </Field>
+                  </div>
+                </div>
+
+                {banksError && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-harvest-200 bg-harvest-50 px-3.5 py-2.5">
+                    <p className="text-[11.5px] font-medium text-harvest-600">{banksError}</p>
+                    <Button type="button" size="sm" variant="outline" onClick={() => setBanksRetry((n) => n + 1)}>
+                      <RefreshCw size={13} /> Try again
+                    </Button>
+                  </div>
+                )}
+
+                {error && (
+                  <p className="rounded-lg border border-critical-200 bg-critical-50 px-3.5 py-2.5 text-[12px] font-medium text-critical-600">
+                    {error}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+                  <p className="text-[10.5px] text-muted">
+                    Changing the account stops the old account from receiving new payouts.
+                  </p>
+                  <Button type="submit" loading={bankSaving} disabled={Boolean(banksError)}>
+                    {!bankSaving && <Save size={15} />}
+                    {bankSaving ? 'Saving…' : 'Save payout account'}
+                  </Button>
+                </div>
+              </form>
             </Card>
           )}
 
@@ -392,8 +554,8 @@ export default function Profile() {
                 <div className="rounded-xl border border-line bg-white p-4">
                   <p className="text-[12px] font-semibold text-ink">Need to update a verified detail?</p>
                   <p className="mt-1 text-[11px] leading-5 text-muted">
-                    Legal name, bank account and identity document changes require a support request so the audit
-                    trail stays intact.
+                    Legal name and identity document changes require a support request so the audit trail stays
+                    intact. You can update your payout bank account yourself on the payout tab.
                   </p>
                   <Button asChild variant="outline" size="sm" className="mt-3">
                     <Link to="/messages">Contact our team</Link>
@@ -441,9 +603,9 @@ export default function Profile() {
                 <Wallet size={13} /> Getting paid
               </p>
               <ul className="mt-2 space-y-1.5 text-[10.5px] leading-4 text-forest-700/80">
-                <li className="flex items-center gap-1.5"><Check size={10} /> Bank transfers supported</li>
-                <li className="flex items-center gap-1.5"><Check size={10} /> Bank details kept private by our team</li>
-                <li className="flex items-center gap-1.5"><Phone size={10} /> We call you to confirm large payments</li>
+                <li className="flex items-center gap-1.5"><Check size={10} /> Money is sent to your saved bank account</li>
+                <li className="flex items-center gap-1.5"><Check size={10} /> Bank details are used only for your payouts</li>
+                <li className="flex items-center gap-1.5"><Phone size={10} /> Email sent when a transfer is confirmed</li>
               </ul>
               <Button asChild variant="outline" size="sm" className="mt-3 w-full">
                 <Link to="/farmer/payouts">See payment statement</Link>

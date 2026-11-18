@@ -22,6 +22,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Transfers (payouts to farmers and transporters)
+    |--------------------------------------------------------------------------
+    |
+    | Payout money leaves the Paystack balance. The secret key must have the
+    | Transfers permission enabled on the Paystack dashboard.
+    |
+    */
+
+    'transferSource' => env('PAYSTACK_TRANSFER_SOURCE', 'balance'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Webhook
     |--------------------------------------------------------------------------
     |

@@ -99,7 +99,12 @@ export const escrowService = {
 
 export const payoutService = {
   list: (params) => api.get('/payouts', { params }),
+  // Starts a real bank transfer. Paystack's webhook marks the payout sent.
+  send: (id) => api.post(`/admin/payouts/${id}/send`),
+  finalizeOtp: (id, otp) => api.post(`/admin/payouts/${id}/transfer-otp`, { otp }),
+  // Fallback only: money sent outside Paystack.
   markPaid: (id, note) => api.post(`/admin/payouts/${id}/paid`, { note }),
+  banks: () => api.get('/banks'),
 }
 
 export const adminService = {

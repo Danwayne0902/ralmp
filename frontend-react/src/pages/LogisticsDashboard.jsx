@@ -379,6 +379,17 @@ export default function LogisticsDashboard() {
             <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
               <Wallet size={12} /> Delivery payouts
             </p>
+            {!user?.account_number && (
+              <div className="mt-2 rounded-lg border border-harvest-200 bg-harvest-50 p-2.5">
+                <p className="text-[10.5px] font-semibold text-harvest-600">Add your bank account to get paid</p>
+                <p className="mt-0.5 text-[10px] leading-4 text-harvest-600/85">
+                  Delivery pay stays in escrow until your bank details are saved.
+                </p>
+                <Link to="/profile?tab=payout" className="mt-1.5 inline-flex text-[10.5px] font-bold text-harvest-600 underline underline-offset-2">
+                  Add bank details
+                </Link>
+              </div>
+            )}
             {payouts.length === 0 ? (
               <p className="mt-2 text-[11px] leading-4 text-muted">
                 No delivery payout yet. The delivery fee is released when the buyer confirms delivery.
@@ -393,8 +404,22 @@ export default function LogisticsDashboard() {
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="text-[12px] font-bold text-forest-600 tnum">{money(payout.amount)}</p>
-                      <Badge tone={payout.status === 'paid' ? 'verified' : 'pending'} size="sm">
-                        {payout.status === 'paid' ? 'Sent' : 'Ready'}
+                      <Badge
+                        tone={payout.status === 'paid'
+                          ? 'verified'
+                          : ['failed', 'reversed'].includes(payout.transfer_status)
+                            ? 'critical'
+                            : 'pending'}
+                        size="sm"
+                        className="mt-0.5"
+                      >
+                        {payout.status === 'paid'
+                          ? 'Sent'
+                          : ['sending', 'pending', 'otp'].includes(payout.transfer_status)
+                            ? 'Sending'
+                            : ['failed', 'reversed'].includes(payout.transfer_status)
+                              ? 'Failed'
+                              : 'Ready'}
                       </Badge>
                     </div>
                   </li>

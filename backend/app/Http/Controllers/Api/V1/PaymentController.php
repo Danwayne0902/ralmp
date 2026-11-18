@@ -7,6 +7,7 @@ use App\Mail\OrderStatusNotification;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\EscrowService;
+use App\Services\PaystackTransferService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -211,8 +212,15 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Invalid signature'], 401);
         }
 
-        $event = $request->input('event');
+        $event = (string) $request->input('event');
         $data = $request->input('data', []);
+
+        // Payouts are confirmed here, not in the browser.
+        if (str_starts_with($event, 'transfer.')) {
+            app(PaystackTransferService::class)->handleWebhook($event, $data);
+
+            return response()->json(['status' => 'ok']);
+        }
 
         if ($event === 'charge.success' && !empty($data['reference'])) {
             $payment = Payment::with('order')->where('reference', $data['reference'])->first();

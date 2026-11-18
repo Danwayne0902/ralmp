@@ -7,7 +7,11 @@ use App\Models\EscrowRelease;
 use App\Models\Order;
 use App\Models\Payout;
 use App\Models\User;
+use App\Mail\PayoutReleased;
+use App\Mail\PayoutSent;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -109,11 +113,11 @@ class EscrowService
      */
     public function release(EscrowRelease $release, User $by, ?string $note = null, ?string $trigger = null): EscrowRelease
     {
-        return DB::transaction(function () use ($release, $by, $note, $trigger) {
+        $result = DB::transaction(function () use ($release, $by, $note, $trigger) {
             $locked = EscrowRelease::whereKey($release->id)->lockForUpdate()->firstOrFail();
 
             if ($locked->status === 'released') {
-                return $locked->fresh(['payout', 'payee']);
+                return [$locked->fresh(['payout', 'payee']), false];
             }
 
             if (in_array($locked->status, ['held', 'cancelled'], true)) {
@@ -135,7 +139,10 @@ class EscrowService
                 'trigger' => $trigger ?: $locked->trigger,
             ]);
 
+            $created = false;
             if (!$locked->payout) {
+                $payee = User::find($payeeId);
+
                 Payout::create([
                     'order_id' => $locked->order_id,
                     'user_id' => $payeeId,
@@ -143,14 +150,28 @@ class EscrowService
                     'amount' => $locked->amount,
                     'status' => 'pending',
                     'reference' => 'PAY-' . Str::upper(Str::random(10)),
+                    'bank_name' => $payee?->bank_name,
+                    'account_number' => $payee?->account_number,
+                    'account_name' => $payee?->account_name,
                     'note' => 'Ready for bank transfer',
                 ]);
+                $created = true;
             }
 
             $this->refreshAccount($locked->account()->lockForUpdate()->firstOrFail());
 
-            return $locked->fresh(['payout', 'payee']);
+            $fresh = $locked->fresh(['payout', 'payee']);
+
+            return [$fresh, $created];
         });
+
+        [$fresh, $created] = $result;
+
+        if ($created && $fresh->payout) {
+            $this->notifyPayoutReleased($fresh->payout);
+        }
+
+        return $fresh;
     }
 
     /**
@@ -198,21 +219,67 @@ class EscrowService
     /**
      * Mark a payout as sent after the bank transfer has been made.
      */
-    public function markPayoutPaid(Payout $payout, User $by, ?string $note = null): Payout
+    public function markPayoutPaid(Payout $payout, ?User $by = null, ?string $note = null): Payout
     {
-        return DB::transaction(function () use ($payout, $by, $note) {
+        $result = DB::transaction(function () use ($payout, $by, $note) {
             $locked = Payout::whereKey($payout->id)->lockForUpdate()->firstOrFail();
+            $changed = false;
 
             if ($locked->status !== 'paid') {
                 $locked->update([
                     'status' => 'paid',
                     'paid_at' => now(),
-                    'note' => $note ?: ('Confirmed by ' . $by->name),
+                    'note' => $note ?: ($by ? 'Confirmed by ' . $by->name : 'Bank transfer confirmed'),
                 ]);
+                $changed = true;
             }
 
-            return $locked->fresh();
+            return [$locked->fresh(), $changed];
         });
+
+        [$fresh, $changed] = $result;
+
+        if ($changed) {
+            $this->notifyPayoutSent($fresh);
+        }
+
+        return $fresh;
+    }
+
+    /**
+     * Tell the payee that money was released. A mail outage never blocks
+     * the release that already happened.
+     */
+    private function notifyPayoutReleased(Payout $payout): void
+    {
+        try {
+            $payout->loadMissing(['user', 'release']);
+
+            if ($payout->user?->email) {
+                Mail::to($payout->user->email)->send(new PayoutReleased($payout));
+            }
+        } catch (\Throwable $e) {
+            Log::error('Payout released email failed', [
+                'payout_id' => $payout->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function notifyPayoutSent(Payout $payout): void
+    {
+        try {
+            $payout->loadMissing(['user', 'release']);
+
+            if ($payout->user?->email) {
+                Mail::to($payout->user->email)->send(new PayoutSent($payout));
+            }
+        } catch (\Throwable $e) {
+            Log::error('Payout sent email failed', [
+                'payout_id' => $payout->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

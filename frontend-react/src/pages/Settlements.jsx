@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Banknote, CheckCircle2, Clock3, Download, Landmark,
-  Lock, RefreshCw, ShieldCheck, Snowflake, Wallet,
+  Lock, RefreshCw, Send, ShieldCheck, Snowflake, Wallet,
 } from 'lucide-react'
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
@@ -24,6 +24,8 @@ export default function Settlements() {
   const [pendingReleases, setPendingReleases] = useState([])
   const [pendingPayouts, setPendingPayouts] = useState([])
   const [acting, setActing] = useState(null)
+  const [otpFor, setOtpFor] = useState(null)
+  const [otp, setOtp] = useState('')
   const isAdmin = user?.role === 'admin'
 
   async function load() {
@@ -64,10 +66,49 @@ export default function Settlements() {
     }
   }
 
-  async function sendPayout(id) {
+  async function sendPayout(payout) {
+    setActing(payout.id)
+    try {
+      const res = await payoutService.send(payout.id)
+      if (res.data?.needs_otp) {
+        setOtpFor(payout.id)
+        setOtp('')
+        toast.info(res.data.message)
+      } else {
+        toast.success(res.data?.message || 'Bank transfer started')
+      }
+      await load()
+    } catch (err) {
+      toast.error(parseError(err))
+      await load()
+    } finally {
+      setActing(null)
+    }
+  }
+
+  async function finishTransfer() {
+    if (!otpFor || otp.trim().length < 4) {
+      toast.error('Enter the code Paystack sent to the business phone.')
+      return
+    }
+    setActing(otpFor)
+    try {
+      const res = await payoutService.finalizeOtp(otpFor, otp.trim())
+      toast.success(res.data?.message || 'Transfer finished')
+      setOtpFor(null)
+      setOtp('')
+      await load()
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setActing(null)
+    }
+  }
+
+  async function markPayoutSent(id) {
     setActing(id)
     try {
-      await payoutService.markPaid(id, 'Bank transfer sent.')
+      await payoutService.markPaid(id, 'Paid outside Paystack and confirmed by the payments desk.')
       toast.success('Payout marked as sent')
       await load()
     } catch (err) {
@@ -394,24 +435,79 @@ export default function Settlements() {
                 <p className="mt-2 text-[11.5px] leading-5 text-muted">No payout is waiting for a bank transfer.</p>
               ) : (
                 <ul className="mt-2 divide-y divide-line">
-                  {pendingPayouts.slice(0, 5).map((payout) => (
-                    <li key={payout.id} className="flex items-center justify-between gap-2 py-2.5 first:pt-0">
-                      <div className="min-w-0">
-                        <p className="break-words text-[11.5px] font-semibold text-ink">
-                          {payout.user?.name || 'Payee'} · {money(payout.amount)}
-                        </p>
-                        <p className="font-mono text-[9.5px] text-muted">{payout.reference}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        loading={acting === payout.id}
-                        onClick={() => sendPayout(payout.id)}
-                      >
-                        Mark sent
-                      </Button>
-                    </li>
-                  ))}
+                  {pendingPayouts.slice(0, 5).map((payout) => {
+                    const bankName = payout.bank_name || payout.user?.bank_name
+                    const account = payout.account_number || payout.user?.account_number
+                    const onTheWay = ['sending', 'pending', 'otp'].includes(payout.transfer_status)
+                    return (
+                      <li key={payout.id} className="py-2.5 first:pt-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="break-words text-[11.5px] font-semibold text-ink">
+                              {payout.user?.name || 'Payee'} · {money(payout.amount)}
+                            </p>
+                            <p className="font-mono text-[9.5px] text-muted">{payout.reference}</p>
+                            <p className={account ? 'text-[10.5px] text-muted' : 'text-[10.5px] font-semibold text-harvest-600'}>
+                              {account
+                                ? `${bankName || 'Bank'} · ****${String(account).slice(-4)}`
+                                : 'No bank details yet'}
+                            </p>
+                            {payout.failure_reason && (
+                              <p className="mt-0.5 max-w-[210px] text-[9.5px] leading-3 text-critical-600">
+                                {payout.failure_reason}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex shrink-0 flex-col items-end gap-1">
+                            <Button
+                              size="sm"
+                              loading={acting === payout.id}
+                              disabled={onTheWay}
+                              onClick={() => sendPayout(payout)}
+                            >
+                              {!acting || acting !== payout.id ? <Send size={12} /> : null}
+                              {onTheWay ? 'Sending…' : 'Send money'}
+                            </Button>
+                            <button
+                              type="button"
+                              className="text-[9.5px] font-semibold text-muted underline underline-offset-2 hover:text-ink"
+                              onClick={() => markPayoutSent(payout.id)}
+                              disabled={acting === payout.id}
+                            >
+                              Already paid outside Paystack
+                            </button>
+                          </div>
+                        </div>
+
+                        {otpFor === payout.id && (
+                          <div className="mt-2 rounded-lg border border-harvest-200 bg-harvest-50 p-2.5">
+                            <p className="text-[10.5px] leading-4 text-harvest-600">
+                              Paystack sent a one-time code to the business phone. Enter it to finish this transfer.
+                            </p>
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <input
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                                inputMode="numeric"
+                                className="h-8 min-w-0 flex-1 rounded-lg border border-sage-300 bg-white px-2 text-[12px] tnum"
+                                placeholder="One-time code"
+                              />
+                              <Button size="sm" loading={acting === payout.id} onClick={finishTransfer}>
+                                Finish
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => { setOtpFor(null); setOtp('') }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </div>
@@ -422,7 +518,7 @@ export default function Settlements() {
               <Landmark size={12} /> Where your money sits
             </p>
             <p className="mt-2 text-[12px] leading-5 text-ink-soft/80">
-              Every payment is recorded against the order and stays inside escrow until its step is proven. Our team sends payouts by bank transfer and marks each one as sent.
+              Every payment is recorded against the order and stays inside escrow until its step is proven. Payouts go to the payee's saved bank account through Paystack, and the bank confirms each transfer before it is marked sent.
             </p>
             <dl className="mt-3 space-y-1.5 border-t border-line pt-3 text-[11.5px]">
               <div className="flex justify-between"><dt className="text-muted">Money held in</dt><dd className="font-semibold text-ink">RALMP escrow account</dd></div>

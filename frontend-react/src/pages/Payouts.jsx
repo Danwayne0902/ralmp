@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Banknote, CalendarDays, CheckCircle2, Clock3, Download,
+  Banknote, CalendarDays, Clock3, Download,
   Landmark, Lock, MessageSquare, ShieldCheck, Sprout, Truck, Wallet,
 } from 'lucide-react'
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
@@ -12,6 +12,19 @@ import { escrowHeld, escrowBase } from '../lib/orders'
 import { fmtDate, money } from '../lib/format'
 import { downloadCsv, parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
+
+function PayoutState({ payout }) {
+  if (payout.status === 'paid') {
+    return <Badge tone="verified" size="sm">Sent</Badge>
+  }
+  if (['sending', 'pending', 'otp'].includes(payout.transferStatus)) {
+    return <Badge tone="pending" size="sm">Sending</Badge>
+  }
+  if (['failed', 'reversed'].includes(payout.transferStatus)) {
+    return <Badge tone="critical" size="sm">Failed — try again</Badge>
+  }
+  return <Badge tone="pending" size="sm">Ready to send</Badge>
+}
 
 export default function Payouts() {
   const { user } = useAuth()
@@ -46,11 +59,12 @@ export default function Payouts() {
   const paidToYou = payouts
     .filter((payout) => payout.status === 'paid')
     .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
-  const readyToSend = payouts
-    .filter((payout) => payout.status === 'pending')
+  const onTheWay = payouts
+    .filter((payout) => payout.status !== 'paid' && ['sending', 'pending', 'otp'].includes(payout.transfer_status))
     .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
-  const paid = orders.filter((order) => order.payment_status === 'paid').length
-  const completed = orders.filter((order) => ['delivered', 'completed'].includes(order.status)).length
+  const readyToSend = payouts
+    .filter((payout) => payout.status === 'pending' && !['sending', 'pending', 'otp'].includes(payout.transfer_status))
+    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
 
   const events = useMemo(
     () =>
@@ -64,6 +78,8 @@ export default function Payouts() {
           reference: payout.reference,
           label: payout.release?.label || 'Payment',
           date: payout.paid_at || payout.created_at,
+          transferStatus: payout.transfer_status,
+          failureReason: payout.failure_reason,
         })),
     [payouts],
   )
@@ -110,15 +126,32 @@ export default function Payouts() {
         </p>
       )}
 
+      {!loading && !user?.account_number && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-card border border-harvest-200 bg-harvest-50 px-4 py-3">
+          <div className="flex items-start gap-2">
+            <Landmark size={16} className="mt-0.5 shrink-0 text-harvest-600" />
+            <div>
+              <p className="text-[12.5px] font-semibold text-harvest-600">Add your bank account to get paid</p>
+              <p className="text-[11px] leading-4 text-harvest-600/85">
+                Money can be released for you, but it cannot leave escrow until your bank details are saved.
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/profile?tab=payout">Add bank details</Link>
+          </Button>
+        </div>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
             <Stat icon={Banknote} label="Paid to you" value={money(paidToYou)} tone="sprout" hint="Bank transfers sent to you" size="lg" />
-            <Stat icon={Clock3} label="Ready to send" value={money(readyToSend)} tone="gold" hint="Released, waiting for the transfer" size="lg" />
+            <Stat icon={Clock3} label="On the way" value={money(onTheWay)} tone="gold" hint="Bank transfer started" size="lg" />
+            <Stat icon={Wallet} label="Ready to send" value={money(readyToSend)} hint="Released, waiting for the transfer" />
             <Stat icon={Lock} label="On hold" value={money(held)} hint="Waiting for pickup, checks or delivery" />
-            <Stat icon={CheckCircle2} label="Finished orders" value={completed} tone="neutral" hint={`${paid} paid ${paid === 1 ? 'order' : 'orders'} in total`} />
           </>
         )}
       </div>
@@ -174,9 +207,7 @@ export default function Payouts() {
                           <Td className="font-mono text-[10px] text-muted">{event.reference}</Td>
                           <Td className="text-right font-semibold text-forest-600 tnum">{money(event.amount)}</Td>
                           <Td>
-                            {event.status === 'paid'
-                              ? <Badge tone="verified" size="sm">Sent</Badge>
-                              : <Badge tone="pending" size="sm">Ready to send</Badge>}
+                            <PayoutState payout={event} />
                           </Td>
                         </Tr>
                       ))}
@@ -197,9 +228,10 @@ export default function Payouts() {
                         </div>
                         <div className="shrink-0 text-right">
                           <p className="text-[13px] font-bold text-forest-600 tnum">{money(event.amount)}</p>
-                          <Badge tone={event.status === 'paid' ? 'verified' : 'pending'} size="sm" className="mt-1">
-                            {event.status === 'paid' ? 'Sent' : 'Ready'}
-                          </Badge>
+                          <div className="mt-1 flex justify-end"><PayoutState payout={event} /></div>
+                          {event.failureReason && (
+                            <p className="mt-1 max-w-[160px] text-[9.5px] leading-3 text-critical-600">{event.failureReason}</p>
+                          )}
                         </div>
                       </div>
                     </li>

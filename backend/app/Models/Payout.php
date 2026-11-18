@@ -16,13 +16,22 @@ class Payout extends Model
         'amount',
         'status',
         'reference',
+        'transfer_code',
+        'transfer_status',
+        'transfer_reference',
+        'bank_name',
+        'account_number',
+        'account_name',
+        'failure_reason',
         'note',
         'paid_at',
+        'sent_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
+        'sent_at' => 'datetime',
     ];
 
     public function order()

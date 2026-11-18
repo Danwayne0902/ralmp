@@ -99,6 +99,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/escrow', [EscrowController::class, 'index']);
         Route::get('/escrow/orders/{orderId}', [EscrowController::class, 'show']);
         Route::get('/payouts', [PayoutController::class, 'index']);
+        Route::get('/banks', [PayoutController::class, 'banks']);
 
         // Cart Routes
         Route::get('/cart', [CartController::class, 'getCart']);
@@ -143,6 +144,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/escrow/pending', [EscrowController::class, 'pending']);
             Route::post('/escrow/releases/{id}/release', [EscrowController::class, 'release']);
             Route::post('/escrow/releases/{id}/hold', [EscrowController::class, 'hold']);
+            Route::post('/payouts/{id}/send', [PayoutController::class, 'send']);
+            Route::post('/payouts/{id}/transfer-otp', [PayoutController::class, 'finalize']);
             Route::post('/payouts/{id}/paid', [PayoutController::class, 'markPaid']);
             
             Route::get('/dashboard', [AdminController::class, 'getDashboard']);

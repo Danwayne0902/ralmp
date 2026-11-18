@@ -163,10 +163,12 @@ artwork is illustrative, not lot photography.
 
 #### Presentation-only surfaces
 
-The Laravel API has no endpoints for escrow release, arbitration rulings,
-e-waybills, laboratory assays or NIBSS payouts. Those screens
-(`/escrow`, `/admin/arbitration`, `/admin/quality/terminal`, `/dispatch/waybill`,
-`/farmer/settlement`, `/buyer/procurement`) render the control framework and
+Escrow release and payouts are real: money is split against the order, released
+only when its proof arrives, and sent to the payee's saved bank account through
+Paystack Transfers. The API has no endpoints for arbitration rulings, e-waybills
+or laboratory assays. Those screens
+(`/admin/arbitration`, `/admin/quality/terminal`, `/dispatch/waybill`,
+`/buyer/procurement`) render the control framework and
 derive their content from real order, listing and payment records. Draft or
 unavailable data is labelled as such (for example "Draft only — not decided",
 or an empty state) and no assay values, awards or settlement references are
@@ -398,6 +400,16 @@ dashboard. The endpoint verifies the `x-paystack-signature` header
 against the order, and only then marks the payment and order as paid. It is
 idempotent, so repeated deliveries are safe.
 
+The same URL also receives payout events. When an admin clicks **Send money**,
+the API creates a Paystack transfer recipient from the payee's saved bank
+details and starts a transfer. The payout is marked **paid** only when Paystack
+sends `transfer.success`; `transfer.failed` and `transfer.reversed` leave it
+pending with the reason, ready to retry. Transfers need the **Transfers**
+permission on the Paystack account and enough money in the balance.
+
+Payees add their bank account under **Profile → Payout account**. The bank list
+comes from Paystack, so the bank codes always match the ones used for transfers.
+
 ## Deployment
 
 ### Production Checklist
@@ -407,7 +419,8 @@ idempotent, so repeated deliveries are safe.
 - [ ] Configure MySQL with backups
 - [ ] Set up Redis for caching/queues
 - [ ] Configure a real mail transport
-- [ ] Set `PAYSTACK_SECRET_KEY` and register the webhook URL
+- [ ] Set `PAYSTACK_SECRET_KEY`, enable Transfers and register the webhook URL
+- [ ] Fund the Paystack balance used for farmer and transporter payouts
 - [ ] Configure Pusher/Soketi and set `BROADCAST_DRIVER=pusher`
 - [ ] Run `php artisan config:cache route:cache`
 - [ ] Configure Supervisor for queues
