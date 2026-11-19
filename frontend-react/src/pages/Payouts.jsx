@@ -21,7 +21,7 @@ function PayoutState({ payout }) {
     return <Badge tone="pending" size="sm">Sending</Badge>
   }
   if (['failed', 'reversed'].includes(payout.transferStatus)) {
-    return <Badge tone="critical" size="sm">Failed — try again</Badge>
+    return <Badge tone="critical" size="sm">Failed</Badge>
   }
   return <Badge tone="pending" size="sm">Ready to send</Badge>
 }
@@ -208,6 +208,11 @@ export default function Payouts() {
                           <Td className="text-right font-semibold text-forest-600 tnum">{money(event.amount)}</Td>
                           <Td>
                             <PayoutState payout={event} />
+                            {event.failureReason && (
+                              <p className="mt-0.5 max-w-[170px] text-[9.5px] leading-3 text-critical-600">
+                                {event.failureReason}
+                              </p>
+                            )}
                           </Td>
                         </Tr>
                       ))}
@@ -303,20 +308,27 @@ export default function Payouts() {
             </p>
             <div className="mt-3 rounded-xl border border-line bg-canvas px-4 py-3">
               <p className="text-[10px] font-bold uppercase tracking-wide text-muted">Account name</p>
-              <p className="mt-0.5 text-[12.5px] font-bold text-ink">{user?.name}</p>
+              <p className="mt-0.5 break-words text-[12.5px] font-bold text-ink">
+                {user?.account_name || user?.name}
+              </p>
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Bank account</p>
+              <p className="mt-0.5 break-words text-[11.5px] text-ink-soft">
+                {user?.account_number
+                  ? `${user.bank_name || 'Bank'} · ****${String(user.account_number).slice(-4)}`
+                  : 'No account saved yet'}
+              </p>
               <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Paid through</p>
-              <p className="mt-0.5 text-[11.5px] text-ink-soft">Bank transfer to your account</p>
-              <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-muted">Verification</p>
-              <Badge tone={user?.verification_status ? 'verified' : 'pending'} size="sm" className="mt-1">
-                {user?.verification_status ? 'Verified' : 'Not verified yet'}
-              </Badge>
+              <p className="mt-0.5 text-[11.5px] text-ink-soft">Bank transfer</p>
             </div>
             <p className="mt-2.5 text-[10.5px] leading-4 text-muted">
-              We keep your bank details private and never show them here. To change them, send us a message.
+              {user?.account_number
+                ? 'Only the last 4 digits are shown here. You can change the account yourself.'
+                : 'Money released for you cannot leave escrow until you add a bank account.'}
             </p>
             <Button asChild variant="outline" size="sm" className="mt-3 w-full">
-              <Link to={`/messages?to=1`}>
-                <MessageSquare size={13} /> Message our team
+              <Link to="/profile?tab=payout">
+                <Landmark size={13} />
+                {user?.account_number ? 'Change payout account' : 'Add payout account'}
               </Link>
             </Button>
           </div>

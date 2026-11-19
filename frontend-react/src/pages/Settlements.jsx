@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Banknote, CheckCircle2, Clock3, Download, Landmark,
+  Banknote, CheckCircle2, Clock3, Download, KeyRound, Landmark,
   Lock, RefreshCw, Send, ShieldCheck, Snowflake, Wallet,
 } from 'lucide-react'
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
@@ -438,36 +438,48 @@ export default function Settlements() {
                   {pendingPayouts.slice(0, 5).map((payout) => {
                     const bankName = payout.bank_name || payout.user?.bank_name
                     const account = payout.account_number || payout.user?.account_number
-                    const onTheWay = ['sending', 'pending', 'otp'].includes(payout.transfer_status)
+                    // A transfer paused for a one-time code needs the code, not another send.
+                    const needsCode = payout.transfer_status === 'otp'
+                    const onTheWay = ['sending', 'pending'].includes(payout.transfer_status)
                     return (
                       <li key={payout.id} className="py-2.5 first:pt-0">
-                        <div className="flex items-start justify-between gap-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                           <div className="min-w-0">
                             <p className="break-words text-[11.5px] font-semibold text-ink">
                               {payout.user?.name || 'Payee'} · {money(payout.amount)}
                             </p>
-                            <p className="font-mono text-[9.5px] text-muted">{payout.reference}</p>
+                            <p className="break-all font-mono text-[9.5px] text-muted">{payout.reference}</p>
                             <p className={account ? 'text-[10.5px] text-muted' : 'text-[10.5px] font-semibold text-harvest-600'}>
                               {account
                                 ? `${bankName || 'Bank'} · ****${String(account).slice(-4)}`
                                 : 'No bank details yet'}
                             </p>
                             {payout.failure_reason && (
-                              <p className="mt-0.5 max-w-[210px] text-[9.5px] leading-3 text-critical-600">
+                              <p className="mt-0.5 text-[10px] leading-4 text-critical-600">
                                 {payout.failure_reason}
                               </p>
                             )}
                           </div>
-                          <div className="flex shrink-0 flex-col items-end gap-1">
-                            <Button
-                              size="sm"
-                              loading={acting === payout.id}
-                              disabled={onTheWay}
-                              onClick={() => sendPayout(payout)}
-                            >
-                              {!acting || acting !== payout.id ? <Send size={12} /> : null}
-                              {onTheWay ? 'Sending…' : 'Send money'}
-                            </Button>
+                          <div className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-1 sm:flex-col sm:items-end sm:gap-y-1">
+                            {needsCode ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => { setOtpFor(payout.id); setOtp('') }}
+                              >
+                                <KeyRound size={12} /> Enter code
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                loading={acting === payout.id}
+                                disabled={onTheWay}
+                                onClick={() => sendPayout(payout)}
+                              >
+                                {!acting || acting !== payout.id ? <Send size={12} /> : null}
+                                {onTheWay ? 'Sending…' : 'Send money'}
+                              </Button>
+                            )}
                             <button
                               type="button"
                               className="text-[9.5px] font-semibold text-muted underline underline-offset-2 hover:text-ink"
