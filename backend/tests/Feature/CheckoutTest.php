@@ -62,8 +62,9 @@ class CheckoutTest extends TestCase
         $order = Order::with('items')->firstOrFail();
 
         $this->assertEquals(2000, $order->subtotal);
-        $this->assertEquals(2500, $order->delivery_fee);
-        $this->assertEquals(4500, $order->total_price);
+        // Delivery is negotiated with a driver after checkout.
+        $this->assertEquals(0, $order->delivery_fee);
+        $this->assertEquals(2000, $order->total_price);
         $this->assertEquals(1000, $order->items->first()->unit_price);
         $this->assertEquals(2, $order->items->first()->quantity);
         $this->assertEquals($farmer->id, $order->farmer_id);

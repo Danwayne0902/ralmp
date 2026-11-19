@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Delivery;
 use App\Models\EscrowAccount;
 use App\Models\EscrowRelease;
 use App\Models\Order;
+use App\Models\PlatformFee;
 use App\Models\Payout;
 use App\Models\User;
 use App\Mail\PayoutReleased;
@@ -124,6 +126,17 @@ class EscrowService
                 throw new RuntimeException('This payment is on hold and cannot be released.');
             }
 
+            // The driver is paid only after both sides confirm the goods arrived.
+            if ($locked->milestone === 'delivery') {
+                $delivery = $locked->order?->delivery;
+
+                if ($delivery && !$delivery->bothConfirmed()) {
+                    throw new RuntimeException(
+                        'The driver is paid after the buyer and the farmer both confirm the goods arrived.'
+                    );
+                }
+            }
+
             $payeeId = $locked->payee_id ?: $this->deliveryPayee($locked);
 
             if (!$payeeId) {
@@ -143,18 +156,37 @@ class EscrowService
             if (!$locked->payout) {
                 $payee = User::find($payeeId);
 
-                Payout::create([
+                $base = round((float) $locked->amount, 2);
+                $fee = $this->feeFor($base);
+
+                $payout = Payout::create([
                     'order_id' => $locked->order_id,
                     'user_id' => $payeeId,
                     'escrow_release_id' => $locked->id,
-                    'amount' => $locked->amount,
+                    'amount' => round($base - $fee, 2),
                     'status' => 'pending',
                     'reference' => 'PAY-' . Str::upper(Str::random(10)),
                     'bank_name' => $payee?->bank_name,
                     'account_number' => $payee?->account_number,
                     'account_name' => $payee?->account_name,
-                    'note' => 'Ready for bank transfer',
+                    'note' => $fee > 0 ? 'Ready for bank transfer (platform fee taken)' : 'Ready for bank transfer',
                 ]);
+
+                // The fee is written in the same transaction as the payout, so
+                // the ledger can never disagree with the money owed.
+                if ($fee > 0) {
+                    PlatformFee::create([
+                        'order_id' => $locked->order_id,
+                        'escrow_release_id' => $locked->id,
+                        'payee_id' => $payeeId,
+                        'payout_id' => $payout->id,
+                        'kind' => $locked->milestone === 'delivery' ? 'delivery' : 'goods',
+                        'base_amount' => $base,
+                        'rate' => $this->feeRate(),
+                        'amount' => $fee,
+                    ]);
+                }
+
                 $created = true;
             }
 
@@ -280,6 +312,117 @@ class EscrowService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * The fee rate actually charged, kept inside the agreed 4-6% range.
+     */
+    public function feeRate(): float
+    {
+        return round(max(4, min(6, (float) config('ramlp.platform_fee_percent', 5))), 2);
+    }
+
+    /**
+     * What the platform keeps from one payment part.
+     */
+    public function feeFor(float $amount): float
+    {
+        if ($amount <= 0) {
+            return 0.0;
+        }
+
+        return round($amount * $this->feeRate() / 100, 2);
+    }
+
+    /**
+     * Move an agreed delivery price into escrow. Called once the buyer has paid
+     * it, so the delivery part always matches money that actually arrived.
+     */
+    public function fundDelivery(Delivery $delivery): ?EscrowRelease
+    {
+        return DB::transaction(function () use ($delivery) {
+            $locked = Delivery::whereKey($delivery->id)->lockForUpdate()->firstOrFail();
+            $order = $locked->order()->first();
+
+            if (!$order) {
+                return null;
+            }
+
+            $account = EscrowAccount::where('order_id', $order->id)->lockForUpdate()->first();
+
+            if (!$account) {
+                throw new RuntimeException('The goods payment for this order has not arrived yet.');
+            }
+
+            $amount = round((float) $locked->agreed_amount, 2);
+
+            if ($amount <= 0) {
+                throw new RuntimeException('No delivery price has been agreed for this order.');
+            }
+
+            $release = EscrowRelease::where('order_id', $order->id)
+                ->where('milestone', 'delivery')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$release) {
+                $release = EscrowRelease::create([
+                    'escrow_account_id' => $account->id,
+                    'order_id' => $order->id,
+                    'milestone' => 'delivery',
+                    'label' => 'Delivery payment',
+                    'payee_id' => $locked->logistics_provider_id,
+                    'payee_role' => 'logistics_provider',
+                    'percentage' => 0,
+                    'amount' => $amount,
+                    'status' => 'pending',
+                    'trigger' => 'Both the buyer and the farmer confirmed the goods arrived',
+                ]);
+
+                $account->update([
+                    'amount' => round((float) $account->amount + $amount, 2),
+                    'delivery_amount' => round((float) $account->delivery_amount + $amount, 2),
+                ]);
+            } elseif ((float) $release->amount !== $amount) {
+                // A re-negotiated price only ever replaces money still in escrow.
+                if ($release->status !== 'pending') {
+                    throw new RuntimeException('This delivery payment has already been released.');
+                }
+
+                $account->update([
+                    'amount' => round((float) $account->amount - (float) $release->amount + $amount, 2),
+                    'delivery_amount' => round((float) $account->delivery_amount - (float) $release->amount + $amount, 2),
+                ]);
+
+                $release->update(['amount' => $amount]);
+            }
+
+            if ($locked->logistics_provider_id && !$release->payee_id) {
+                $release->update(['payee_id' => $locked->logistics_provider_id]);
+            }
+
+            return $release->fresh();
+        });
+    }
+
+    /**
+     * Release the driver's payment once both sides have confirmed the goods
+     * arrived. Safe to call at any time; it does nothing until both confirm.
+     */
+    public function releaseDeliveryIfBothConfirmed(Order $order, ?User $by = null): ?EscrowRelease
+    {
+        $delivery = $order->delivery()->first();
+
+        if (!$delivery || !$delivery->bothConfirmed()) {
+            return null;
+        }
+
+        return $this->releaseMilestone(
+            $order,
+            'delivery',
+            $by,
+            'Both the buyer and the farmer confirmed the goods arrived'
+        );
     }
 
     /**

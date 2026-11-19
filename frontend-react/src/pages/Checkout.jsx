@@ -42,9 +42,11 @@ export default function Checkout() {
     (sum, item) => sum + Number(item.unit_price ?? 0) * Number(item.quantity ?? 0),
     0,
   )
-  const total = subtotal + Number(cart.deliveryFee || 0)
+  // Checkout charges the goods only. Delivery is agreed with a driver in chat
+  // after the order and paid separately before pickup.
+  const total = subtotal
   const minDate = isoDate(new Date())
-  const reviewOrder = { total_price: total, status: 'pending', payment_status: 'pending' }
+  const reviewOrder = { subtotal, delivery_fee: 0, total_price: total, status: 'pending', payment_status: 'pending' }
 
   async function changeQuantity(item, next) {
     const value = Math.max(0, Math.min(Number(next), Number(item.available_quantity || next)))
@@ -227,10 +229,15 @@ export default function Checkout() {
 
           <div className="rounded-card border border-line bg-white p-5 shadow-card">
             <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
-              <Truck size={16} className="text-forest-500" /> Delivery & settlement instructions
+              <Truck size={16} className="text-forest-500" /> Delivery and payment steps
             </h2>
+            <div className="mt-3 rounded-xl border border-line bg-canvas px-3.5 py-3 text-[11.5px] leading-5 text-muted">
+              You pay for the goods now. After that, a driver sends a delivery price in chat. You agree the price,
+              then pay it from the order page before pickup. Delivery money is held until both you and the farmer
+              confirm the goods arrived.
+            </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field label="Delivery date" htmlFor="delivery-date" hint="We confirm with the transporter" required>
+              <Field label="Preferred delivery date" htmlFor="delivery-date" hint="The driver confirms the exact pickup" required>
                 <div className="relative">
                   <CalendarDays size={15} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
                   <Input
@@ -291,7 +298,7 @@ export default function Checkout() {
 
         <aside className="space-y-4 self-start lg:sticky lg:top-24">
           <EscrowLedger
-            order={{ subtotal, delivery_fee: cart.deliveryFee, total_price: total }}
+            order={{ subtotal, delivery_fee: 0, total_price: total }}
             className="shadow-card"
           />
 

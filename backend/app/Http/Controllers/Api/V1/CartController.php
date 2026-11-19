@@ -184,7 +184,7 @@ class CartController extends Controller
                 'items' => [],
                 'total' => 0,
                 'count' => 0,
-                'delivery_fee' => (float) config('ramlp.delivery_fee', 2500),
+                'delivery_fee' => 0.0,
             ];
         }
 
@@ -231,7 +231,7 @@ class CartController extends Controller
             'items' => $items,
             'total' => round($total, 2),
             'count' => count($items),
-            'delivery_fee' => (float) config('ramlp.delivery_fee', 2500),
+            'delivery_fee' => 0.0,
         ];
     }
 }

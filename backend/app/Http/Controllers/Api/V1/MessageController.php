@@ -68,6 +68,7 @@ class MessageController extends Controller
         ->with([
             'sender:id,name,profile_image',
             'recipient:id,name,profile_image',
+            'offer.driver:id,name,profile_image',
         ])
         ->orderBy('created_at', 'asc')
         ->get();

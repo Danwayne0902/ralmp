@@ -15,6 +15,8 @@ class Message extends Model
         'recipient_id',
         'conversation_id',
         'message',
+        'type',
+        'offer_id',
         'file_path',
         'is_read',
         'read_at',
@@ -34,5 +36,10 @@ class Message extends Model
     public function recipient()
     {
         return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    public function offer()
+    {
+        return $this->belongsTo(DeliveryOffer::class, 'offer_id');
     }
 }

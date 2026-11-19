@@ -133,7 +133,7 @@ function FilterControls({ filters, setFilters, onReset, onApply }) {
 }
 
 function BasketRail({ onCheckout }) {
-  const { items, total, count, deliveryFee, loading } = useCart()
+  const { items, total, count, loading } = useCart()
   const priceOf = (item) => Number(item.unit_price ?? item.price ?? 0)
   const subtotal = items.reduce((sum, item) => sum + priceOf(item) * Number(item.quantity || 0), 0)
   const activeCount = count || items.length
@@ -186,13 +186,13 @@ function BasketRail({ onCheckout }) {
               <span className="font-semibold text-ink tnum">{money(subtotal || total)}</span>
             </div>
             <div className="flex justify-between text-muted">
-              <span>Delivery (est.)</span>
-              <span className="font-semibold text-ink tnum">{money(deliveryFee)}</span>
+              <span>Delivery</span>
+              <span className="font-semibold text-ink">Agreed in chat</span>
             </div>
             <div className="flex justify-between border-t border-line pt-2">
-              <span className="font-semibold text-ink">Total to pay</span>
+              <span className="font-semibold text-ink">Goods to pay now</span>
               <span className="font-display text-[15px] font-extrabold text-forest-600 tnum">
-                {money((subtotal || total) + deliveryFee)}
+                {money(subtotal || total)}
               </span>
             </div>
           </div>

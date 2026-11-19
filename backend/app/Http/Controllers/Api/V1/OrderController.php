@@ -59,6 +59,7 @@ class OrderController extends Controller
             'produce',
             'items.produce',
             'delivery.trackingHistory',
+            'delivery.logisticsProvider:id,name,phone',
             'payments',
             'escrow.releases.payout',
             'payouts',
@@ -102,7 +103,9 @@ class OrderController extends Controller
             ? Carbon::parse($validated['delivery_date'])
             : now()->addDays((int) config('ramlp.default_delivery_days', 3));
 
-        $deliveryFee = (float) config('ramlp.delivery_fee', 2500);
+        // Delivery is negotiated with a driver after the order is placed, so
+        // checkout only charges for the goods themselves.
+        $deliveryFee = 0.0;
 
         $orders = DB::transaction(function () use ($validated, $deliveryDate, $deliveryFee, $request) {
             $ids = collect($validated['items'])->pluck('produce_id')->unique()->values();
@@ -307,16 +310,29 @@ class OrderController extends Controller
 
         $order->update(['status' => 'completed']);
 
+        $delivery = $order->delivery;
+
+        if ($delivery) {
+            $delivery->update([
+                'buyer_confirmed_at' => $delivery->buyer_confirmed_at ?: now(),
+            ]);
+        }
+
         $escrow = app(EscrowService::class);
         $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Buyer confirmed the goods');
         $escrow->releaseMilestone($order, 'final', $request->user(), 'Buyer confirmed the goods arrived');
-        $escrow->releaseMilestone($order, 'delivery', $request->user(), 'Delivery completed');
+
+        // The driver is paid only after both the buyer and the farmer confirm
+        // the goods arrived. The second confirmation releases the money.
+        $driverPaid = (bool) $escrow->releaseDeliveryIfBothConfirmed($order->fresh('delivery'), $request->user());
 
         $order = $order->fresh()->load('buyer', 'farmer', 'escrow.releases');
         event(new OrderStatusUpdated($order));
 
         return response()->json([
-            'message' => 'Delivery confirmed. The final payment is released.',
+            'message' => $driverPaid
+                ? 'Delivery confirmed. The final payment and the driver payment are released.'
+                : 'Delivery confirmed. The final payment is released. The driver is paid once the farmer confirms the handover.',
             'order' => $order,
         ], 200);
     }

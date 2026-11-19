@@ -2,14 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
-  ArrowLeft, Inbox, Loader2, MessageSquare, RefreshCw, Search, Send,
-  ShieldCheck, Sprout,
+  ArrowLeft, Check, Inbox, Loader2, MessageSquare, RefreshCw, Search, Send,
+  ShieldCheck, Sprout, Wallet, X,
 } from 'lucide-react'
 import { PageHeader, Skeleton, Avatar } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
-import { messageService } from '../lib/services'
-import { fmtDateTime, relativeDate } from '../lib/format'
+import { deliveryOfferService, messageService } from '../lib/services'
+import { fmtDateTime, money, relativeDate } from '../lib/format'
 import { parseError, cn } from '../lib/utils'
 import { useAuth } from '../store/auth'
 
@@ -19,6 +19,113 @@ function sameThread(prev, next) {
     if (prev[i].id !== next[i].id) return false
   }
   return true
+}
+
+function OfferMessage({ offer, user, busy, onAccept, onDecline, onCounter }) {
+  const [open, setOpen] = useState(false)
+  const [amount, setAmount] = useState('')
+  const [note, setNote] = useState('')
+  const [error, setError] = useState('')
+
+  const isBuyer = user?.id === offer?.buyer_id
+  const isDriver = user?.id === offer?.driver_id
+  const isRecipient = offer?.proposed_by !== user?.id
+  const statusTone = offer?.status === 'accepted' ? 'verified' : offer?.status === 'proposed' ? 'pending' : 'neutral'
+
+  async function submit(e) {
+    e.preventDefault()
+    const value = Number(amount)
+    if (!value || value <= 0) {
+      setError('Enter the price you want to offer.')
+      return
+    }
+    setError('')
+    await onCounter(offer, value, note.trim())
+    setOpen(false)
+    setAmount('')
+    setNote('')
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-[440px] rounded-2xl border border-forest-200 bg-white p-3.5 shadow-card">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest-50 text-forest-600">
+            <Wallet size={15} />
+          </span>
+          <div>
+            <p className="text-[11.5px] font-bold text-ink">Delivery price offer</p>
+            <p className="text-[10px] text-muted">Order #{offer.order_id} · {fmtDateTime(offer.created_at)}</p>
+          </div>
+        </div>
+        <Badge tone={statusTone} size="sm" className="capitalize">{offer.status}</Badge>
+      </div>
+
+      <p className="mt-2.5 font-display text-[24px] font-extrabold tracking-tight text-forest-600 tnum">
+        {money(offer.amount)}
+      </p>
+      {offer.driver?.name && (
+        <p className="text-[10.5px] text-muted">Driver: {offer.driver.name}</p>
+      )}
+      {offer.note && <p className="mt-1 text-[11px] leading-5 text-ink-soft">{offer.note}</p>}
+
+      {offer.status === 'proposed' && isRecipient && (
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {(isBuyer || isDriver) && (
+            <Button size="sm" className="h-7 px-2.5 text-[10.5px]" onClick={() => onAccept(offer)} disabled={busy}>
+              <Check size={12} /> Accept
+            </Button>
+          )}
+          <Button size="sm" variant="outline" className="h-7 px-2.5 text-[10.5px]" onClick={() => setOpen((v) => !v)} disabled={busy}>
+            Counter
+          </Button>
+          <Button size="sm" variant="ghost" className="h-7 px-2.5 text-[10.5px]" onClick={() => onDecline(offer)} disabled={busy}>
+            <X size={12} /> Decline
+          </Button>
+        </div>
+      )}
+
+      {offer.status === 'accepted' && (
+        <p className="mt-2.5 text-[10.5px] leading-4 text-forest-700">
+          Price locked in. {isBuyer ? 'Pay it from the order page before pickup.' : 'The buyer pays it into escrow before pickup.'}
+        </p>
+      )}
+
+      {open && offer.status === 'proposed' && (
+        <form onSubmit={submit} className="mt-2.5 space-y-2 border-t border-line pt-2.5">
+          <input
+            type="number"
+            min="1"
+            step="1"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Your price (₦)"
+            aria-label="Counter-offer amount"
+            className="h-9 w-full rounded-lg border border-line bg-canvas px-2.5 text-[12px] outline-none focus:border-forest-500"
+          />
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            maxLength={255}
+            placeholder="Short note (optional)"
+            aria-label="Counter-offer note"
+            className="h-9 w-full rounded-lg border border-line bg-canvas px-2.5 text-[11.5px] outline-none focus:border-forest-500"
+          />
+          {error && <p className="text-[10.5px] text-critical-600">{error}</p>}
+          <Button type="submit" size="sm" className="w-full" disabled={busy}>
+            {busy ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />} Send counter-offer
+          </Button>
+        </form>
+      )}
+
+      <Link
+        to={`/orders/${offer.order_id}`}
+        className="mt-2.5 inline-block text-[10.5px] font-semibold text-forest-600 hover:underline"
+      >
+        Open order #{offer.order_id}
+      </Link>
+    </div>
+  )
 }
 
 export default function Messages() {
@@ -32,6 +139,7 @@ export default function Messages() {
   const [text, setText] = useState('')
   const [q, setQ] = useState('')
   const [error, setError] = useState('')
+  const [offerBusy, setOfferBusy] = useState(false)
   const scrollRef = useRef(null)
 
   const activeId = searchParams.get('to') ? Number(searchParams.get('to')) : null
@@ -134,6 +242,57 @@ export default function Messages() {
       toast.error(parseError(err))
     } finally {
       setSending(false)
+    }
+  }
+
+  // Delivery prices are agreed in the thread. Accepting locks the price and
+  // assigns the driver, a counter-offer replaces the open one, so both refresh.
+  async function refreshThread() {
+    if (!activeId) return
+    const res = await messageService.conversation(activeId)
+    setMessages(res.data?.messages || [])
+  }
+
+  async function acceptOffer(offer) {
+    setOfferBusy(true)
+    try {
+      await deliveryOfferService.accept(offer.id)
+      await refreshThread()
+      toast.success('Delivery price locked in. Pay it from the order page before pickup.')
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setOfferBusy(false)
+    }
+  }
+
+  async function declineOffer(offer) {
+    setOfferBusy(true)
+    try {
+      await deliveryOfferService.decline(offer.id)
+      await refreshThread()
+      toast.success('Offer declined.')
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setOfferBusy(false)
+    }
+  }
+
+  async function counterOffer(offer, amount, note) {
+    setOfferBusy(true)
+    try {
+      await deliveryOfferService.propose(offer.order_id, {
+        amount,
+        note: note || undefined,
+        driver_id: offer.driver_id,
+      })
+      await refreshThread()
+      toast.success('Counter-offer sent.')
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setOfferBusy(false)
     }
   }
 
@@ -307,6 +466,20 @@ export default function Messages() {
                   </div>
                 ) : (
                   messages.map((message) => {
+                    if (message.type === 'offer' && message.offer) {
+                      return (
+                        <div key={message.id} className="py-0.5">
+                          <OfferMessage
+                            offer={message.offer}
+                            user={user}
+                            busy={offerBusy}
+                            onAccept={acceptOffer}
+                            onDecline={declineOffer}
+                            onCounter={counterOffer}
+                          />
+                        </div>
+                      )
+                    }
                     const mine = message.sender_id === user?.id
                     return (
                       <div key={message.id} className={cn('flex gap-2', mine ? 'justify-end' : 'justify-start')}>

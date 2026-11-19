@@ -25,6 +25,8 @@ class PaymentController extends Controller
         $validated = $request->validate([
             'order_id' => ['required', 'integer', 'exists:orders,id'],
             'callback_url' => ['required', 'url'],
+            // When present, this pays the delivery price agreed in chat.
+            'delivery_id' => ['nullable', 'integer', 'exists:deliveries,id'],
             // Accepted for backwards compatibility; the authenticated email wins.
             'email' => ['nullable', 'email'],
         ]);
@@ -32,11 +34,40 @@ class PaymentController extends Controller
         $order = Order::with('buyer:id,name,email')->findOrFail($validated['order_id']);
         $this->authorizeBuyer($request, $order);
 
-        if ($order->payment_status === 'paid') {
-            return response()->json([
-                'message' => 'Order already paid',
-                'order' => $order,
-            ], 400);
+        $delivery = null;
+
+        if (!empty($validated['delivery_id'])) {
+            $delivery = \App\Models\Delivery::where('order_id', $order->id)->find($validated['delivery_id']);
+
+            if (!$delivery) {
+                return response()->json(['message' => 'That delivery does not belong to this order.'], 404);
+            }
+
+            if ($delivery->payment_status === 'paid') {
+                return response()->json([
+                    'message' => 'This delivery has already been paid for.',
+                    'delivery' => $delivery,
+                ], 400);
+            }
+
+            if ((float) $delivery->agreed_amount <= 0) {
+                return response()->json([
+                    'message' => 'Agree a delivery price with a driver before paying.',
+                ], 422);
+            }
+
+            if ($order->payment_status !== 'paid') {
+                return response()->json([
+                    'message' => 'Please pay for the goods before paying for delivery.',
+                ], 422);
+            }
+        } else {
+            if ($order->payment_status === 'paid') {
+                return response()->json([
+                    'message' => 'Order already paid',
+                    'order' => $order,
+                ], 400);
+            }
         }
 
         $secret = config('paystack.secretKey');
@@ -47,7 +78,7 @@ class PaymentController extends Controller
             ], 500);
         }
 
-        $amount = (int) round((float) $order->total_price * 100); // kobo
+        $amount = (int) round((float) ($delivery ? $delivery->agreed_amount : $order->total_price) * 100); // kobo
         $reference = 'RAMLP_' . Str::upper(Str::random(12));
 
         $response = Http::withToken($secret)
@@ -59,6 +90,8 @@ class PaymentController extends Controller
                 'callback_url' => $validated['callback_url'],
                 'metadata' => [
                     'order_id' => $order->id,
+                    'delivery_id' => $delivery?->id,
+                    'kind' => $delivery ? 'delivery' : 'order',
                     'user_id' => $request->user()->id,
                 ],
             ]);
@@ -66,6 +99,7 @@ class PaymentController extends Controller
         if (!$response->successful() || $response->json('status') !== true) {
             Log::warning('Paystack initialize failed', [
                 'order_id' => $order->id,
+                'delivery_id' => $delivery?->id,
                 'status' => $response->status(),
                 'body' => $response->json(),
             ]);
@@ -78,9 +112,11 @@ class PaymentController extends Controller
 
         $data = $response->json('data');
 
-        DB::transaction(function () use ($order, $request, $reference, $amount, $data) {
+        DB::transaction(function () use ($order, $delivery, $request, $reference, $amount, $data) {
             Payment::create([
                 'order_id' => $order->id,
+                'kind' => $delivery ? 'delivery' : 'order',
+                'delivery_id' => $delivery?->id,
                 'user_id' => $request->user()->id,
                 'provider' => 'paystack',
                 'reference' => $reference,
@@ -89,7 +125,11 @@ class PaymentController extends Controller
                 'status' => 'pending',
             ]);
 
-            $order->update(['payment_reference' => $reference]);
+            if ($delivery) {
+                $delivery->update(['payment_reference' => $reference]);
+            } else {
+                $order->update(['payment_reference' => $reference]);
+            }
         });
 
         return response()->json([
@@ -108,7 +148,7 @@ class PaymentController extends Controller
             'reference' => ['required', 'string'],
         ]);
 
-        $payment = Payment::with('order')->where('reference', $validated['reference'])->first();
+        $payment = Payment::with('order', 'delivery')->where('reference', $validated['reference'])->first();
 
         if (!$payment) {
             return response()->json(['message' => 'Payment not found'], 404);
@@ -118,12 +158,16 @@ class PaymentController extends Controller
         $this->authorizeBuyer($request, $order);
 
         // Idempotent: a verified payment is never charged twice.
-        if ($payment->status === 'success' && $order->payment_status === 'paid') {
-            app(EscrowService::class)->fund($order->fresh());
+        if ($payment->status === 'success') {
+            if ($payment->kind === 'delivery' && $payment->delivery) {
+                app(EscrowService::class)->fundDelivery($payment->delivery);
+            } elseif ($order->payment_status === 'paid') {
+                app(EscrowService::class)->fund($order->fresh());
+            }
 
             return response()->json([
                 'message' => 'Payment already verified',
-                'order' => $order->fresh()->load('buyer', 'farmer', 'escrow.releases'),
+                'order' => $order->fresh()->load('buyer', 'farmer', 'escrow.releases', 'delivery'),
                 'payment' => $payment,
             ], 200);
         }
@@ -148,22 +192,25 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Payment has not been completed'], 400);
         }
 
-        if (!$this->amountMatches($order, $data)) {
+        if (!$this->amountMatches($payment, $data)) {
             Log::warning('Paystack amount mismatch', [
                 'order_id' => $order->id,
-                'expected' => (int) round((float) $order->total_price * 100),
+                'delivery_id' => $payment->delivery_id,
+                'expected' => $this->expectedAmount($payment),
                 'received' => $data['amount'] ?? null,
                 'currency' => $data['currency'] ?? null,
             ]);
 
-            return response()->json(['message' => 'Payment amount does not match the order total'], 422);
+            return response()->json(['message' => 'Payment amount does not match the expected total'], 422);
         }
 
         $order = $this->markPaid($payment, $order, $data);
 
         return response()->json([
-            'message' => 'Payment verified successfully',
-            'order' => $order->load('buyer', 'farmer', 'escrow.releases'),
+            'message' => $payment->kind === 'delivery'
+                ? 'Delivery payment verified successfully'
+                : 'Payment verified successfully',
+            'order' => $order->load('buyer', 'farmer', 'escrow.releases', 'delivery'),
             'payment' => $payment->fresh(),
         ], 200);
     }
@@ -223,10 +270,10 @@ class PaymentController extends Controller
         }
 
         if ($event === 'charge.success' && !empty($data['reference'])) {
-            $payment = Payment::with('order')->where('reference', $data['reference'])->first();
+            $payment = Payment::with('order', 'delivery')->where('reference', $data['reference'])->first();
 
             if ($payment && $payment->status !== 'success' && $payment->order) {
-                if ($this->amountMatches($payment->order, $data)) {
+                if ($this->amountMatches($payment, $data)) {
                     $this->markPaid($payment, $payment->order, $data);
                 } else {
                     Log::warning('Paystack webhook amount mismatch', [
@@ -245,7 +292,9 @@ class PaymentController extends Controller
      */
     private function markPaid(Payment $payment, Order $order, array $gatewayData): Order
     {
-        DB::transaction(function () use ($payment, $order, $gatewayData) {
+        $isDelivery = $payment->kind === 'delivery' && $payment->delivery;
+
+        DB::transaction(function () use ($payment, $order, $gatewayData, $isDelivery) {
             $payment->update([
                 'status' => 'success',
                 'gateway_status' => $gatewayData['status'] ?? 'success',
@@ -253,17 +302,29 @@ class PaymentController extends Controller
                 'paid_at' => now(),
             ]);
 
-            $order->update([
-                'payment_status' => 'paid',
-                'status' => 'confirmed',
-                'paid_at' => now(),
-            ]);
+            if ($isDelivery) {
+                $payment->delivery->update([
+                    'payment_status' => 'paid',
+                    'payment_reference' => $payment->reference,
+                    'paid_at' => now(),
+                ]);
 
-            // Split the money into its payment parts as soon as it is safe.
-            app(EscrowService::class)->fund($order->fresh());
+                // Move the agreed delivery price into escrow. It is released to
+                // the driver only after both confirmations.
+                app(EscrowService::class)->fundDelivery($payment->delivery->fresh());
+            } else {
+                $order->update([
+                    'payment_status' => 'paid',
+                    'status' => 'confirmed',
+                    'paid_at' => now(),
+                ]);
+
+                // Split the money into its payment parts as soon as it is safe.
+                app(EscrowService::class)->fund($order->fresh());
+            }
         });
 
-        $fresh = $order->fresh()->load('buyer', 'farmer', 'escrow.releases');
+        $fresh = $order->fresh()->load('buyer', 'farmer', 'escrow.releases', 'delivery');
 
         try {
             if ($fresh->buyer) {
@@ -272,10 +333,15 @@ class PaymentController extends Controller
             if ($fresh->farmer) {
                 Mail::to($fresh->farmer->email)->send(new OrderStatusNotification($fresh, 'farmer'));
             }
+            if ($isDelivery && $fresh->delivery?->logisticsProvider) {
+                Mail::to($fresh->delivery->logisticsProvider->email)
+                    ->send(new OrderStatusNotification($fresh, 'logistics_provider'));
+            }
         } catch (\Throwable $e) {
             // A mail outage must never roll back a successful payment.
             Log::error('Order payment notification failed', [
                 'order_id' => $fresh->id,
+                'delivery_id' => $payment->delivery_id,
                 'error' => $e->getMessage(),
             ]);
         }
@@ -283,9 +349,18 @@ class PaymentController extends Controller
         return $fresh;
     }
 
-    private function amountMatches(Order $order, array $gatewayData): bool
+    private function expectedAmount(Payment $payment): int
     {
-        $expected = (int) round((float) $order->total_price * 100);
+        if ($payment->kind === 'delivery' && $payment->delivery) {
+            return (int) round((float) $payment->delivery->agreed_amount * 100);
+        }
+
+        return (int) round((float) $payment->order->total_price * 100);
+    }
+
+    private function amountMatches(Payment $payment, array $gatewayData): bool
+    {
+        $expected = $this->expectedAmount($payment);
         $received = (int) ($gatewayData['amount'] ?? -1);
         $currency = strtoupper($gatewayData['currency'] ?? 'NGN');
 

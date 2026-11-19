@@ -11,6 +11,8 @@ class Payment extends Model
 
     protected $fillable = [
         'order_id',
+        'kind',
+        'delivery_id',
         'user_id',
         'provider',
         'reference',
@@ -31,6 +33,11 @@ class Payment extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function delivery()
+    {
+        return $this->belongsTo(Delivery::class);
     }
 
     public function user()

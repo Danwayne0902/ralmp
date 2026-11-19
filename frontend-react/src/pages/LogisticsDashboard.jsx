@@ -11,7 +11,7 @@ import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Field, Input, NativeSelect, Textarea } from '../components/ui/Form'
 import { Modal } from '../components/ui/Overlay'
-import { logisticsService, payoutService } from '../lib/services'
+import { deliveryOfferService, logisticsService, payoutService } from '../lib/services'
 import { fmtDate, money } from '../lib/format'
 import { parseError, cn } from '../lib/utils'
 import { useAuth } from '../store/auth'
@@ -35,6 +35,9 @@ export default function LogisticsDashboard() {
   const [dashboard, setDashboard] = useState(null)
   const [deliveries, setDeliveries] = useState([])
   const [payouts, setPayouts] = useState([])
+  const [jobs, setJobs] = useState([])
+  const [offerDraft, setOfferDraft] = useState({})
+  const [offering, setOffering] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [active, setActive] = useState(null)
@@ -47,14 +50,16 @@ export default function LogisticsDashboard() {
   async function load() {
     setLoading(true)
     try {
-      const [dashRes, deliveryRes, payoutRes] = await Promise.all([
+      const [dashRes, deliveryRes, payoutRes, jobsRes] = await Promise.all([
         logisticsService.dashboard(),
         logisticsService.deliveries({ per_page: 50 }),
         payoutService.list({ per_page: 50 }),
+        deliveryOfferService.openJobs().catch(() => ({ data: { jobs: [] } })),
       ])
       setDashboard(dashRes.data)
       setDeliveries(deliveryRes.data?.data || [])
       setPayouts(payoutRes.data?.data || [])
+      setJobs(jobsRes.data?.jobs || [])
       setError('')
     } catch (err) {
       setError(parseError(err))
@@ -133,6 +138,30 @@ export default function LogisticsDashboard() {
     }
   }
 
+  async function sendOffer(e, job) {
+    e.preventDefault()
+    const draft = offerDraft[job.order_id] || {}
+    const amount = Number(draft.amount)
+    if (!amount || amount <= 0) {
+      toast.error('Enter the price you want to charge for this delivery.')
+      return
+    }
+    setOffering(job.order_id)
+    try {
+      await deliveryOfferService.propose(job.order_id, {
+        amount,
+        note: draft.note?.trim() || undefined,
+      })
+      setOfferDraft((prev) => ({ ...prev, [job.order_id]: { amount: '', note: '' } }))
+      toast.success('Delivery offer sent in chat. The buyer can accept or counter it.')
+      await load()
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setOffering(null)
+    }
+  }
+
   return (
     <div className="page-wrap page-pad">
       <PageHeader
@@ -163,6 +192,80 @@ export default function LogisticsDashboard() {
             <Stat icon={Clock3} label="On the way" value={money(onTheWay)} hint="Bank transfer started" size="lg" />
             <Stat icon={ShieldCheck} label="Paid to you" value={money(paidToYou)} tone="neutral" hint="Bank transfers sent to you" size="lg" />
           </>
+        )}
+      </div>
+
+      <div className="mt-5 rounded-card border border-line bg-white shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+          <div>
+            <h2 className="font-display text-[15px] font-bold text-ink">Open jobs</h2>
+            <p className="mt-0.5 text-[11px] text-muted">
+              Paid orders that still need a driver. Send a price; the buyer accepts or counters in chat.
+            </p>
+          </div>
+          <Badge tone="pending" size="sm">{jobs.length} waiting</Badge>
+        </div>
+
+        {loading ? (
+          <div className="space-y-2 p-5">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}</div>
+        ) : jobs.length === 0 ? (
+          <p className="px-5 py-7 text-center text-[12px] text-muted">
+            No open jobs right now. New paid orders appear here.
+          </p>
+        ) : (
+          <div className="divide-y divide-line">
+            {jobs.map((job) => {
+              const draft = offerDraft[job.order_id] || {}
+              return (
+                <div key={job.order_id} className="grid gap-3 px-5 py-4 lg:grid-cols-[minmax(0,1fr)_250px]">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-[12.5px] font-bold text-ink">Order #{job.order_id}</p>
+                      <Badge tone="neutral" size="sm" className="capitalize">{job.status}</Badge>
+                      {job.my_offer && (
+                        <Badge tone="pending" size="sm">Your offer {money(job.my_offer.amount)}</Badge>
+                      )}
+                    </div>
+                    <p className="mt-1 flex items-start gap-1 text-[11px] leading-4 text-ink-soft">
+                      <MapPin size={11} className="mt-0.5 shrink-0 text-forest-500" />
+                      <span className="break-words">{job.pickup_location || 'Farm gate'} → {job.delivery_location || 'Buyer delivery point'}</span>
+                    </p>
+                    <p className="mt-1 text-[10.5px] leading-4 text-muted">
+                      {job.items?.map((item) => item.produce?.commodity_name || 'Produce').join(', ') || 'Goods'}
+                    </p>
+                    <p className="mt-1 text-[10.5px] text-muted">
+                      Goods value {money(job.subtotal)} · Preferred pickup {fmtDate(job.delivery_date)}
+                    </p>
+                  </div>
+
+                  <form onSubmit={(e) => sendOffer(e, job)} className="space-y-2">
+                    <Input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={draft.amount || ''}
+                      onChange={(e) => setOfferDraft((prev) => ({ ...prev, [job.order_id]: { ...draft, amount: e.target.value } }))}
+                      placeholder="Your price (₦)"
+                      aria-label={`Delivery price for order ${job.order_id}`}
+                      className="h-9 text-[12px]"
+                    />
+                    <Input
+                      value={draft.note || ''}
+                      onChange={(e) => setOfferDraft((prev) => ({ ...prev, [job.order_id]: { ...draft, note: e.target.value } }))}
+                      maxLength={255}
+                      placeholder="Note (optional)"
+                      aria-label={`Note for order ${job.order_id}`}
+                      className="h-9 text-[12px]"
+                    />
+                    <Button type="submit" size="sm" className="w-full" disabled={offering === job.order_id}>
+                      {offering === job.order_id ? <Loader2 size={13} className="animate-spin" /> : <ArrowRight size={13} />}
+                      {offering === job.order_id ? 'Sending…' : 'Send offer'}
+                    </Button>
+                  </form>
+                </div>
+              )
+            })}
+          </div>
         )}
       </div>
 
@@ -211,9 +314,9 @@ export default function LogisticsDashboard() {
                             <span className={cn('rounded-full border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide', TONE_STYLES[column.tone])}>
                               #{delivery.id}
                             </span>
-                            {delivery.delivery_cost && (
+                            {(delivery.agreed_amount || delivery.delivery_cost) && (
                               <span className="text-[10.5px] font-bold text-forest-600 tnum">
-                                {money(delivery.delivery_cost)}
+                                {money(delivery.agreed_amount || delivery.delivery_cost)}
                               </span>
                             )}
                           </div>
@@ -292,7 +395,11 @@ export default function LogisticsDashboard() {
                         <p className="text-[11.5px]">{delivery.driver_name || 'Not assigned'}</p>
                         <p className="text-[10px] text-muted">{delivery.vehicle_info || 'No vehicle record'}</p>
                       </Td>
-                      <Td className="text-right font-semibold tnum">{delivery.delivery_cost ? money(delivery.delivery_cost) : '—'}</Td>
+                      <Td className="text-right font-semibold tnum">
+                        {delivery.agreed_amount || delivery.delivery_cost
+                          ? money(delivery.agreed_amount || delivery.delivery_cost)
+                          : '—'}
+                      </Td>
                       <Td><Badge tone="neutral" size="sm" className="capitalize">{delivery.status?.replace('_', ' ')}</Badge></Td>
                       <Td className="font-mono text-[10px] text-muted">{delivery.tracking_number || '—'}</Td>
                       <Td>
@@ -373,7 +480,9 @@ export default function LogisticsDashboard() {
                   <div className="flex justify-between"><dt className="text-muted">Speed charge</dt><dd className="tnum">{quote.breakdown?.express_multiplier}×</dd></div>
                 </dl>
                 <p className="mt-2 text-[9.5px] leading-4 text-muted">
-                  This is only an estimate. The final delivery pay is fixed when the buyer pays at checkout.
+                  This is only a guide. The final price is what you and the buyer agree in chat. The platform fee is
+                  taken from that agreed price, and the money is released after both the buyer and the farmer confirm
+                  the goods arrived.
                 </p>
               </div>
             )}

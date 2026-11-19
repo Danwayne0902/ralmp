@@ -7,7 +7,10 @@ use App\Models\User;
 use App\Models\ProduceListing;
 use App\Models\Order;
 use App\Models\Delivery;
+use App\Models\PlatformFee;
+use App\Services\EscrowService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -383,5 +386,98 @@ class AdminController extends Controller
         }
 
         return $this->getAnalytics($request);
+    }
+
+    /**
+     * Platform fees actually kept, with the orders and people they came from.
+     */
+    public function getFees(Request $request)
+    {
+        if (!$request->user()->hasRole('admin')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $monthStart = now()->startOfMonth();
+
+        $totals = PlatformFee::query()
+            ->selectRaw('COUNT(*) as count, COALESCE(SUM(amount), 0) as total, COALESCE(SUM(base_amount), 0) as base')
+            ->first();
+
+        $thisMonth = PlatformFee::where('created_at', '>=', $monthStart)
+            ->selectRaw('COUNT(*) as count, COALESCE(SUM(amount), 0) as total')
+            ->first();
+
+        $byKind = PlatformFee::query()
+            ->selectRaw('kind, COUNT(*) as count, COALESCE(SUM(amount), 0) as total, COALESCE(SUM(base_amount), 0) as base')
+            ->groupBy('kind')
+            ->get()
+            ->map(fn ($row) => [
+                'kind' => $row->kind,
+                'count' => (int) $row->count,
+                'total' => round((float) $row->total, 2),
+                'base' => round((float) $row->base, 2),
+            ])
+            ->values();
+
+        $perOrder = PlatformFee::query()
+            ->select('order_id', DB::raw('SUM(amount) as total'), DB::raw('SUM(base_amount) as base'), DB::raw('COUNT(*) as parts'))
+            ->groupBy('order_id')
+            ->orderByDesc(DB::raw('SUM(amount)'))
+            ->limit(50)
+            ->get()
+            ->map(fn ($row) => [
+                'order_id' => $row->order_id,
+                'total' => round((float) $row->total, 2),
+                'base' => round((float) $row->base, 2),
+                'parts' => (int) $row->parts,
+            ])
+            ->values();
+
+        $recent = PlatformFee::with([
+            'order:id,status,total_price',
+            'payee:id,name,role',
+            'payout:id,status,amount,reference',
+        ])
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get()
+            ->map(fn (PlatformFee $fee) => [
+                'id' => $fee->id,
+                'order_id' => $fee->order_id,
+                'order_status' => $fee->order?->status,
+                'kind' => $fee->kind,
+                'base_amount' => (float) $fee->base_amount,
+                'rate' => (float) $fee->rate,
+                'amount' => (float) $fee->amount,
+                'payee' => $fee->payee ? [
+                    'id' => $fee->payee->id,
+                    'name' => $fee->payee->name,
+                    'role' => $fee->payee->role,
+                ] : null,
+                'payout' => $fee->payout ? [
+                    'id' => $fee->payout->id,
+                    'status' => $fee->payout->status,
+                    'amount' => (float) $fee->payout->amount,
+                    'reference' => $fee->payout->reference,
+                ] : null,
+                'created_at' => $fee->created_at,
+            ])
+            ->values();
+
+        return response()->json([
+            'fee_percent' => app(EscrowService::class)->feeRate(),
+            'totals' => [
+                'count' => (int) ($totals->count ?? 0),
+                'amount' => round((float) ($totals->total ?? 0), 2),
+                'base' => round((float) ($totals->base ?? 0), 2),
+            ],
+            'this_month' => [
+                'count' => (int) ($thisMonth->count ?? 0),
+                'amount' => round((float) ($thisMonth->total ?? 0), 2),
+            ],
+            'by_kind' => $byKind,
+            'per_order' => $perOrder,
+            'recent' => $recent,
+        ], 200);
     }
 }

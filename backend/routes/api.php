@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\MessageController;
 use App\Http\Controllers\Api\V1\EscrowController;
 use App\Http\Controllers\Api\V1\PayoutController;
+use App\Http\Controllers\Api\V1\DeliveryOfferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +86,14 @@ Route::prefix('v1')->group(function () {
         Route::post('/logistics/deliveries/{id}/tracking', [LogisticsController::class, 'addTrackingUpdate']);
         Route::get('/logistics/deliveries/{id}/tracking', [LogisticsController::class, 'getTrackingHistory']);
 
+        // Delivery price negotiation
+        Route::get('/logistics/open-jobs', [DeliveryOfferController::class, 'openJobs']);
+        Route::get('/orders/{orderId}/delivery-offers', [DeliveryOfferController::class, 'index']);
+        Route::post('/orders/{orderId}/delivery-offers', [DeliveryOfferController::class, 'store']);
+        Route::post('/orders/{orderId}/handover-confirm', [DeliveryOfferController::class, 'confirmHandover']);
+        Route::post('/delivery-offers/{id}/accept', [DeliveryOfferController::class, 'accept']);
+        Route::post('/delivery-offers/{id}/decline', [DeliveryOfferController::class, 'decline']);
+
         // Order Routes
         Route::get('/orders', [OrderController::class, 'index']);
         // Keep literal routes above the {id} wildcard so they are not shadowed.
@@ -139,6 +148,9 @@ Route::prefix('v1')->group(function () {
             Route::delete('/commodities/{id}', [AdminController::class, 'removeCommodity']);
             
             Route::get('/orders', [AdminController::class, 'getOrders']);
+
+            // Platform fees actually kept
+            Route::get('/fees', [AdminController::class, 'getFees']);
 
             // Escrow release controls
             Route::get('/escrow/pending', [EscrowController::class, 'pending']);

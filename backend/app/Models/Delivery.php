@@ -21,6 +21,12 @@ class Delivery extends Model
         'estimated_delivery_time',
         'actual_delivery_time',
         'delivery_cost',
+        'agreed_amount',
+        'payment_reference',
+        'payment_status',
+        'paid_at',
+        'buyer_confirmed_at',
+        'farmer_confirmed_at',
         'driver_name',
         'driver_phone',
         'vehicle_info',
@@ -32,6 +38,10 @@ class Delivery extends Model
         'estimated_delivery_time' => 'datetime',
         'actual_delivery_time' => 'datetime',
         'delivery_cost' => 'decimal:2',
+        'agreed_amount' => 'decimal:2',
+        'paid_at' => 'datetime',
+        'buyer_confirmed_at' => 'datetime',
+        'farmer_confirmed_at' => 'datetime',
     ];
 
     /**
@@ -53,6 +63,21 @@ class Delivery extends Model
     /**
      * Get tracking history for this delivery
      */
+    public function offers()
+    {
+        return $this->hasMany(DeliveryOffer::class, 'order_id', 'order_id');
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === 'paid';
+    }
+
+    public function bothConfirmed(): bool
+    {
+        return (bool) $this->buyer_confirmed_at && (bool) $this->farmer_confirmed_at;
+    }
+
     public function trackingHistory()
     {
         return $this->hasMany(DeliveryTracking::class)->orderBy('timestamp', 'asc');

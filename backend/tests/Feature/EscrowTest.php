@@ -47,8 +47,9 @@ class EscrowTest extends TestCase
             'farmer_id' => $farmer->id,
             'produce_id' => $listing->id,
             'subtotal' => 20000,
-            'delivery_fee' => 2500,
-            'total_price' => 22500,
+            // Checkout charges goods only; delivery is negotiated later.
+            'delivery_fee' => 0,
+            'total_price' => 20000,
             'status' => 'confirmed',
             'payment_status' => 'paid',
             'paid_at' => now(),
@@ -56,7 +57,7 @@ class EscrowTest extends TestCase
         ]);
     }
 
-    private function deliveryFor(Order $order, User $logistics): Delivery
+    private function deliveryFor(Order $order, User $logistics, array $overrides = []): Delivery
     {
         return Delivery::create([
             'order_id' => $order->id,
@@ -65,10 +66,12 @@ class EscrowTest extends TestCase
             'pickup_location' => 'Farm gate',
             'delivery_location' => 'Buyer store',
             'delivery_cost' => 2500,
+            'agreed_amount' => 2500,
+            ...$overrides,
         ]);
     }
 
-    public function test_funding_splits_the_order_into_farmer_and_delivery_parts(): void
+    public function test_funding_splits_the_goods_payment_into_farmer_parts(): void
     {
         $farmer = $this->user('farmer');
         $logistics = $this->user('logistics_provider');
@@ -79,20 +82,40 @@ class EscrowTest extends TestCase
         $account = $service->fund($order->fresh('delivery'));
 
         $this->assertSame('funded', $account->status);
-        $this->assertEquals(22500, (float) $account->amount);
+        $this->assertEquals(20000, (float) $account->amount);
         $this->assertEquals(20000, (float) $account->farmer_amount);
-        $this->assertCount(4, $account->releases);
+        $this->assertEquals(0, (float) $account->delivery_amount);
+        $this->assertCount(3, $account->releases);
 
         $parts = $account->releases->keyBy('milestone');
         $this->assertEquals(2000, (float) $parts['pickup']->amount);
         $this->assertEquals(12000, (float) $parts['quality']->amount);
         $this->assertEquals(6000, (float) $parts['final']->amount);
-        $this->assertEquals(2500, (float) $parts['delivery']->amount);
-        $this->assertSame($logistics->id, $parts['delivery']->payee_id);
+        $this->assertNull($parts->get('delivery'));
 
         // Funding twice must not duplicate the schedule.
         $service->fund($order->fresh('delivery'));
-        $this->assertSame(4, EscrowRelease::where('order_id', $order->id)->count());
+        $this->assertSame(3, EscrowRelease::where('order_id', $order->id)->count());
+    }
+
+    public function test_a_paid_delivery_price_is_added_to_the_escrow(): void
+    {
+        $farmer = $this->user('farmer');
+        $logistics = $this->user('logistics_provider');
+        $order = $this->paidOrder($farmer);
+        $delivery = $this->deliveryFor($order, $logistics, ['payment_status' => 'paid']);
+
+        $service = app(EscrowService::class);
+        $service->fund($order->fresh('delivery'));
+        $release = $service->fundDelivery($delivery->fresh());
+
+        $this->assertSame('delivery', $release->milestone);
+        $this->assertEquals(2500, (float) $release->amount);
+        $this->assertSame($logistics->id, $release->payee_id);
+
+        $account = $order->fresh()->escrow;
+        $this->assertEquals(22500, (float) $account->amount);
+        $this->assertEquals(2500, (float) $account->delivery_amount);
     }
 
     public function test_transporter_pickup_releases_the_first_payment(): void
@@ -110,9 +133,16 @@ class EscrowTest extends TestCase
         $release = EscrowRelease::where('order_id', $order->id)->where('milestone', 'pickup')->firstOrFail();
         $this->assertSame('released', $release->status);
         $this->assertNotNull($release->payout);
-        $this->assertEquals(2000, (float) $release->payout->amount);
+        // 5% platform fee is taken before the bank payout.
+        $this->assertEquals(1900, (float) $release->payout->amount);
         $this->assertSame('pending', $release->payout->status);
         $this->assertSame($logistics->id, $release->released_by);
+        $this->assertDatabaseHas('platform_fees', [
+            'order_id' => $order->id,
+            'escrow_release_id' => $release->id,
+            'kind' => 'goods',
+            'amount' => 100,
+        ]);
 
         $account = $order->fresh()->escrow;
         $this->assertEquals(2000, (float) $account->released_amount);
@@ -150,14 +180,17 @@ class EscrowTest extends TestCase
         $this->assertSame(1, Payout::where('escrow_release_id', $release->id)->count());
     }
 
-    public function test_buyer_confirmation_releases_final_and_delivery_payments(): void
+    public function test_driver_payment_waits_for_both_the_buyer_and_the_farmer(): void
     {
         $farmer = $this->user('farmer');
         $buyer = $this->user('buyer');
         $logistics = $this->user('logistics_provider');
         $order = $this->paidOrder($farmer, $buyer, ['status' => 'delivered']);
-        $this->deliveryFor($order, $logistics);
-        app(EscrowService::class)->fund($order->fresh('delivery'));
+        $delivery = $this->deliveryFor($order, $logistics, ['payment_status' => 'paid']);
+
+        $service = app(EscrowService::class);
+        $service->fund($order->fresh('delivery'));
+        $service->fundDelivery($delivery->fresh());
 
         $other = $this->user('buyer');
         Sanctum::actingAs($other);
@@ -168,11 +201,24 @@ class EscrowTest extends TestCase
             ->assertOk()
             ->assertJsonPath('order.status', 'completed');
 
+        // The farmer has not confirmed yet, so the driver is not paid.
         $this->assertSame('released', EscrowRelease::where('order_id', $order->id)->where('milestone', 'final')->value('status'));
-        $this->assertSame('released', EscrowRelease::where('order_id', $order->id)->where('milestone', 'delivery')->value('status'));
+        $this->assertSame('pending', EscrowRelease::where('order_id', $order->id)->where('milestone', 'delivery')->value('status'));
+        $this->assertDatabaseMissing('payouts', ['order_id' => $order->id, 'user_id' => $logistics->id]);
 
         $this->assertDatabaseHas('payouts', ['order_id' => $order->id, 'user_id' => $farmer->id]);
+
+        // The farmer's handover confirmation completes the pair.
+        Sanctum::actingAs($farmer);
+        $this->postJson("/api/v1/orders/{$order->id}/handover-confirm")->assertOk();
+
+        $this->assertSame('released', EscrowRelease::where('order_id', $order->id)->where('milestone', 'delivery')->value('status'));
         $this->assertDatabaseHas('payouts', ['order_id' => $order->id, 'user_id' => $logistics->id]);
+        $this->assertDatabaseHas('platform_fees', [
+            'order_id' => $order->id,
+            'kind' => 'delivery',
+            'amount' => 125,
+        ]);
     }
 
     public function test_cancelling_an_order_puts_the_remaining_money_on_hold(): void
@@ -189,7 +235,7 @@ class EscrowTest extends TestCase
             EscrowRelease::where('order_id', $order->id)->where('status', 'pending')->count()
         );
         $this->assertSame(
-            4,
+            3,
             EscrowRelease::where('order_id', $order->id)->where('status', 'held')->count()
         );
     }
@@ -248,7 +294,7 @@ class EscrowTest extends TestCase
         $this->getJson("/api/v1/escrow/orders/{$order->id}")
             ->assertOk()
             ->assertJsonPath('escrow.order_id', $order->id)
-            ->assertJsonCount(4, 'escrow.releases');
+            ->assertJsonCount(3, 'escrow.releases');
 
         Sanctum::actingAs($this->user('buyer'));
         $this->getJson("/api/v1/escrow/orders/{$order->id}")->assertStatus(403);

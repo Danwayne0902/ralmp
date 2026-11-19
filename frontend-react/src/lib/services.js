@@ -89,6 +89,17 @@ export const orderService = {
   confirmDelivery: (id) => api.post(`/orders/${id}/confirm-delivery`),
 }
 
+export const deliveryOfferService = {
+  // Every offer for one order, plus the current delivery state.
+  forOrder: (orderId) => api.get(`/orders/${orderId}/delivery-offers`),
+  propose: (orderId, data) => api.post(`/orders/${orderId}/delivery-offers`, data),
+  accept: (id) => api.post(`/delivery-offers/${id}/accept`),
+  decline: (id) => api.post(`/delivery-offers/${id}/decline`),
+  // Drivers: paid orders that still need a driver.
+  openJobs: () => api.get('/logistics/open-jobs'),
+  confirmHandover: (orderId) => api.post(`/orders/${orderId}/handover-confirm`),
+}
+
 export const escrowService = {
   list: (params) => api.get('/escrow', { params }),
   forOrder: (orderId) => api.get(`/escrow/orders/${orderId}`),
@@ -113,6 +124,7 @@ export const adminService = {
   setRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
   toggleStatus: (id) => api.put(`/admin/users/${id}/status`),
   analytics: () => api.get('/admin/analytics'),
+  fees: () => api.get('/admin/fees'),
   charts: (params) => api.get('/admin/chart-data', { params }),
   insights: () => api.get('/admin/market-insights'),
   orders: (params) => api.get('/admin/orders', { params }),

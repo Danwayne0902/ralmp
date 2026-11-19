@@ -4,8 +4,8 @@ import { toast } from 'sonner'
 import { QRCodeSVG } from 'qrcode.react'
 import {
   ArrowLeft, ArrowRight, BadgeCheck, Building2, Check, CheckCircle2,
-  CircleAlert, ClipboardList, Clock3, CreditCard, FileText, Lock, MapPin,
-  MessageSquare, Package, Phone, Printer, ShieldCheck, Sprout, Truck,
+  CircleAlert, ClipboardList, Clock3, CreditCard, FileText, Loader2, Lock, MapPin,
+  MessageSquare, Package, Phone, Printer, ShieldCheck, Sprout, Truck, Wallet,
   X,
 } from 'lucide-react'
 import { PageHeader, EmptyState, Loading, Table, Th, Td, Tr } from '../components/ui/Data'
@@ -14,7 +14,8 @@ import { Badge, StatusBadge } from '../components/ui/Badge'
 import { KeyValue, Callout } from '../components/ui/Card'
 import { Modal } from '../components/ui/Overlay'
 import { EscrowLedger, MilestoneSchedule, SettlementTimeline } from '../components/finance/Escrow'
-import { orderService } from '../lib/services'
+import { deliveryOfferService, orderService, paymentService } from '../lib/services'
+import { loadPaystackScript, openPaystackPayment } from '../lib/paystack'
 import { fmtDate, fmtDateTime, money, qtyUnit } from '../lib/format'
 import { parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
@@ -60,6 +61,104 @@ function PartyCard({ title, person, role, action }) {
   )
 }
 
+function OfferCard({ offer, busy, onAccept, onDecline, onCounter }) {
+  const [open, setOpen] = useState(false)
+  const [amount, setAmount] = useState('')
+  const [note, setNote] = useState('')
+
+  const statusTone =
+    offer.status === 'accepted'
+      ? 'verified'
+      : offer.status === 'proposed'
+        ? 'pending'
+        : 'neutral'
+
+  async function submitCounter(e) {
+    e.preventDefault()
+    const value = Number(amount)
+    if (!value || value <= 0) {
+      toast.error('Enter the price you want to offer.')
+      return
+    }
+    await onCounter(offer, value, note.trim())
+    setOpen(false)
+    setAmount('')
+    setNote('')
+  }
+
+  return (
+    <div className="rounded-xl border border-line bg-white p-3.5">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="break-words text-[12px] font-bold text-ink">
+            {offer.driver?.name || 'Driver'}
+            {offer.mine && <span className="ml-1.5 text-[10px] font-medium text-muted">(your offer)</span>}
+          </p>
+          <p className="text-[10px] text-muted">
+            {offer.proposer?.name ? `Sent by ${offer.proposer.name}` : 'Delivery price'} · {fmtDateTime(offer.created_at)}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="font-display text-[16px] font-extrabold text-forest-600 tnum">{money(offer.amount)}</p>
+          <Badge tone={statusTone} size="sm" className="capitalize">{offer.status}</Badge>
+        </div>
+      </div>
+
+      {offer.note && <p className="mt-2 text-[11px] leading-5 text-muted">{offer.note}</p>}
+
+      {offer.status === 'proposed' && (offer.can_accept || offer.mine) && (
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {offer.can_accept && (
+            <Button size="sm" className="h-7 px-2.5 text-[10.5px]" onClick={() => onAccept(offer)} disabled={busy}>
+              <Check size={12} /> Accept price
+            </Button>
+          )}
+          <Button size="sm" variant="outline" className="h-7 px-2.5 text-[10.5px]" onClick={() => setOpen((v) => !v)} disabled={busy}>
+            Counter
+          </Button>
+          <Button size="sm" variant="ghost" className="h-7 px-2.5 text-[10.5px]" onClick={() => onDecline(offer)} disabled={busy}>
+            Decline
+          </Button>
+        </div>
+      )}
+
+      {offer.status === 'accepted' && (
+        <p className="mt-2 text-[10.5px] font-medium text-forest-600">
+          Price locked in. Pay it below before pickup.
+        </p>
+      )}
+
+      {open && offer.status === 'proposed' && (
+        <form onSubmit={submitCounter} className="mt-2.5 space-y-2 border-t border-line pt-2.5">
+          <div className="flex gap-2">
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Your price (₦)"
+              aria-label="Counter-offer amount"
+              className="h-8 w-full rounded-lg border border-line bg-canvas px-2.5 text-[11.5px] outline-none focus:border-forest-500"
+            />
+            <Button type="submit" size="sm" className="h-8 shrink-0 px-2.5 text-[10.5px]" disabled={busy}>
+              Send
+            </Button>
+          </div>
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            maxLength={255}
+            placeholder="Short note (optional)"
+            aria-label="Counter-offer note"
+            className="h-8 w-full rounded-lg border border-line bg-canvas px-2.5 text-[11px] outline-none focus:border-forest-500"
+          />
+        </form>
+      )}
+    </div>
+  )
+}
+
 export default function OrderDetail() {
   const { id } = useParams()
   const { user } = useAuth()
@@ -68,6 +167,9 @@ export default function OrderDetail() {
   const [error, setError] = useState('')
   const [updating, setUpdating] = useState(false)
   const [confirm, setConfirm] = useState(null)
+  const [negotiation, setNegotiation] = useState(null)
+  const [offerBusy, setOfferBusy] = useState(false)
+  const [payingDelivery, setPayingDelivery] = useState(false)
 
   const isBuyer = order && user?.id === order.buyer_id
   const isFarmer = order && user?.id === order.farmer_id
@@ -79,6 +181,12 @@ export default function OrderDetail() {
     const res = await orderService.get(id)
     const data = res.data?.order || res.data
     setOrder(data)
+    try {
+      const offersRes = await deliveryOfferService.forOrder(id)
+      setNegotiation(offersRes.data)
+    } catch {
+      // A read failure must not hide the order itself.
+    }
     return data
   }
 
@@ -86,10 +194,14 @@ export default function OrderDetail() {
     let active = true
     setLoading(true)
     setError('')
-    orderService
-      .get(id)
-      .then((res) => {
-        if (active) setOrder(res.data?.order || res.data)
+    Promise.all([
+      orderService.get(id),
+      deliveryOfferService.forOrder(id).catch(() => null),
+    ])
+      .then(([res, offersRes]) => {
+        if (!active) return
+        setOrder(res.data?.order || res.data)
+        if (offersRes) setNegotiation(offersRes.data)
       })
       .catch((err) => {
         if (active) setError(parseError(err))
@@ -119,10 +231,102 @@ export default function OrderDetail() {
   async function confirmDelivery() {
     setUpdating(true)
     try {
-      await orderService.confirmDelivery(id)
+      const res = await orderService.confirmDelivery(id)
       await load()
-      toast.success('Delivery confirmed. The final payment is released.')
+      toast.success(res.data?.message || 'Delivery confirmed. The final payment is released.')
       setConfirm(null)
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function acceptOffer(offer) {
+    setOfferBusy(true)
+    try {
+      await deliveryOfferService.accept(offer.id)
+      await load()
+      toast.success(isBuyer ? 'Delivery price locked in. Pay it below before pickup.' : 'Delivery price locked in.')
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setOfferBusy(false)
+    }
+  }
+
+  async function declineOffer(offer) {
+    setOfferBusy(true)
+    try {
+      await deliveryOfferService.decline(offer.id)
+      await load()
+      toast.success('Offer declined.')
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setOfferBusy(false)
+    }
+  }
+
+  async function counterOffer(offer, amount, note) {
+    setOfferBusy(true)
+    try {
+      await deliveryOfferService.propose(id, {
+        amount,
+        note: note || undefined,
+        driver_id: offer.driver?.id,
+      })
+      await load()
+      toast.success('Counter-offer sent in chat.')
+    } catch (err) {
+      toast.error(parseError(err))
+    } finally {
+      setOfferBusy(false)
+    }
+  }
+
+  async function payDelivery() {
+    const target = order?.delivery || negotiation?.delivery
+    if (!target) return
+    setPayingDelivery(true)
+    try {
+      const res = await paymentService.initialize({
+        order_id: Number(id),
+        delivery_id: target.id,
+        callback_url: `${window.location.origin}/orders/${id}`,
+        email: user?.email,
+      })
+
+      const init = res.data
+      await loadPaystackScript()
+
+      const result = await openPaystackPayment({
+        email: user?.email,
+        amount: Number(target.agreed_amount || 0),
+        reference: init.reference,
+        metadata: { order_id: Number(id), delivery_id: target.id, kind: 'delivery' },
+      })
+
+      await paymentService.verify(result?.reference || init.reference)
+      await load()
+      toast.success('Delivery paid. The money is held until both sides confirm the goods arrived.')
+    } catch (err) {
+      if (err?.message === 'Payment cancelled') {
+        toast.info('Payment window closed. The delivery price is still locked in.')
+      } else {
+        toast.error(parseError(err))
+      }
+    } finally {
+      setPayingDelivery(false)
+    }
+  }
+
+  async function confirmHandover() {
+    setUpdating(true)
+    try {
+      const res = await deliveryOfferService.confirmHandover(id)
+      await load()
+      toast.success(res.data?.message || 'Handover confirmed.')
     } catch (err) {
       toast.error(parseError(err))
     } finally {
@@ -187,6 +391,16 @@ export default function OrderDetail() {
 
   const next = NEXT_STATUS[order.status]
   const paid = order.payment_status === 'paid'
+  const delivery = order.delivery || negotiation?.delivery || null
+  const offers = negotiation?.offers || []
+  const deliveryPaid = delivery?.payment_status === 'paid'
+  const feePercent = Number(negotiation?.fee_percent ?? delivery?.fee_percent ?? 5)
+  const agreedAmount = Number(delivery?.agreed_amount || 0)
+  const driverReceives = Number(
+    delivery?.driver_receives ?? (agreedAmount - agreedAmount * feePercent / 100),
+  )
+  const canPayDelivery = isBuyer && Boolean(delivery) && agreedAmount > 0 && !deliveryPaid && paid
+  const canConfirmHandover = isFarmer && Boolean(delivery) && paid && !delivery?.farmer_confirmed_at
   const waybill = order.delivery?.tracking_number || null
   const tracking = order.delivery?.tracking_history || order.delivery?.trackingHistory || []
   const counterparty = isFarmer ? order.buyer : order.farmer
@@ -262,11 +476,13 @@ export default function OrderDetail() {
                   </Tr>
                 ))}
                 <Tr className="hover:bg-transparent">
-                  <Td colSpan={3} className="text-right text-[11.5px] text-muted">Delivery</Td>
-                  <Td className="text-right tnum">{money(order.delivery_fee)}</Td>
+                  <Td colSpan={3} className="text-right text-[11.5px] text-muted">Delivery (agreed in chat)</Td>
+                  <Td className="text-right tnum">
+                    {agreedAmount > 0 ? money(agreedAmount) : 'Not agreed yet'}
+                  </Td>
                 </Tr>
                 <Tr className="hover:bg-transparent">
-                  <Td colSpan={3} className="text-right text-[12px] font-bold text-ink">Total paid</Td>
+                  <Td colSpan={3} className="text-right text-[12px] font-bold text-ink">Goods paid</Td>
                   <Td className="text-right font-display text-[16px] font-extrabold text-forest-600 tnum">
                     {money(order.total_price)}
                   </Td>
@@ -288,10 +504,10 @@ export default function OrderDetail() {
               <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
                 <Truck size={16} className="text-forest-500" /> Delivery
               </h2>
-              {order.delivery?.status ? (
-                <Badge tone="transit" size="sm">{order.delivery.status}</Badge>
+              {delivery?.status ? (
+                <Badge tone="transit" size="sm">{delivery.status.replace('_', ' ')}</Badge>
               ) : (
-                <Badge tone="neutral" size="sm">Waiting for a transporter</Badge>
+                <Badge tone="neutral" size="sm">Waiting for a driver</Badge>
               )}
             </div>
 
@@ -299,8 +515,10 @@ export default function OrderDetail() {
               <div className="min-w-0">
                 <dl className="space-y-0.5">
                   <KeyValue label="Delivery note number" mono>{waybill || 'Not issued yet'}</KeyValue>
-                  <KeyValue label="Transporter">{order.delivery?.logistics_provider?.name || 'Finding a transporter'}</KeyValue>
-                  <KeyValue label="Vehicle and plate">{order.delivery?.vehicle_number || 'Not assigned'}</KeyValue>
+                  <KeyValue label="Driver">
+                    {delivery?.logistics_provider?.name || delivery?.logisticsProvider?.name || 'Finding a driver'}
+                  </KeyValue>
+                  <KeyValue label="Vehicle and plate">{delivery?.vehicle_number || 'Not assigned'}</KeyValue>
                   <KeyValue label="Origin">{order.produce?.location || order.farmer?.address || 'Farm gate'}</KeyValue>
                   <KeyValue label="Destination">
                     {[order.buyer?.lga, order.buyer?.state].filter(Boolean).join(', ') || order.buyer?.address || 'Buyer delivery point'}
@@ -363,6 +581,91 @@ export default function OrderDetail() {
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="border-t border-line px-5 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="flex items-center gap-2 font-display text-[13px] font-bold text-ink">
+                  <Wallet size={14} className="text-forest-500" /> Delivery price
+                </h3>
+                <span className="text-[10px] text-muted">Platform fee {feePercent}%</span>
+              </div>
+
+              {delivery && agreedAmount > 0 ? (
+                <div className="mt-2.5 rounded-xl border border-line bg-canvas p-3.5">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">
+                        {deliveryPaid ? 'Paid into escrow' : 'Agreed price'}
+                      </p>
+                      <p className="font-display text-[22px] font-extrabold tracking-tight text-forest-600 tnum">
+                        {money(agreedAmount)}
+                      </p>
+                    </div>
+                    <Badge tone={deliveryPaid ? 'verified' : 'pending'} size="sm">
+                      {deliveryPaid ? 'Paid' : 'Not paid'}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-[10.5px] leading-4 text-muted">
+                    The driver receives {money(driverReceives)} after the {feePercent}% platform fee.
+                  </p>
+
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    <Badge tone={delivery.buyer_confirmed_at ? 'verified' : 'neutral'} size="sm">
+                      Buyer {delivery.buyer_confirmed_at ? 'confirmed' : 'waiting'}
+                    </Badge>
+                    <Badge tone={delivery.farmer_confirmed_at ? 'verified' : 'neutral'} size="sm">
+                      Farmer {delivery.farmer_confirmed_at ? 'confirmed' : 'waiting'}
+                    </Badge>
+                  </div>
+
+                  {deliveryPaid && !delivery.both_confirmed && (
+                    <p className="mt-2 rounded-lg border border-harvest-200 bg-harvest-50 px-3 py-2 text-[10.5px] leading-4 text-harvest-600">
+                      The driver is paid automatically once both the buyer and the farmer confirm the goods arrived.
+                    </p>
+                  )}
+                  {deliveryPaid && delivery.both_confirmed && (
+                    <p className="mt-2 rounded-lg border border-forest-200 bg-forest-50 px-3 py-2 text-[10.5px] leading-4 text-forest-700">
+                      Both sides confirmed. The driver&apos;s payment has been released for bank transfer.
+                    </p>
+                  )}
+
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    {canPayDelivery && (
+                      <Button size="sm" onClick={payDelivery} disabled={payingDelivery}>
+                        {payingDelivery ? <Loader2 size={13} className="animate-spin" /> : <CreditCard size={13} />}
+                        {payingDelivery ? 'Opening checkout…' : `Pay delivery · ${money(agreedAmount)}`}
+                      </Button>
+                    )}
+                    {canConfirmHandover && (
+                      <Button size="sm" variant="secondary" onClick={confirmHandover} disabled={updating}>
+                        <CheckCircle2 size={13} /> Confirm handover
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-2 rounded-xl border border-dashed border-sage-400 px-3.5 py-3 text-[11.5px] leading-5 text-muted">
+                  No delivery price agreed yet. Drivers can see this paid order and send a price. Their offer appears
+                  here and in your messages, where you can accept it or counter it.
+                </p>
+              )}
+
+              {offers.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Offers in chat</p>
+                  {offers.map((offer) => (
+                    <OfferCard
+                      key={offer.id}
+                      offer={offer}
+                      busy={offerBusy}
+                      onAccept={acceptOffer}
+                      onDecline={declineOffer}
+                      onCounter={counterOffer}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -479,7 +782,7 @@ export default function OrderDetail() {
           confirm?.type === 'cancel'
             ? 'This returns the stock to the farmer and closes the order. If you have not paid, no refund is needed.'
             : confirm?.type === 'delivery'
-              ? 'This closes the order and releases the final payment to the farmer and the delivery payment to the transporter.'
+              ? 'This closes the order and releases the final payment to the farmer. The driver is paid only after the farmer also confirms the handover.'
               : confirm?.status === 'rejected'
                 ? 'Rejecting returns the stock to the farmer and closes the order.'
                 : 'The change is saved on the order and the other person is told by email.'

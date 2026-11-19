@@ -3,11 +3,25 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Marketplace
+    | Platform fee
     |--------------------------------------------------------------------------
     |
-    | Flat delivery fee (in Naira) applied to every order. This is charged
-    | server-side so clients cannot influence the amount they pay.
+    | Percentage kept by the platform from every released payment part, both
+    | goods and delivery. Clamped to the agreed 4-6% range so a bad env value
+    | cannot silently overcharge.
+    |
+    */
+
+    'platform_fee_percent' => (float) env('RAMLP_PLATFORM_FEE_PERCENT', 5),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy flat delivery fee
+    |--------------------------------------------------------------------------
+    |
+    | Delivery is now negotiated with a driver after the order is placed, so
+    | checkout no longer charges this. It is kept so old orders and tests that
+    | still carry a delivery fee keep working.
     |
     */
 

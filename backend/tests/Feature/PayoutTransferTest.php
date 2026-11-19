@@ -256,7 +256,7 @@ class PayoutTransferTest extends TestCase
 
         Mail::assertSent(PayoutReleased::class, function ($mail) use ($farmer) {
             return $mail->hasTo($farmer->email)
-                && (float) $mail->payout->amount === 2000.0;
+                && (float) $mail->payout->amount === 1900.0;
         });
     }
 

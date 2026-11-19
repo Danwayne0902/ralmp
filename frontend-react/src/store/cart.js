@@ -5,7 +5,7 @@ export const useCart = create((set, get) => ({
   items: [],
   total: 0,
   count: 0,
-  deliveryFee: 2500,
+  deliveryFee: 0,
   loading: false,
 
   fetch: async () => {
@@ -17,7 +17,7 @@ export const useCart = create((set, get) => ({
         items: data.items || [],
         total: Number(data.total || 0),
         count: Number(data.count || 0),
-        deliveryFee: Number(data.delivery_fee ?? 2500),
+        deliveryFee: Number(data.delivery_fee ?? 0),
       })
     } finally {
       set({ loading: false })
