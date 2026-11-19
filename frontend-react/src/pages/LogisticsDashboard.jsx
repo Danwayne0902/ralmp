@@ -216,6 +216,9 @@ export default function LogisticsDashboard() {
           <div className="divide-y divide-line">
             {jobs.map((job) => {
               const draft = offerDraft[job.order_id] || {}
+              const feeRate = Number(job.fee_percent ?? 5)
+              const offerAmount = Number(draft.amount) || 0
+              const offerNet = offerAmount > 0 ? offerAmount - (offerAmount * feeRate) / 100 : 0
               return (
                 <div key={job.order_id} className="grid gap-3 px-5 py-4 lg:grid-cols-[minmax(0,1fr)_250px]">
                   <div className="min-w-0">
@@ -249,6 +252,17 @@ export default function LogisticsDashboard() {
                       aria-label={`Delivery price for order ${job.order_id}`}
                       className="h-9 text-[12px]"
                     />
+                    <p className="text-[10px] leading-4 text-muted">
+                      {offerAmount > 0 ? (
+                        <>
+                          You receive{' '}
+                          <span className="font-semibold text-forest-600 tnum">{money(offerNet)}</span> after the{' '}
+                          {feeRate}% platform fee.
+                        </>
+                      ) : (
+                        <>The {feeRate}% platform fee is taken from the price you agree.</>
+                      )}
+                    </p>
                     <Input
                       value={draft.note || ''}
                       onChange={(e) => setOfferDraft((prev) => ({ ...prev, [job.order_id]: { ...draft, note: e.target.value } }))}
@@ -517,6 +531,11 @@ export default function LogisticsDashboard() {
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="text-[12px] font-bold text-forest-600 tnum">{money(payout.amount)}</p>
+                      {Number(payout.platform_fee) > 0 && (
+                        <p className="text-[9.5px] text-muted tnum">
+                          after {money(payout.platform_fee)} fee
+                        </p>
+                      )}
                       <Badge
                         tone={payout.status === 'paid'
                           ? 'verified'

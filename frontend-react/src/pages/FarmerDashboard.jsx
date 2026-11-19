@@ -8,7 +8,7 @@ import { Stat, Table, Th, Td, Tr, Skeleton, EmptyState } from '../components/ui/
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
 import { produceService, orderService } from '../lib/services'
-import { escrowHeld, escrowReleased } from '../lib/orders'
+import { escrowHeldNet, escrowReleasedNet } from '../lib/orders'
 import { fmtDate, money, qtyUnit, unitOne } from '../lib/format'
 import { useAuth } from '../store/auth'
 import { parseError } from '../lib/utils'
@@ -47,8 +47,8 @@ export default function FarmerDashboard() {
 
   const availableLots = listings.filter((lot) => lot.availability_status === 'available')
   const stockValue = availableLots.reduce((sum, lot) => sum + Number(lot.price || 0) * Number(lot.quantity || 0), 0)
-  const inEscrow = orders.reduce((sum, order) => sum + escrowHeld(order), 0)
-  const released = orders.reduce((sum, order) => sum + escrowReleased(order), 0)
+  const inEscrow = orders.reduce((sum, order) => sum + escrowHeldNet(order), 0)
+  const released = orders.reduce((sum, order) => sum + escrowReleasedNet(order), 0)
   const pendingOrders = orders.filter((order) => order.status === 'pending')
 
   const nextAction = useMemo(() => {
@@ -114,8 +114,8 @@ export default function FarmerDashboard() {
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[108px] rounded-card" />)
         ) : (
           <>
-            <Stat icon={Banknote} label="Money received" value={money(earnings?.total_earnings ?? 0)} tone="sprout" hint="Sent to your bank account" size="lg" />
-            <Stat icon={Lock2} label="Money on hold" value={money(inEscrow)} tone="gold" hint="Waiting for pickup, checks or delivery" size="lg" />
+            <Stat icon={Banknote} label="Money received" value={money(earnings?.total_earnings ?? 0)} tone="sprout" hint="Sent to your bank account, after the platform fee" size="lg" />
+            <Stat icon={Lock2} label="Money on hold" value={money(inEscrow)} tone="gold" hint="Waiting for pickup, checks or delivery, after the platform fee" size="lg" />
             <Stat icon={Sprout} label="For sale" value={availableLots.length} hint={`${listings.length} listings in total`} />
             <Stat icon={Truck} label="Orders" value={earnings?.total_orders ?? orders.length} tone="neutral" hint={`${earnings?.completed_orders ?? 0} finished`} />
           </>

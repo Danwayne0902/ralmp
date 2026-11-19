@@ -48,4 +48,13 @@ class Payout extends Model
     {
         return $this->belongsTo(EscrowRelease::class, 'escrow_release_id');
     }
+
+    /**
+     * The platform fee taken from this payout. amount on the payout is already
+     * net; the fee row keeps the gross base and the rate we charged.
+     */
+    public function platformFee()
+    {
+        return $this->hasOne(PlatformFee::class);
+    }
 }

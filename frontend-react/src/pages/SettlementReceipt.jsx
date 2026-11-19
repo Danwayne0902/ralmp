@@ -9,7 +9,7 @@ import { Card, CardHeader, CardBody, CardFooter, Callout, KeyValue } from '../co
 import { Button } from '../components/ui/Button'
 import { Badge, StateBadge } from '../components/ui/Badge'
 import { produceService, orderService } from '../lib/services'
-import { escrowSchedule, escrowReleased } from '../lib/orders'
+import { escrowSchedule, escrowReleased, escrowReleasedNet, escrowNetBase } from '../lib/orders'
 import { fmtDate, fmtDateTime, money, num } from '../lib/format'
 import { cn, downloadCsv, parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
@@ -153,7 +153,7 @@ export default function SettlementReceipt() {
   const settled = useMemo(() => orders.filter((order) => escrowReleased(order) > 0), [orders])
   const active = useMemo(() => orders.find((order) => order.id === activeId) || null, [orders, activeId])
   const schedule = useMemo(() => escrowSchedule(active), [active])
-  const settledAmount = escrowReleased(active)
+  const settledAmount = escrowReleasedNet(active)
   const reference = active?.payment_reference || (active ? `RAMLP-${active.id}` : 'RAMLP')
   const txRef = `RCPT/${reference}-${String(active?.id ?? 0).padStart(4, '0')}`
   const seal = fingerprint(txRef, 64)
@@ -162,7 +162,7 @@ export default function SettlementReceipt() {
   const disbursed = Number(earnings?.total_earnings || 0)
   const pending = orders
     .filter((order) => order.payment_status === 'paid' && !['cancelled', 'rejected'].includes(order.status))
-    .reduce((sum, order) => sum + Math.max(0, Number(order.total_price || 0) - escrowReleased(order)), 0)
+    .reduce((sum, order) => sum + Math.max(0, escrowNetBase(order) - escrowReleasedNet(order)), 0)
   const lastSettlement = settled[0] ? settled[0].paid_at || settled[0].updated_at || settled[0].order_date : null
 
   function exportStatement() {
@@ -170,7 +170,7 @@ export default function SettlementReceipt() {
       order_id: order.id,
       commodity: order.produce?.commodity_name || '',
       buyer: order.buyer?.name || '',
-      settled: escrowReleased(order),
+      settled: escrowReleasedNet(order),
       total: order.total_price,
       paid_at: order.paid_at || order.order_date,
       reference: order.payment_reference || '',
@@ -339,7 +339,14 @@ export default function SettlementReceipt() {
                               {tranche.index} · {tranche.short}
                             </Td>
                             <Td className="text-[12px] text-muted">{tranche.trigger}</Td>
-                            <Td className="text-right font-semibold tnum text-ink">{money(tranche.amount)}</Td>
+                            <Td className="text-right">
+                              <p className="font-semibold tnum text-ink">{money(tranche.net)}</p>
+                              {tranche.fee > 0 && (
+                                <p className="text-[10px] text-muted tnum">
+                                  {money(tranche.amount)} − {money(tranche.fee)} fee
+                                </p>
+                              )}
+                            </Td>
                             <Td><StateBadge state={tranche.state} /></Td>
                           </Tr>
                         ))}
@@ -393,7 +400,7 @@ export default function SettlementReceipt() {
                         </span>
                         <span className="shrink-0 text-right">
                           <span className="block font-display text-[13px] font-bold tnum text-forest-600">
-                            {money(escrowReleased(order))}
+                            {money(escrowReleasedNet(order))}
                           </span>
                           <span className="mt-0.5 inline-flex items-center gap-1 text-[10.5px] font-semibold text-forest-600">
                             <CheckCircle2 size={10} /> Cleared

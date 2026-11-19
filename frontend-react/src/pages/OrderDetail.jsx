@@ -17,6 +17,7 @@ import { EscrowLedger, MilestoneSchedule, SettlementTimeline } from '../componen
 import { deliveryOfferService, orderService, paymentService } from '../lib/services'
 import { loadPaystackScript, openPaystackPayment } from '../lib/paystack'
 import { fmtDate, fmtDateTime, money, qtyUnit } from '../lib/format'
+import { escrowFeePercent } from '../lib/orders'
 import { parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
 
@@ -395,6 +396,10 @@ export default function OrderDetail() {
   const offers = negotiation?.offers || []
   const deliveryPaid = delivery?.payment_status === 'paid'
   const feePercent = Number(negotiation?.fee_percent ?? delivery?.fee_percent ?? 5)
+  const goodsRate = escrowFeePercent(order)
+  const goodsBase = Number(order.subtotal || 0)
+  const goodsFee = Math.round((goodsBase * goodsRate) / 100 * 100) / 100
+  const farmerReceives = Math.round((goodsBase - goodsFee) * 100) / 100
   const agreedAmount = Number(delivery?.agreed_amount || 0)
   const driverReceives = Number(
     delivery?.driver_receives ?? (agreedAmount - agreedAmount * feePercent / 100),
@@ -487,6 +492,18 @@ export default function OrderDetail() {
                     {money(order.total_price)}
                   </Td>
                 </Tr>
+                {goodsFee > 0 && (
+                  <Tr className="hover:bg-transparent">
+                    <Td colSpan={3} className="text-right text-[11.5px] text-muted">
+                      Platform fee {goodsRate}% · farmer receives
+                    </Td>
+                    <Td className="text-right text-[11.5px] tnum">
+                      <span className="text-muted">−{money(goodsFee)}</span>
+                      <span className="text-muted"> · </span>
+                      <span className="font-semibold text-forest-600">{money(farmerReceives)}</span>
+                    </Td>
+                  </Tr>
+                )}
               </tbody>
             </Table>
             {order.notes && (

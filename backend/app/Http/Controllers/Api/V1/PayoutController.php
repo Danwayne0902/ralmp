@@ -19,6 +19,7 @@ class PayoutController extends Controller
             'order.produce:id,commodity_name,unit',
             'release:id,milestone,label,released_at',
             'user:id,name,email,phone,bank_name,account_number',
+            'platformFee:id,payout_id,kind,base_amount,rate,amount',
         ]);
 
         if ($user->hasRole('admin')) {
@@ -33,7 +34,25 @@ class PayoutController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        return response()->json($query->orderByDesc('created_at')->paginate($request->get('per_page', 15)), 200);
+        $paginator = $query->orderByDesc('created_at')->paginate($request->get('per_page', 15));
+
+        // amount on a payout is the money the payee receives. Attach the gross
+        // base and the platform fee so every list can show what was taken.
+        $paginator->getCollection()->transform(function (Payout $payout) {
+            $fee = $payout->platformFee;
+
+            // The loaded relation would serialise as platform_fee and shadow the
+            // flat figure below, so keep the values from the relation only.
+            $payout->makeHidden('platformFee');
+
+            $payout->setAttribute('base_amount', (float) ($fee?->base_amount ?? $payout->amount));
+            $payout->setAttribute('platform_fee', (float) ($fee?->amount ?? 0));
+            $payout->setAttribute('fee_percent', (float) ($fee?->rate ?? 0));
+
+            return $payout;
+        });
+
+        return response()->json($paginator, 200);
     }
 
     /**

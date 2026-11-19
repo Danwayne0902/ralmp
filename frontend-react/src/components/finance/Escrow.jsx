@@ -1,7 +1,7 @@
 import { ArrowDownToLine, Check, Lock, ShieldCheck, Snowflake, Truck } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { money } from '../../lib/format'
-import { escrowSchedule } from '../../lib/orders'
+import { escrowFeePercent, escrowNet, escrowSchedule } from '../../lib/orders'
 import { StateBadge } from '../ui/Badge'
 import { Progress } from '../ui/Data'
 
@@ -9,6 +9,7 @@ export function EscrowLedger({ order, className, showTitle = true }) {
   const subtotal = Number(order?.subtotal ?? 0)
   const delivery = Number(order?.delivery_fee ?? 0)
   const total = Number(order?.total_price ?? order?.total_amount ?? subtotal + delivery)
+  const feePercent = escrowFeePercent(order)
 
   return (
     <div className={cn('rounded-xl border border-line bg-white', className)}>
@@ -36,6 +37,15 @@ export function EscrowLedger({ order, className, showTitle = true }) {
         <div className="flex items-center justify-between gap-3 py-2.5">
           <dt className="text-muted">Escrow holding fee</dt>
           <dd className="font-semibold text-forest-600">Free</dd>
+        </div>
+        <div className="flex items-start justify-between gap-3 py-2.5">
+          <dt className="text-muted">
+            Platform fee
+            <span className="mt-0.5 block text-[10.5px] leading-4 text-muted">
+              Taken from each part when it is paid out
+            </span>
+          </dt>
+          <dd className="shrink-0 font-semibold text-harvest-600 tnum">{feePercent}%</dd>
         </div>
       </dl>
       <div className="border-t border-line px-4 py-3.5">
@@ -77,6 +87,9 @@ function deliveryPart(order) {
     stateLabel = 'Waiting for delivery'
   }
 
+  const amount = release ? Number(release.amount) : fee
+  const net = escrowNet(amount, escrowFeePercent(order), release)
+
   return {
     key: 'delivery',
     index: 'D',
@@ -84,7 +97,9 @@ function deliveryPart(order) {
     title: 'Delivery payment',
     short: 'Delivery',
     trigger: 'Paid to the transporter when the goods are delivered.',
-    amount: release ? Number(release.amount) : fee,
+    amount,
+    net,
+    fee: Math.round((amount - net) * 100) / 100,
     state,
     stateLabel,
   }
@@ -95,6 +110,7 @@ export function MilestoneSchedule({ order, compact = false, className, title = '
   const schedule = delivery ? [...escrowSchedule(order), delivery] : escrowSchedule(order)
   const settled = schedule.filter((m) => m.state === 'settled').length
   const pct = Math.round((settled / schedule.length) * 100)
+  const feePercent = escrowFeePercent(order)
 
   return (
     <div className={cn('rounded-card border border-line bg-white', className)}>
@@ -141,6 +157,11 @@ export function MilestoneSchedule({ order, compact = false, className, title = '
                 </div>
                 <div className="text-right">
                   <p className="text-[13px] font-bold text-ink tnum">{money(m.amount)}</p>
+                  {m.fee > 0 && (
+                    <p className="mt-0.5 text-[10px] leading-3 text-muted tnum">
+                      {m.key === 'delivery' ? 'Driver' : 'Farmer'} gets {money(m.net)} after the {feePercent}% fee
+                    </p>
+                  )}
                   <div className="mt-1 flex justify-end">
                     <StateBadge state={m.state} label={m.stateLabel} />
                   </div>

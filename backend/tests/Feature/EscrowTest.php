@@ -264,6 +264,55 @@ class EscrowTest extends TestCase
         $this->getJson('/api/v1/payouts')->assertOk()->assertJsonCount(2, 'data');
     }
 
+    public function test_money_payloads_carry_the_platform_fee_and_net_amount(): void
+    {
+        $farmer = $this->user('farmer');
+        $order = $this->paidOrder($farmer);
+        $account = app(EscrowService::class)->fund($order->fresh('delivery'));
+        $admin = $this->user('admin');
+
+        app(EscrowService::class)->release($account->releases->firstWhere('milestone', 'pickup'), $admin);
+
+        // The payee sees what was taken, not only what arrives.
+        Sanctum::actingAs($farmer);
+        $payouts = $this->getJson('/api/v1/payouts')->assertOk()->json('data');
+        $this->assertCount(1, $payouts);
+        $this->assertEquals(2000, $payouts[0]['base_amount']);
+        $this->assertEquals(100, $payouts[0]['platform_fee']);
+        $this->assertEquals(5, $payouts[0]['fee_percent']);
+        $this->assertEquals(1900, $payouts[0]['amount']);
+        // The raw relation must not leak in and shadow the flat figures above.
+        $this->assertArrayNotHasKey('platformFee', $payouts[0]);
+
+        // Escrow rows expose the same gross -> fee -> net split.
+        $releases = $this->getJson("/api/v1/escrow/orders/{$order->id}")
+            ->assertOk()
+            ->json('escrow.releases');
+
+        $byMilestone = collect($releases)->keyBy('milestone');
+        $this->assertEquals(5, $byMilestone['pickup']['fee_percent']);
+        // Pickup has a payout, so its net is the money the farmer receives.
+        $this->assertEquals(1900, $byMilestone['pickup']['net_amount']);
+        // A part still in escrow is net of the fee too.
+        $this->assertEquals(11400, $byMilestone['quality']['net_amount']);
+    }
+
+    public function test_farmer_earnings_report_held_money_net_of_the_fee(): void
+    {
+        $farmer = $this->user('farmer');
+        $buyer = $this->user('buyer');
+        $order = $this->paidOrder($farmer, $buyer);
+        app(EscrowService::class)->fund($order->fresh('delivery'));
+
+        Sanctum::actingAs($buyer);
+        $this->postJson("/api/v1/orders/{$order->id}/cancel")->assertOk();
+
+        // 20000 held, less the 5% platform fee.
+        Sanctum::actingAs($farmer);
+        $earnings = $this->getJson('/api/v1/farmer/earnings')->assertOk()->json();
+        $this->assertEquals(19000, $earnings['held_earnings']);
+    }
+
     public function test_admin_can_mark_a_payout_as_paid(): void
     {
         $farmer = $this->user('farmer');

@@ -268,10 +268,13 @@ class ProduceListingController extends Controller
             ->where('status', 'pending')
             ->sum('amount');
 
-        // Money still waiting on a proof or review.
-        $heldEarnings = EscrowRelease::where('payee_id', $userId)
+        // Money still waiting on a proof or review. Held escrow is a gross
+        // figure, so take the platform fee off it to match the net payouts.
+        $heldGross = (float) EscrowRelease::where('payee_id', $userId)
             ->whereIn('status', ['pending', 'held'])
             ->sum('amount');
+        $feeRate = app(\App\Services\EscrowService::class)->feeRate();
+        $heldEarnings = round($heldGross - ($heldGross * $feeRate / 100), 2);
 
         // Orders count
         $totalOrders = Order::where('farmer_id', $userId)->count();

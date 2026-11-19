@@ -55,6 +55,29 @@ export const TRANCHE_SPLIT = [
 
 const RELEASE_BY_TRANCHE = { t1: 'pickup', t2: 'quality', t3: 'final' }
 
+// The platform keeps a slice of every payment part. The rate comes with the
+// escrow rows; this is only the fallback for orders with no escrow yet.
+export const DEFAULT_FEE_PERCENT = 5
+
+function round2(value) {
+  return Math.round((Number(value) || 0) * 100) / 100
+}
+
+export function escrowFeePercent(order) {
+  if (!order) return DEFAULT_FEE_PERCENT
+  const releases = Array.isArray(order.escrow?.releases) ? order.escrow.releases : []
+  const withRate = releases.find((row) => row?.fee_percent != null && Number(row.fee_percent) > 0)
+  if (withRate) return Number(withRate.fee_percent)
+  return Number(order.fee_percent ?? DEFAULT_FEE_PERCENT)
+}
+
+// Gross escrow amount in, money the payee actually receives out.
+export function escrowNet(amount, rate, release) {
+  const gross = Number(amount) || 0
+  if (release?.net_amount != null) return Number(release.net_amount)
+  return round2(gross - (gross * (Number(rate) || 0)) / 100)
+}
+
 function releaseState(release) {
   if (!release) return { state: 'held', stateLabel: 'Not set up yet' }
   if (release.status === 'released') {
@@ -76,14 +99,19 @@ export function escrowSchedule(order) {
   const total = Number(order.total_price ?? order.total_amount ?? 0)
   const base = Number(order.subtotal ?? 0) > 0 ? Number(order.subtotal) : total
   const releases = Array.isArray(order.escrow?.releases) ? order.escrow.releases : []
+  const rate = escrowFeePercent(order)
 
   if (releases.length > 0) {
     return TRANCHE_SPLIT.map((tranche) => {
       const release = releases.find((row) => row.milestone === RELEASE_BY_TRANCHE[tranche.key])
       const state = releaseState(release)
+      const amount = release ? Number(release.amount) : Math.round(base * tranche.share)
+      const net = escrowNet(amount, rate, release)
       return {
         ...tranche,
-        amount: release ? Number(release.amount) : Math.round(base * tranche.share),
+        amount,
+        net,
+        fee: round2(amount - net),
         ...state,
         release,
       }
@@ -124,9 +152,14 @@ export function escrowSchedule(order) {
       }
     }
 
+    const amount = Math.round(base * tranche.share)
+    const net = escrowNet(amount, rate)
+
     return {
       ...tranche,
-      amount: Math.round(base * tranche.share),
+      amount,
+      net,
+      fee: round2(amount - net),
       state,
       stateLabel,
     }
@@ -149,6 +182,28 @@ export function escrowBase(order) {
   if (!order) return 0
   const subtotal = Number(order.subtotal ?? 0)
   return subtotal > 0 ? subtotal : Number(order.total_price ?? 0)
+}
+
+// What is left for the payee once the platform fee is taken off each part.
+// Use these wherever the farmer or the driver is looking at the figures.
+export function escrowReleasedNet(order) {
+  return round2(
+    escrowSchedule(order)
+      .filter((t) => t.state === 'settled')
+      .reduce((sum, t) => sum + t.net, 0),
+  )
+}
+
+export function escrowHeldNet(order) {
+  return round2(
+    escrowSchedule(order)
+      .filter((t) => t.state === 'held' || t.state === 'in_progress')
+      .reduce((sum, t) => sum + t.net, 0),
+  )
+}
+
+export function escrowNetBase(order) {
+  return round2(escrowSchedule(order).reduce((sum, t) => sum + t.net, 0))
 }
 
 // Whole-order money movement, including the delivery payment. The 10/60/30

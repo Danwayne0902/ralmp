@@ -8,7 +8,7 @@ import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } f
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
 import { orderService, payoutService } from '../lib/services'
-import { escrowHeld, escrowBase } from '../lib/orders'
+import { escrowHeldNet, escrowNetBase } from '../lib/orders'
 import { fmtDate, money } from '../lib/format'
 import { downloadCsv, parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
@@ -55,7 +55,7 @@ export default function Payouts() {
     }
   }, [])
 
-  const held = orders.reduce((sum, order) => sum + escrowHeld(order), 0)
+  const held = orders.reduce((sum, order) => sum + escrowHeldNet(order), 0)
   const paidToYou = payouts
     .filter((payout) => payout.status === 'paid')
     .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
@@ -74,6 +74,9 @@ export default function Payouts() {
           id: payout.id,
           order: payout.order,
           amount: Number(payout.amount || 0),
+          base: Number(payout.base_amount ?? payout.amount ?? 0),
+          fee: Number(payout.platform_fee || 0),
+          feePercent: Number(payout.fee_percent || 0),
           status: payout.status,
           reference: payout.reference,
           label: payout.release?.label || 'Payment',
@@ -90,11 +93,11 @@ export default function Payouts() {
       buyer: order.buyer?.name || '',
       commodity: order.produce?.commodity_name || '',
       total: order.total_price,
-      base: escrowBase(order),
+      base: escrowNetBase(order),
       released: payouts
         .filter((payout) => payout.order_id === order.id)
         .reduce((sum, payout) => sum + Number(payout.amount || 0), 0),
-      held: escrowHeld(order),
+      held: escrowHeldNet(order),
       order_status: order.status,
       payment_status: order.payment_status,
       date: order.order_date,
@@ -162,7 +165,9 @@ export default function Payouts() {
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
               <div>
                 <h2 className="font-display text-[15px] font-bold text-ink">Your payouts</h2>
-                <p className="mt-0.5 text-[11px] text-muted">Each line is money released from escrow for you.</p>
+                <p className="mt-0.5 text-[11px] text-muted">
+                  Each line is money released from escrow for you, already net of the platform fee.
+                </p>
               </div>
               <Badge tone="verified" size="sm"><ShieldCheck size={11} /> Saved record</Badge>
             </div>
@@ -205,7 +210,14 @@ export default function Payouts() {
                           </Td>
                           <Td className="text-[11.5px] font-semibold text-ink">{event.label}</Td>
                           <Td className="font-mono text-[10px] text-muted">{event.reference}</Td>
-                          <Td className="text-right font-semibold text-forest-600 tnum">{money(event.amount)}</Td>
+                          <Td className="text-right">
+                            <p className="font-semibold text-forest-600 tnum">{money(event.amount)}</p>
+                            {event.fee > 0 && (
+                              <p className="text-[9.5px] text-muted tnum">
+                                {money(event.base)} − {money(event.fee)} fee
+                              </p>
+                            )}
+                          </Td>
                           <Td>
                             <PayoutState payout={event} />
                             {event.failureReason && (
@@ -233,6 +245,9 @@ export default function Payouts() {
                         </div>
                         <div className="shrink-0 text-right">
                           <p className="text-[13px] font-bold text-forest-600 tnum">{money(event.amount)}</p>
+                          {event.fee > 0 && (
+                            <p className="text-[9.5px] text-muted tnum">{money(event.base)} − {money(event.fee)} fee</p>
+                          )}
                           <div className="mt-1 flex justify-end"><PayoutState payout={event} /></div>
                           {event.failureReason && (
                             <p className="mt-1 max-w-[160px] text-[9.5px] leading-3 text-critical-600">{event.failureReason}</p>
@@ -268,7 +283,7 @@ export default function Payouts() {
             ) : (
               <ul className="divide-y divide-line">
                 {orders.map((order) => {
-                  const total = escrowBase(order)
+                  const total = escrowNetBase(order)
                   const orderReleased = payouts
                     .filter((payout) => payout.order_id === order.id)
                     .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
@@ -352,6 +367,10 @@ export default function Payouts() {
                 </li>
               ))}
             </ol>
+            <p className="mt-3 border-t border-line pt-2.5 text-[10.5px] leading-4 text-muted">
+              A platform fee is taken from each part before it reaches your bank, so the amounts above are what you
+              receive.
+            </p>
           </div>
 
           <div className="rounded-card border border-forest-100 bg-forest-50 p-4">
