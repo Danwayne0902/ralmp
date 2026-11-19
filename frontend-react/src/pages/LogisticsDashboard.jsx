@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
-  ArrowRight, CalendarDays, CheckCircle2, ClipboardCheck, Compass,
+  ArrowRight, CalendarDays, CheckCircle2, ClipboardCheck, Clock3, Compass,
   Gauge, Loader2, MapPin, Navigation, Phone, RefreshCw, Route,
   ShieldCheck, Truck, Wallet,
 } from 'lucide-react'
@@ -80,8 +80,11 @@ export default function LogisticsDashboard() {
   const paidToYou = payouts
     .filter((payout) => payout.status === 'paid')
     .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
+  const onTheWay = payouts
+    .filter((payout) => payout.status !== 'paid' && ['sending', 'pending', 'otp'].includes(payout.transfer_status))
+    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
   const readyToSend = payouts
-    .filter((payout) => payout.status === 'pending')
+    .filter((payout) => payout.status === 'pending' && !['sending', 'pending', 'otp'].includes(payout.transfer_status))
     .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
 
   function openUpdate(delivery, status) {
@@ -157,6 +160,7 @@ export default function LogisticsDashboard() {
             <Stat icon={Truck} label="Jobs in progress" value={dashboard?.active_deliveries ?? 0} hint="Accepted, picked up or moving" />
             <Stat icon={CheckCircle2} label="Delivered" value={dashboard?.completed_deliveries ?? 0} tone="sprout" hint="Dropped off at the buyer" />
             <Stat icon={Wallet} label="Ready to send" value={money(readyToSend)} tone="gold" hint="Released, waiting for the transfer" size="lg" />
+            <Stat icon={Clock3} label="On the way" value={money(onTheWay)} hint="Bank transfer started" size="lg" />
             <Stat icon={ShieldCheck} label="Paid to you" value={money(paidToYou)} tone="neutral" hint="Bank transfers sent to you" size="lg" />
           </>
         )}
@@ -400,7 +404,7 @@ export default function LogisticsDashboard() {
                   <li key={payout.id} className="flex items-center justify-between gap-2 py-2 first:pt-0">
                     <div className="min-w-0">
                       <p className="text-[11.5px] font-semibold text-ink">Order #{payout.order_id}</p>
-                      <p className="truncate font-mono text-[9.5px] text-muted">{payout.reference}</p>
+                      <p className="break-all font-mono text-[9.5px] text-muted">{payout.reference}</p>
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="text-[12px] font-bold text-forest-600 tnum">{money(payout.amount)}</p>

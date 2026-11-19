@@ -428,14 +428,19 @@ export default function Settlements() {
 
           {isAdmin && (
             <div className="rounded-card border border-line bg-white p-5 shadow-card">
-              <p className="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
+              <p className="flex flex-wrap items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
                 <Banknote size={12} /> Payouts to send
+                {pendingPayouts.length > 0 && (
+                  <span className="rounded-full bg-canvas px-1.5 py-0.5 text-[9.5px] font-bold tracking-normal text-ink-soft tnum">
+                    {pendingPayouts.length} waiting
+                  </span>
+                )}
               </p>
               {pendingPayouts.length === 0 ? (
                 <p className="mt-2 text-[11.5px] leading-5 text-muted">No payout is waiting for a bank transfer.</p>
               ) : (
-                <ul className="mt-2 divide-y divide-line">
-                  {pendingPayouts.slice(0, 5).map((payout) => {
+                <ul className="mt-2 max-h-[26rem] divide-y divide-line overflow-y-auto">
+                  {pendingPayouts.map((payout) => {
                     const bankName = payout.bank_name || payout.user?.bank_name
                     const account = payout.account_number || payout.user?.account_number
                     // A transfer paused for a one-time code needs the code, not another send.
