@@ -209,6 +209,10 @@ class DeliveryOfferController extends Controller
             return response()->json(['message' => 'The goods must be paid for first.'], 422);
         }
 
+        if (in_array($order->status, ['completed', 'cancelled', 'rejected'], true)) {
+            return response()->json(['message' => 'This order is closed, so a delivery price cannot be agreed.'], 422);
+        }
+
         if ($order->delivery && $order->delivery->payment_status === 'paid') {
             return response()->json(['message' => 'The delivery price has already been paid.'], 422);
         }
@@ -243,7 +247,9 @@ class DeliveryOfferController extends Controller
 
             $delivery->update([
                 'logistics_provider_id' => $locked->driver_id,
-                'status' => in_array($delivery->status, ['cancelled', 'delivered'], true) ? $delivery->status : 'assigned',
+                // Only a fresh delivery moves to "assigned". A job already
+                // picked up or in transit keeps its real status.
+                'status' => $delivery->status === 'pending' ? 'assigned' : $delivery->status,
                 'agreed_amount' => $locked->amount,
                 'delivery_cost' => $locked->amount,
             ]);
@@ -327,8 +333,18 @@ class DeliveryOfferController extends Controller
         ])
             ->where('payment_status', 'paid')
             ->whereNotIn('status', ['completed', 'cancelled', 'rejected'])
-            ->whereDoesntHave('delivery', function ($query) {
-                $query->whereNotNull('logistics_provider_id');
+            // A job is open when no driver has it yet, or when this driver
+            // already has it but no price has been agreed.
+            ->where(function ($query) use ($request) {
+                $query->whereDoesntHave('delivery', function ($delivery) {
+                    $delivery->whereNotNull('logistics_provider_id');
+                })->orWhereHas('delivery', function ($delivery) use ($request) {
+                    $delivery->where('logistics_provider_id', $request->user()->id)
+                        ->where('payment_status', '!=', 'paid')
+                        ->where(function ($price) {
+                            $price->whereNull('agreed_amount')->orWhere('agreed_amount', 0);
+                        });
+                });
             })
             ->orderByDesc('created_at')
             ->limit(100)

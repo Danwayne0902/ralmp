@@ -754,10 +754,16 @@ export default function OrderDetail() {
                   Admin view. You can change statuses from the admin orders page.
                 </p>
               )}
-              {isBuyer && paid && order.status === 'delivered' && (
+              {isBuyer && paid && order.status === 'delivered'
+                && (!delivery || agreedAmount <= 0 || deliveryPaid) && (
                 <Button variant="secondary" className="w-full" onClick={() => setConfirm({ type: 'delivery', label: 'Accept delivery & close order' })}>
                   <CheckCircle2 size={14} /> Accept delivery
                 </Button>
+              )}
+              {isBuyer && paid && order.status === 'delivered' && delivery && agreedAmount > 0 && !deliveryPaid && (
+                <p className="rounded-lg border border-harvest-200 bg-harvest-50 px-3 py-2 text-[11px] leading-5 text-harvest-600">
+                  Pay the agreed delivery price in the Delivery section before you close the order.
+                </p>
               )}
               {!canManage && !isBuyer && (
                 <p className="rounded-lg border border-line bg-canvas px-3 py-2 text-[11px] text-muted">

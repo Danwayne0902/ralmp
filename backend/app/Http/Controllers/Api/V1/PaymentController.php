@@ -160,7 +160,12 @@ class PaymentController extends Controller
         // Idempotent: a verified payment is never charged twice.
         if ($payment->status === 'success') {
             if ($payment->kind === 'delivery' && $payment->delivery) {
-                app(EscrowService::class)->fundDelivery($payment->delivery);
+                $escrow = app(EscrowService::class);
+                $escrow->fundDelivery($payment->delivery);
+                $escrow->releaseDeliveryIfBothConfirmed(
+                    $order->fresh('delivery'),
+                    $payment->user ?: $order->buyer
+                );
             } elseif ($order->payment_status === 'paid') {
                 app(EscrowService::class)->fund($order->fresh());
             }
@@ -228,6 +233,8 @@ class PaymentController extends Controller
                 return [
                     'id' => $payment->id,
                     'order_id' => $payment->order_id,
+                    'kind' => $payment->kind,
+                    'delivery_id' => $payment->delivery_id,
                     'reference' => $payment->reference,
                     'amount' => $payment->amount / 100,
                     'currency' => $payment->currency,
@@ -311,7 +318,17 @@ class PaymentController extends Controller
 
                 // Move the agreed delivery price into escrow. It is released to
                 // the driver only after both confirmations.
-                app(EscrowService::class)->fundDelivery($payment->delivery->fresh());
+                $escrow = app(EscrowService::class);
+                $delivery = $payment->delivery->fresh();
+                $escrow->fundDelivery($delivery);
+
+                // Both sides may have confirmed before this price was paid. If
+                // so, the money is released now instead of waiting for a
+                // confirmation that will never come again.
+                $escrow->releaseDeliveryIfBothConfirmed(
+                    $order->fresh('delivery'),
+                    $payment->user ?: $order->buyer
+                );
             } else {
                 $order->update([
                     'payment_status' => 'paid',

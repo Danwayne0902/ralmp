@@ -43,7 +43,7 @@ class DeliveryOfferTest extends TestCase
         return $user;
     }
 
-    private function paidOrder(?User $farmer = null, ?User $buyer = null): Order
+    private function paidOrder(?User $farmer = null, ?User $buyer = null, array $overrides = []): Order
     {
         $farmer ??= $this->user('farmer');
         $buyer ??= $this->user('buyer');
@@ -59,6 +59,7 @@ class DeliveryOfferTest extends TestCase
             'status' => 'confirmed',
             'payment_status' => 'paid',
             'paid_at' => now(),
+            ...$overrides,
         ]);
     }
 
@@ -213,6 +214,84 @@ class DeliveryOfferTest extends TestCase
         ]);
     }
 
+    public function test_open_jobs_show_a_held_job_that_still_has_no_price(): void
+    {
+        $order = $this->paidOrder();
+        $driver = $this->user('logistics_provider');
+        $other = $this->user('logistics_provider');
+
+        Delivery::create([
+            'order_id' => $order->id,
+            'logistics_provider_id' => $driver->id,
+            'status' => 'assigned',
+            'pickup_location' => 'Farm gate',
+            'delivery_location' => 'Buyer store',
+            'payment_status' => 'unpaid',
+        ]);
+
+        Sanctum::actingAs($driver);
+        $this->getJson('/api/v1/logistics/open-jobs')
+            ->assertOk()
+            ->assertJsonPath('jobs.0.order_id', $order->id);
+
+        Sanctum::actingAs($other);
+        $this->getJson('/api/v1/logistics/open-jobs')
+            ->assertOk()
+            ->assertJsonCount(0, 'jobs');
+    }
+
+    public function test_accepting_a_price_keeps_a_picked_up_job_in_transit(): void
+    {
+        $buyer = $this->user('buyer');
+        $order = $this->paidOrder(null, $buyer);
+        $driver = $this->user('logistics_provider');
+
+        $delivery = Delivery::create([
+            'order_id' => $order->id,
+            'logistics_provider_id' => $driver->id,
+            'status' => 'picked_up',
+            'pickup_location' => 'Farm gate',
+            'delivery_location' => 'Buyer store',
+            'payment_status' => 'unpaid',
+            'agreed_amount' => 2000,
+        ]);
+
+        $offer = DeliveryOffer::create([
+            'order_id' => $order->id,
+            'buyer_id' => $buyer->id,
+            'driver_id' => $driver->id,
+            'proposed_by' => $driver->id,
+            'amount' => 2500,
+            'status' => 'proposed',
+        ]);
+
+        Sanctum::actingAs($buyer);
+        $this->postJson("/api/v1/delivery-offers/{$offer->id}/accept")->assertOk();
+
+        $this->assertSame('picked_up', $delivery->fresh()->status);
+        $this->assertEquals(2500, (float) $delivery->fresh()->agreed_amount);
+    }
+
+    public function test_a_closed_order_cannot_agree_a_new_delivery_price(): void
+    {
+        $buyer = $this->user('buyer');
+        $order = $this->paidOrder(null, $buyer);
+        $order->update(['status' => 'completed']);
+        $driver = $this->user('logistics_provider');
+
+        $offer = DeliveryOffer::create([
+            'order_id' => $order->id,
+            'buyer_id' => $buyer->id,
+            'driver_id' => $driver->id,
+            'proposed_by' => $driver->id,
+            'amount' => 3000,
+            'status' => 'proposed',
+        ]);
+
+        Sanctum::actingAs($buyer);
+        $this->postJson("/api/v1/delivery-offers/{$offer->id}/accept")->assertStatus(422);
+    }
+
     public function test_the_buyer_pays_the_agreed_delivery_price_into_escrow(): void
     {
         $farmer = $this->user('farmer');
@@ -287,6 +366,97 @@ class DeliveryOfferTest extends TestCase
 
         // The goods order stays paid; the delivery does not change its total.
         $this->assertSame('paid', $order->fresh()->payment_status);
+    }
+
+    public function test_delivery_paid_after_both_confirmations_is_released_at_once(): void
+    {
+        $farmer = $this->user('farmer');
+        $buyer = $this->user('buyer');
+        $driver = $this->user('logistics_provider');
+        $order = $this->paidOrder($farmer, $buyer);
+
+        $delivery = Delivery::create([
+            'order_id' => $order->id,
+            'logistics_provider_id' => $driver->id,
+            'status' => 'delivered',
+            'pickup_location' => 'Farm gate',
+            'delivery_location' => 'Buyer store',
+            'agreed_amount' => 3000,
+            'payment_status' => 'unpaid',
+            // Both sides confirmed before the delivery price was paid.
+            'buyer_confirmed_at' => now(),
+            'farmer_confirmed_at' => now(),
+        ]);
+
+        app(EscrowService::class)->fund($order->fresh('delivery'));
+
+        $payment = Payment::create([
+            'order_id' => $order->id,
+            'kind' => 'delivery',
+            'delivery_id' => $delivery->id,
+            'user_id' => $buyer->id,
+            'reference' => 'RAMLP_LATE_DELIVERY',
+            'amount' => 300000,
+            'currency' => 'NGN',
+            'status' => 'pending',
+        ]);
+
+        Http::fake([
+            'api.paystack.co/transaction/verify/*' => Http::response([
+                'status' => true,
+                'data' => [
+                    'status' => 'success',
+                    'amount' => 300000,
+                    'currency' => 'NGN',
+                    'reference' => 'RAMLP_LATE_DELIVERY',
+                ],
+            ], 200),
+        ]);
+
+        Sanctum::actingAs($buyer);
+
+        $this->postJson('/api/v1/payment/verify', ['reference' => 'RAMLP_LATE_DELIVERY'])
+            ->assertOk();
+
+        $this->assertSame('success', $payment->fresh()->status);
+        $this->assertSame('paid', $delivery->fresh()->payment_status);
+        $this->assertSame(
+            'released',
+            EscrowRelease::where('order_id', $order->id)->where('milestone', 'delivery')->value('status')
+        );
+        $this->assertDatabaseHas('payouts', [
+            'order_id' => $order->id,
+            'user_id' => $driver->id,
+            'amount' => 2850,
+        ]);
+        $this->assertDatabaseHas('platform_fees', [
+            'order_id' => $order->id,
+            'kind' => 'delivery',
+            'amount' => 150,
+        ]);
+    }
+
+    public function test_a_priced_delivery_must_be_paid_before_the_order_closes(): void
+    {
+        $buyer = $this->user('buyer');
+        $order = $this->paidOrder(null, $buyer, ['status' => 'delivered']);
+
+        Delivery::create([
+            'order_id' => $order->id,
+            'status' => 'delivered',
+            'pickup_location' => 'Farm gate',
+            'delivery_location' => 'Buyer store',
+            'agreed_amount' => 3000,
+            'payment_status' => 'unpaid',
+        ]);
+
+        Sanctum::actingAs($buyer);
+
+        $this->postJson("/api/v1/orders/{$order->id}/confirm-delivery")
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Pay the agreed delivery price before confirming delivery.');
+
+        $this->assertSame('delivered', $order->fresh()->status);
     }
 
     public function test_admin_can_see_platform_fees(): void

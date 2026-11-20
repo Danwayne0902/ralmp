@@ -7,7 +7,7 @@ import {
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
-import { escrowService, orderService, paymentService, payoutService } from '../lib/services'
+import { adminService, escrowService, orderService, paymentService, payoutService } from '../lib/services'
 import { escrowSchedule, escrowReleasedAll, escrowHeldAll, TRANCHE_SPLIT } from '../lib/orders'
 import { fmtDate, fmtDateTime, money } from '../lib/format'
 import { downloadCsv, parseError } from '../lib/utils'
@@ -26,12 +26,13 @@ export default function Settlements() {
   const [acting, setActing] = useState(null)
   const [otpFor, setOtpFor] = useState(null)
   const [otp, setOtp] = useState('')
+  const [fees, setFees] = useState(null)
   const isAdmin = user?.role === 'admin'
 
   async function load() {
     setLoading(true)
     try {
-      const [orderRes, paymentRes, releasesRes, payoutsRes] = await Promise.all([
+      const [orderRes, paymentRes, releasesRes, payoutsRes, feesRes] = await Promise.all([
         orderService.list({ per_page: 100 }),
         paymentService.history().catch(() => ({ data: { payments: [] } })),
         isAdmin
@@ -40,11 +41,15 @@ export default function Settlements() {
         isAdmin
           ? payoutService.list({ status: 'pending', per_page: 50 }).catch(() => ({ data: { data: [] } }))
           : Promise.resolve({ data: { data: [] } }),
+        isAdmin
+          ? adminService.fees().catch(() => ({ data: null }))
+          : Promise.resolve({ data: null }),
       ])
       setOrders(orderRes.data?.data || [])
       setPayments(paymentRes.data?.payments || [])
       setPendingReleases(releasesRes.data?.releases || [])
       setPendingPayouts(payoutsRes.data?.data || [])
+      setFees(feesRes.data || null)
       setError('')
     } catch (err) {
       setError(parseError(err))
@@ -201,6 +206,102 @@ export default function Settlements() {
           </>
         )}
       </div>
+
+      {isAdmin && (
+        <div className="mt-5 rounded-card border border-line bg-white shadow-card">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+            <div>
+              <h2 className="font-display text-[15px] font-bold text-ink">Platform fees</h2>
+              <p className="mt-0.5 text-[11px] text-muted">
+                Money kept by RALMP from released goods and delivery payments.
+              </p>
+            </div>
+            <Badge tone="neutral" size="sm">
+              {fees ? `${Number(fees.fee_percent).toLocaleString('en-NG')}% per release` : 'Fee rate loading'}
+            </Badge>
+          </div>
+
+          {!fees ? (
+            <p className="px-5 py-6 text-[12px] text-muted">Could not load the fee record just now.</p>
+          ) : (
+            <>
+              <div className="grid gap-3 p-5 sm:grid-cols-3">
+                <div className="rounded-xl border border-forest-200 bg-forest-50/60 p-3.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-forest-700/70">Fees earned</p>
+                  <p className="mt-1 font-display text-[22px] font-extrabold tracking-tight text-forest-700 tnum">
+                    {money(fees.totals?.amount || 0)}
+                  </p>
+                  <p className="mt-0.5 text-[10.5px] text-muted">
+                    From {money(fees.totals?.base || 0)} released
+                  </p>
+                </div>
+                <div className="rounded-xl border border-line bg-canvas p-3.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">This month</p>
+                  <p className="mt-1 font-display text-[22px] font-extrabold tracking-tight text-ink tnum">
+                    {money(fees.this_month?.amount || 0)}
+                  </p>
+                  <p className="mt-0.5 text-[10.5px] text-muted">
+                    {fees.this_month?.count || 0} {fees.this_month?.count === 1 ? 'release' : 'releases'}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-line bg-canvas p-3.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">Fee split</p>
+                  <dl className="mt-1.5 space-y-1 text-[11px]">
+                    {(fees.by_kind || []).length === 0 && <p className="text-muted">Nothing taken yet.</p>}
+                    {(fees.by_kind || []).map((row) => (
+                      <div key={row.kind} className="flex justify-between gap-2">
+                        <dt className="capitalize text-muted">{row.kind}</dt>
+                        <dd className="font-semibold text-ink tnum">{money(row.total)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              </div>
+
+              {(fees.recent || []).length > 0 ? (
+                <div className="border-t border-line">
+                  <Table minWidth={640}>
+                    <thead>
+                      <tr>
+                        <Th>Order</Th>
+                        <Th>Paid to</Th>
+                        <Th>Kind</Th>
+                        <Th className="text-right">Base</Th>
+                        <Th className="text-right">Fee kept</Th>
+                        <Th>When</Th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fees.recent.slice(0, 8).map((fee) => (
+                        <Tr key={fee.id}>
+                          <Td>
+                            <Link to={`/orders/${fee.order_id}`} className="font-semibold text-forest-600 hover:underline">
+                              #{fee.order_id}
+                            </Link>
+                          </Td>
+                          <Td>
+                            <p className="text-[11.5px]">{fee.payee?.name || 'Member'}</p>
+                            <p className="text-[10px] capitalize text-muted">{fee.payee?.role?.replace('_', ' ')}</p>
+                          </Td>
+                          <Td><Badge tone="neutral" size="sm" className="capitalize">{fee.kind}</Badge></Td>
+                          <Td className="text-right tnum">{money(fee.base_amount)}</Td>
+                          <Td className="text-right font-semibold text-forest-600 tnum">{money(fee.amount)}</Td>
+                          <Td className="text-[10.5px] text-muted">{fmtDateTime(fee.created_at)}</Td>
+                        </Tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              ) : (
+                <p className="border-t border-line px-5 py-5 text-[11.5px] text-muted">
+                  No platform fee has been taken yet. A fee is recorded each time money is released to a farmer or a
+                  driver.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_330px]">
         <div className="min-w-0 space-y-5">

@@ -161,11 +161,36 @@ fruits and spices from three co-op accounts. Listings were created through the p
 API, so prices, volumes and units behave exactly like user-created lots. Category
 artwork is illustrative, not lot photography.
 
-#### Presentation-only surfaces
+#### How the money moves
 
 Escrow release and payouts are real: money is split against the order, released
 only when its proof arrives, and sent to the payee's saved bank account through
-Paystack Transfers. The API has no endpoints for arbitration rulings, e-waybills
+Paystack Transfers.
+
+1. **Checkout** charges the goods only. The cart no longer adds a flat delivery fee.
+2. **Delivery price** is negotiated in the order chat. A driver sends an offer,
+   the buyer accepts or counters, and an accepted offer locks the amount, assigns
+   that driver, and closes the other open offers.
+3. **Delivery payment** is a second Paystack charge for the agreed amount, paid by
+   the buyer before pickup and held in escrow.
+4. **Goods release** happens milestone by milestone. Each release credits the
+   farmer the net amount; the platform fee is recorded in `platform_fees` in the
+   same transaction.
+5. **Delivery release** needs both sides. The farmer confirms the handover and the
+   buyer confirms the goods arrived. When the second confirmation lands, the
+   driver's money is released automatically. If the delivery price is paid after
+   both confirmations, it is released straight away.
+6. **Payouts** go to the payee's saved bank account through Paystack Transfers and
+   are marked paid only by a `transfer.success` webhook.
+
+The platform fee is `RAMLP_PLATFORM_FEE_PERCENT`, clamped to 4–6 and 5 by default.
+It is charged on goods and on delivery, and admins see the running total, the
+month-to-date figure, the goods/delivery split and the recent fee rows under
+**Payments → Platform fees**.
+
+#### Presentation-only surfaces
+
+The API has no endpoints for arbitration rulings, e-waybills
 or laboratory assays. Those screens
 (`/admin/arbitration`, `/admin/quality/terminal`, `/dispatch/waybill`,
 `/buyer/procurement`) render the control framework and
@@ -300,9 +325,12 @@ default `http://localhost:8000/api/v1` is correct.
 - Reviews & ratings (held for moderation)
 
 ✅ **Logistics Module**
+- Drivers bid and counter-offer the delivery price in the order chat
+- An accepted offer locks the price and assigns the driver
+- The buyer pays the agreed delivery price into escrow before the order can close
+- Delivery money is released only after the buyer and the farmer both confirm
 - Delivery assignment & tracking
 - Real-time tracking updates
-- Cost estimation algorithm
 - Driver management
 - Pickup scheduling
 - Status updates (6 statuses)
@@ -320,7 +348,8 @@ default `http://localhost:8000/api/v1` is correct.
 - Server-authoritative pricing and totals (client prices are ignored)
 - Stock validation and reservation in DB transactions
 - Multi-farmer carts split into one order per farmer
-- Configurable delivery fee
+- Checkout charges goods only; delivery is agreed with a driver afterwards
+- Platform fee of 4–6% (5% by default) on released goods and delivery money
 - Order lifecycle (8 statuses) with stock restoration on cancel/reject
 - Price transparency
 
@@ -335,7 +364,7 @@ default `http://localhost:8000/api/v1` is correct.
 
 ## Database Schema
 
-**Tables**: users, roles, permissions, model_has_roles, model_has_permissions, produce_listings, orders, order_items, deliveries, messages, and supporting tables.
+**Tables**: users, roles, permissions, model_has_roles, model_has_permissions, produce_listings, orders, order_items, deliveries, delivery_offers, messages, payments, escrow_releases, payouts, platform_fees, and supporting tables.
 
 **Key Relationships**:
 - Users → Roles (Many-to-Many)
@@ -377,6 +406,9 @@ PAYSTACK_SECRET_KEY=sk_test_...
 PAYSTACK_PAYMENT_URL=https://api.paystack.co
 
 # Marketplace rules
+# Platform fee taken from released goods and delivery money. Clamped to 4–6.
+RAMLP_PLATFORM_FEE_PERCENT=5
+# Legacy flat delivery fee, kept for older orders. Checkout no longer charges it.
 RAMLP_DELIVERY_FEE=2500
 RAMLP_DEFAULT_DELIVERY_DAYS=3
 ```
@@ -398,7 +430,9 @@ Register `https://<your-host>/api/v1/payment/webhook` in the Paystack
 dashboard. The endpoint verifies the `x-paystack-signature` header
 (HMAC SHA512 with `PAYSTACK_SECRET_KEY`), checks the amount and currency
 against the order, and only then marks the payment and order as paid. It is
-idempotent, so repeated deliveries are safe.
+idempotent, so repeated deliveries are safe. The same path handles the second
+payment for an agreed delivery price; those payments are matched to the delivery
+instead of the order total.
 
 The same URL also receives payout events. When an admin clicks **Send money**,
 the API creates a Paystack transfer recipient from the payee's saved bank

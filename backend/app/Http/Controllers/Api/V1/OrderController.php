@@ -308,6 +308,16 @@ class OrderController extends Controller
             ], 422);
         }
 
+        // A priced delivery must be paid before the order closes, otherwise
+        // the driver has no money to be released.
+        if ($order->delivery
+            && (float) $order->delivery->agreed_amount > 0
+            && $order->delivery->payment_status !== 'paid') {
+            return response()->json([
+                'message' => 'Pay the agreed delivery price before confirming delivery.',
+            ], 422);
+        }
+
         $order->update(['status' => 'completed']);
 
         $delivery = $order->delivery;
