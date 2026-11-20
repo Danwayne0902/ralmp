@@ -481,17 +481,22 @@ export default function OrderDetail() {
                   </Tr>
                 ))}
                 <Tr className="hover:bg-transparent">
-                  <Td colSpan={3} className="text-right text-[11.5px] text-muted">Delivery (agreed in chat)</Td>
-                  <Td className="text-right tnum">
-                    {agreedAmount > 0 ? money(agreedAmount) : 'Not agreed yet'}
-                  </Td>
-                </Tr>
-                <Tr className="hover:bg-transparent">
-                  <Td colSpan={3} className="text-right text-[12px] font-bold text-ink">Goods paid</Td>
+                  <Td colSpan={3} className="text-right text-[12px] font-bold text-ink">Paid at checkout</Td>
                   <Td className="text-right font-display text-[16px] font-extrabold text-forest-600 tnum">
                     {money(order.total_price)}
                   </Td>
                 </Tr>
+                {agreedAmount > 0 && (
+                  <Tr className="hover:bg-transparent">
+                    <Td colSpan={3} className="text-right text-[11.5px] text-muted">
+                      Delivery agreed in chat · paid separately
+                    </Td>
+                    <Td className="text-right text-[11.5px] tnum">
+                      <span className="font-semibold text-ink">{money(agreedAmount)}</span>
+                      <span className="text-muted"> · {deliveryPaid ? 'paid' : 'not paid yet'}</span>
+                    </Td>
+                  </Tr>
+                )}
                 {goodsFee > 0 && (
                   <Tr className="hover:bg-transparent">
                     <Td colSpan={3} className="text-right text-[11.5px] text-muted">

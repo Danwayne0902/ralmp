@@ -28,7 +28,13 @@ export function EscrowLedger({ order, className, showTitle = true }) {
         </div>
         <div className="flex items-center justify-between gap-3 py-2.5">
           <dt className="text-muted">Delivery</dt>
-          <dd className="font-semibold text-ink tnum">{money(delivery)}</dd>
+          <dd className="text-right font-semibold tnum">
+            {delivery > 0 ? (
+              <span className="text-ink">{money(delivery)}</span>
+            ) : (
+              <span className="text-[11.5px] font-medium text-muted">Agreed in chat, paid separately</span>
+            )}
+          </dd>
         </div>
         <div className="flex items-center justify-between gap-3 py-2.5">
           <dt className="text-muted">Quality and moisture check</dt>
@@ -62,7 +68,10 @@ export function EscrowLedger({ order, className, showTitle = true }) {
 }
 
 function deliveryPart(order) {
-  const fee = Number(order?.delivery_fee ?? 0)
+  // Newer orders agree the delivery price in chat, so the delivery's own
+  // amount is the real figure. The flat order fee only covers older orders.
+  const agreed = Number(order?.delivery?.agreed_amount ?? 0)
+  const fee = agreed > 0 ? agreed : Number(order?.delivery_fee ?? 0)
   const release = order?.escrow?.releases?.find((row) => row.milestone === 'delivery')
 
   if (!release && fee <= 0) return null
