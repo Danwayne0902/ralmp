@@ -313,6 +313,34 @@ class EscrowTest extends TestCase
         $this->assertEquals(19000, $earnings['held_earnings']);
     }
 
+    public function test_buyer_confirmation_releases_the_farmer_quality_part(): void
+    {
+        $farmer = $this->user('farmer');
+        $buyer = $this->user('buyer');
+        $order = $this->paidOrder($farmer, $buyer, ['status' => 'shipped']);
+        $account = app(EscrowService::class)->fund($order->fresh('delivery'));
+
+        $this->assertSame(3, $account->releases->where('payee_role', 'farmer')->count());
+
+        Sanctum::actingAs($buyer);
+        $this->postJson("/api/v1/orders/{$order->id}/confirm-delivery")->assertOk();
+
+        $byMilestone = EscrowRelease::where('order_id', $order->id)
+            ->where('payee_role', 'farmer')
+            ->pluck('status', 'milestone');
+
+        // The buyer accepting the goods is proof of an acceptable delivery,
+        // so all three farmer parts release together.
+        $this->assertSame('released', $byMilestone['pickup']);
+        $this->assertSame('released', $byMilestone['quality']);
+        $this->assertSame('released', $byMilestone['final']);
+
+        // 20000 goods, less the 5% fee across the three parts.
+        $this->assertEquals(19000, (float) Payout::where('order_id', $order->id)
+            ->where('user_id', $farmer->id)
+            ->sum('amount'));
+    }
+
     public function test_admin_can_mark_a_payout_as_paid(): void
     {
         $farmer = $this->user('farmer');

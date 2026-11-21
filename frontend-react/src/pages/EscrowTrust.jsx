@@ -23,23 +23,23 @@ const TRANCHE_MODEL = [
   },
   {
     share: '60%',
-    title: 'Weight and quality check',
-    icon: Weight,
-    trigger: 'Delivery weight and quality pass',
-    body: 'Paid only when the delivery weight matches pickup within 1.0% and the sample passes the agreed moisture and aflatoxin test.',
+    title: 'Main payment',
+    icon: ClipboardCheck,
+    trigger: 'Buyer confirms the goods arrived',
+    body: 'Released as soon as the buyer confirms the goods arrived in good order. Until then it stays in escrow.',
   },
   {
     share: '30%',
-    title: 'Goods delivered',
+    title: 'Order closing payment',
     icon: Warehouse,
-    trigger: 'Buyer signs for the goods',
-    body: 'Paid when the buyer signs that the goods have arrived. This closes the order and completes the farmer’s payment.',
+    trigger: 'Buyer confirms the goods arrived',
+    body: 'Released on the same confirmation, right after the main payment. This closes the order and completes the farmer’s money.',
   },
 ]
 
 const FREEZE = [
-  { title: 'Weight difference', body: 'The delivery weight is more than 1.0% different from the pickup weight.', icon: Weight },
-  { title: 'Failed quality check', body: 'Moisture or aflatoxin is outside the range agreed on the order.', icon: CircleAlert },
+  { title: 'Weight difference', body: 'Somebody reports a difference between the pickup weight and the delivery weight.', icon: Weight },
+  { title: 'Quality complaint', body: 'The buyer reports that the goods are not as agreed.', icon: CircleAlert },
   { title: 'Missing proof', body: 'No sample, no delivery note, or no receiving slip on record.', icon: FileText },
   { title: 'Open complaint', body: 'There is an open complaint on the order and no decision yet.', icon: Gavel },
 ]
@@ -74,7 +74,7 @@ const FAQ = [
   },
   {
     q: 'Who can release the escrow?',
-    a: 'Each part has its own proof. The transporter marks pickup for the first 10%. Our payments team checks the weight and quality for 60%. The buyer confirms delivery for the last 30%. The delivery fee is paid when the goods arrive.',
+    a: 'Each part has its own proof. The transporter marks pickup for the first 10%. The buyer confirming the goods arrived releases the other 90%, in two parts of 60% and 30%. The delivery fee is released after the buyer and the farmer both confirm delivery.',
   },
   {
     q: 'What happens if the goods are not as agreed?',
@@ -179,8 +179,7 @@ export default function EscrowTrust() {
                   <p className="font-display text-[15px] font-bold">How the money is split</p>
                   <ul className="mt-3 space-y-2 text-[12.5px] text-muted">
                     <li>10% when the goods leave the farm.</li>
-                    <li>60% when the weight and quality are checked.</li>
-                    <li>30% when the buyer receives the goods.</li>
+                    <li>90% when the buyer confirms the goods arrived.</li>
                   </ul>
                 </div>
               )}
@@ -230,7 +229,7 @@ export default function EscrowTrust() {
             <div className="max-w-2xl">
               <p className="label-caps text-forest-500">When money is paid</p>
               <h2 className="mt-2 font-display text-[27px] font-extrabold leading-9 tracking-[-0.02em] text-ink sm:text-[34px] sm:leading-[42px]">
-                Three payments. Three proofs.
+                Three payments. One clear record.
               </h2>
             </div>
           </Reveal>
@@ -266,7 +265,7 @@ export default function EscrowTrust() {
                 <Snowflake size={17} className="text-forest-500" /> When payment is paused
               </h2>
               <p className="mt-1 text-[12px] leading-5 text-muted">
-                Any one of these puts the rest of the money on hold. It is not a punishment. It is a pause until the proof is complete.
+                Any one of these can pause the rest of the money. It is not a punishment. It is a pause until the record is complete.
               </p>
               <ul className="mt-5 space-y-3">
                 {FREEZE.map((item) => (

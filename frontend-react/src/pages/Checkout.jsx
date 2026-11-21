@@ -310,7 +310,7 @@ export default function Checkout() {
               {[
                 'Money held in escrow until each step is checked',
                 'Farmer told only after you pay',
-                'Paid out as weight and quality are checked',
+                'Paid out at pickup and when you confirm the goods arrived',
                 'Disagreements put the money on hold for review',
               ].map((line) => (
                 <li key={line} className="flex items-start gap-2">

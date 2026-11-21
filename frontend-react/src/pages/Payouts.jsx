@@ -8,7 +8,7 @@ import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } f
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
 import { orderService, payoutService } from '../lib/services'
-import { escrowHeldNet, escrowNetBase } from '../lib/orders'
+import { escrowHeldNet, escrowNetBase, escrowSchedule } from '../lib/orders'
 import { fmtDate, money } from '../lib/format'
 import { downloadCsv, parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
@@ -79,7 +79,9 @@ export default function Payouts() {
           feePercent: Number(payout.fee_percent || 0),
           status: payout.status,
           reference: payout.reference,
-          label: payout.release?.label || 'Payment',
+          label: payout.release?.milestone === 'quality'
+            ? 'Main payment'
+            : payout.release?.label || 'Payment',
           date: payout.paid_at || payout.created_at,
           transferStatus: payout.transfer_status,
           failureReason: payout.failure_reason,
@@ -110,7 +112,7 @@ export default function Payouts() {
       <PageHeader
         eyebrow="My money"
         title="My payments"
-        description="Money we have paid you, money still on hold, and the record for each order."
+        description="Money we have paid you, money still in escrow, and the record for each order."
         actions={
           <>
             <Button asChild variant="outline" size="md">
@@ -154,7 +156,7 @@ export default function Payouts() {
             <Stat icon={Banknote} label="Paid to you" value={money(paidToYou)} tone="sprout" hint="Bank transfers sent to you" size="lg" />
             <Stat icon={Clock3} label="On the way" value={money(onTheWay)} tone="gold" hint="Bank transfer started" size="lg" />
             <Stat icon={Wallet} label="Ready to send" value={money(readyToSend)} hint="Released, waiting for the transfer" />
-            <Stat icon={Lock} label="On hold" value={money(held)} hint="Waiting for pickup, checks or delivery" />
+            <Stat icon={Lock} label="In escrow" value={money(held)} hint="Released step by step, or held for review" />
           </>
         )}
       </div>
@@ -265,7 +267,7 @@ export default function Payouts() {
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div>
                 <h2 className="font-display text-[15px] font-bold text-ink">Order balances</h2>
-                <p className="mt-0.5 text-[11px] text-muted">What we paid and what is still on hold.</p>
+                <p className="mt-0.5 text-[11px] text-muted">What we paid and what is still in escrow.</p>
               </div>
               <span className="text-[10.5px] text-muted">{orders.length} orders</span>
             </div>
@@ -288,6 +290,9 @@ export default function Payouts() {
                     .filter((payout) => payout.order_id === order.id)
                     .reduce((sum, payout) => sum + Number(payout.amount || 0), 0)
                   const pct = total ? Math.min(100, Math.round((orderReleased / total) * 100)) : 0
+                  const nextPart = escrowSchedule(order).find(
+                    (part) => part.state === 'in_progress' || part.state === 'held',
+                  )
                   return (
                     <li key={order.id} className="px-5 py-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -308,6 +313,12 @@ export default function Payouts() {
                         <Progress value={pct} tone={pct === 100 ? 'sprout' : 'forest'} />
                         <span className="w-8 shrink-0 text-right text-[10px] font-semibold text-muted tnum">{pct}%</span>
                       </div>
+                      {nextPart && (
+                        <p className="mt-1.5 text-[10.5px] leading-4 text-muted">
+                          Next: <span className="font-semibold text-ink-soft">{nextPart.title}</span>
+                          {nextPart.stateLabel ? ` · ${nextPart.stateLabel}` : ''}
+                        </p>
+                      )}
                     </li>
                   )
                 })}
@@ -353,8 +364,7 @@ export default function Payouts() {
             <ol className="mt-2.5 space-y-3">
               {[
                 { label: 'Goods picked up', note: '10% on pickup' },
-                { label: 'Weight and quality checked', note: '60% when the check passes' },
-                { label: 'Goods delivered', note: '30% when the buyer signs' },
+                { label: 'Buyer confirms the goods', note: '60% main payment and 30% final payment' },
               ].map((step, index) => (
                 <li key={step.label} className="flex gap-2.5">
                   <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-forest-50 text-[9px] font-bold text-forest-600">

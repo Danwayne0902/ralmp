@@ -33,14 +33,14 @@ const PROCESS = [
     step: '03',
     icon: Truck,
     title: 'Weight and quality check',
-    body: 'The load is weighed at pickup and again at delivery. It is also checked for moisture and grade. If something is outside the agreed range, the money stays on hold.',
-    note: '1.0% allowance',
+    body: 'The load is weighed at pickup and again at delivery, and both weights stay on the order. If something is wrong, the buyer can keep the money in escrow and open a complaint.',
+    note: 'Both weights kept',
   },
   {
     step: '04',
     icon: Banknote,
     title: 'Farmer gets paid',
-    body: 'The money is paid in three parts: 10%, 60% and 30%. Each part is paid only after its proof is uploaded. Nobody can skip a step.',
+    body: '10% is released at pickup. The other 60% and 30% are released together when the buyer confirms the goods arrived. Nobody can skip a step.',
     note: '10 / 60 / 30',
   },
 ]
@@ -92,8 +92,8 @@ const STAKEHOLDERS = [
 
 const ASSURANCE = [
   { icon: Landmark, title: 'Money kept safe', body: 'Buyer money is held in escrow until each step is proven. Both sides can see the record.' },
-  { icon: Scale, title: 'Honest weights', body: 'Goods are weighed at pickup and at delivery. A big difference puts the payment on hold.' },
-  { icon: FlaskConical, title: 'Quality checks', body: 'Moisture and grade are checked. Bad stock stops payment and goes to a review.' },
+  { icon: Scale, title: 'Honest weights', body: 'Goods are weighed at pickup and at delivery, and both weights stay on the order record.' },
+  { icon: FlaskConical, title: 'Quality checks', body: 'Moisture and grade records stay with the order. An admin can pause a payment while a complaint is reviewed.' },
   { icon: ShieldCheck, title: 'Fair dispute process', body: 'If both sides disagree, a neutral person looks at the evidence and decides.' },
 ]
 
@@ -118,8 +118,8 @@ function HeroRail({ lot }) {
   const origin = lot?.location || 'Farm gate'
   const payments = [
     { label: 'Pickup payment', share: '10%', amount: value * 0.1, state: 'Paid at the farm gate' },
-    { label: 'Weight and quality check', share: '60%', amount: value * 0.6, state: 'Paid when the load is checked' },
-    { label: 'Final payment', share: '30%', amount: value * 0.3, state: 'Paid when the buyer receives it' },
+    { label: 'Main payment', share: '60%', amount: value * 0.6, state: 'Paid when the buyer confirms' },
+    { label: 'Final payment', share: '30%', amount: value * 0.3, state: 'Paid on the same confirmation' },
   ]
 
   return (
@@ -464,8 +464,7 @@ export default function Home() {
                 <p className="font-display text-[15px] font-bold">How the money is split</p>
                 <ul className="mt-3 space-y-2 text-[12.5px] text-muted">
                   <li>10% when the goods leave the farm.</li>
-                  <li>60% when the weight and quality are checked.</li>
-                  <li>30% when the buyer receives the goods.</li>
+                  <li>90% when the buyer confirms the goods arrived.</li>
                 </ul>
               </div>
             )}

@@ -67,12 +67,12 @@ class EscrowService
                 ],
                 [
                     'milestone' => 'quality',
-                    'label' => 'Weight and quality payment',
+                    'label' => 'Main payment',
                     'payee_id' => $order->farmer_id,
                     'payee_role' => 'farmer',
                     'percentage' => 60,
                     'amount' => $quality,
-                    'trigger' => 'Our team checks the weight and quality',
+                    'trigger' => 'Buyer confirms the goods arrived in good order',
                 ],
                 [
                     'milestone' => 'final',

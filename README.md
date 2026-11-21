@@ -173,9 +173,10 @@ Paystack Transfers.
    that driver, and closes the other open offers.
 3. **Delivery payment** is a second Paystack charge for the agreed amount, paid by
    the buyer before pickup and held in escrow.
-4. **Goods release** happens milestone by milestone. Each release credits the
-   farmer the net amount; the platform fee is recorded in `platform_fees` in the
-   same transaction.
+4. **Goods release** happens in two moments. The first 10% is released at pickup.
+   The other 60% and 30% are released together when the buyer confirms the goods
+   arrived. Each release credits the farmer the net amount; the platform fee is
+   recorded in `platform_fees` in the same transaction.
 5. **Delivery release** needs both sides. The farmer confirms the handover and the
    buyer confirms the goods arrived. When the second confirmation lands, the
    driver's money is released automatically. If the delivery price is paid after

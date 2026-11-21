@@ -115,7 +115,7 @@ export default function FarmerDashboard() {
         ) : (
           <>
             <Stat icon={Banknote} label="Money received" value={money(earnings?.total_earnings ?? 0)} tone="sprout" hint="Sent to your bank account, after the platform fee" size="lg" />
-            <Stat icon={Lock2} label="Money on hold" value={money(inEscrow)} tone="gold" hint="Waiting for pickup, checks or delivery, after the platform fee" size="lg" />
+            <Stat icon={Lock2} label="Money in escrow" value={money(inEscrow)} tone="gold" hint="Waiting for pickup and the buyer's sign-off, after the platform fee" size="lg" />
             <Stat icon={Sprout} label="For sale" value={availableLots.length} hint={`${listings.length} listings in total`} />
             <Stat icon={Truck} label="Orders" value={earnings?.total_orders ?? orders.length} tone="neutral" hint={`${earnings?.completed_orders ?? 0} finished`} />
           </>
@@ -260,7 +260,7 @@ export default function FarmerDashboard() {
             <p className="mt-1 text-[11px] leading-5 text-muted">
               {pendingOrders.length > 0
                 ? `${pendingOrders.length} ${pendingOrders.length === 1 ? 'order is' : 'orders are'} waiting for your confirmation.`
-                : 'Held safely until the weight and quality checks are done and the buyer signs.'}
+                : 'Held safely until the goods are picked up and the buyer confirms they arrived.'}
             </p>
             <div className="mt-4 space-y-2 border-t border-line pt-3">
               <div className="flex justify-between text-[11.5px]">

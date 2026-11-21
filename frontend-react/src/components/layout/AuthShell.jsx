@@ -27,7 +27,7 @@ export default function AuthShell({ children, aside }) {
           <ul className="mt-8 space-y-3.5">
             {(aside?.points || [
               'Buyer pays before the goods move',
-              'Weight and quality are checked',
+              'Money is released only when the buyer confirms',
               'Money is paid step by step',
             ]).map((point) => (
               <li key={point} className="flex items-start gap-2.5 text-[13px] text-forest-100/85">

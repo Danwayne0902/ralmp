@@ -39,9 +39,9 @@ export const TRANCHE_SPLIT = [
     key: 't2',
     index: 'M2',
     share: 0.6,
-    title: 'Second payment after checks',
-    short: 'Weight and quality',
-    trigger: 'Weight within 1.0% and moisture within the agreed range.',
+    title: 'Second payment when the goods arrive',
+    short: 'Main payment',
+    trigger: 'The buyer confirms the goods arrived in good order.',
   },
   {
     key: 't3',
@@ -139,10 +139,13 @@ export function escrowSchedule(order) {
         stateLabel = 'Waiting for delivery note'
       }
     } else if (tranche.key === 't2') {
-      if (arrived) state = 'settled'
-      else if (dispatched) {
+      if (accepted) state = 'settled'
+      else if (arrived) {
         state = 'in_progress'
-        stateLabel = 'Waiting for weight check'
+        stateLabel = 'Waiting for the buyer to confirm'
+      } else if (dispatched) {
+        state = 'in_progress'
+        stateLabel = 'Waiting for delivery'
       }
     } else if (tranche.key === 't3') {
       if (accepted) state = 'settled'

@@ -257,6 +257,7 @@ class OrderController extends Controller
 
         if ($validated['status'] === 'completed') {
             $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Order marked as shipped');
+            $escrow->releaseMilestone($order, 'quality', $request->user(), 'Order closed after delivery');
             $escrow->releaseMilestone($order, 'final', $request->user(), 'Order closed after delivery');
             $escrow->releaseMilestone($order, 'delivery', $request->user(), 'Delivery completed');
         }
@@ -330,6 +331,7 @@ class OrderController extends Controller
 
         $escrow = app(EscrowService::class);
         $escrow->releaseMilestone($order, 'pickup', $request->user(), 'Buyer confirmed the goods');
+        $escrow->releaseMilestone($order, 'quality', $request->user(), 'Buyer confirmed the goods arrived in order');
         $escrow->releaseMilestone($order, 'final', $request->user(), 'Buyer confirmed the goods arrived');
 
         // The driver is paid only after both the buyer and the farmer confirm

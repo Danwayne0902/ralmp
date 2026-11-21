@@ -60,7 +60,7 @@ export function EscrowLedger({ order, className, showTitle = true }) {
           {money(total)}
         </p>
         <p className="mt-1 text-[11px] leading-4 text-muted">
-          It is paid out step by step as pickup, checks and delivery are confirmed.
+          It is released in steps: 10% at pickup and the rest when the buyer confirms the goods arrived.
         </p>
       </div>
     </div>

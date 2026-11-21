@@ -211,7 +211,7 @@ export default function InspectorTerminal() {
           hint={order?.produce?.commodity_name || 'Produce pending'}
         />
         <Stat icon={Scale} label="Load size" value={order ? qtyUnit(order.quantity, 'units') : '—'} hint="As stated by the farmer" />
-        <Stat icon={ShieldCheck} label="60% payment" value={money(milestone)} hint="Paid when you sign off" tone="sprout" />
+        <Stat icon={ShieldCheck} label="60% payment" value={money(milestone)} hint="Paid when the buyer confirms" tone="sprout" />
         <Stat
           icon={Fingerprint}
           label="Sign-off status"
@@ -458,11 +458,11 @@ export default function InspectorTerminal() {
           </Card>
 
           <Card>
-            <CardHeader icon={ShieldCheck} title="60% payment" description="Paid when the check passes" />
+            <CardHeader icon={ShieldCheck} title="60% payment" description="Paid when the buyer confirms the goods arrived" />
             <CardBody>
               <p className="font-display text-[24px] font-extrabold tracking-tight text-forest-600 tnum">{money(milestone)}</p>
               <p className="mt-1 text-[12px] leading-5 text-muted">
-                Held in escrow and paid the moment you sign off.
+                Held in escrow and released when the buyer confirms the goods arrived.
               </p>
             </CardBody>
           </Card>
