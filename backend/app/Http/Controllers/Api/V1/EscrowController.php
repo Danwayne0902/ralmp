@@ -65,13 +65,59 @@ class EscrowController extends Controller
             'order:id,buyer_id,farmer_id,status,payment_status,subtotal,total_price,delivery_fee',
             'order.buyer:id,name',
             'order.farmer:id,name',
+            'order.delivery:id,order_id,status,payment_status,buyer_confirmed_at,farmer_confirmed_at',
             'payee:id,name',
         ])
             ->where('status', 'pending')
             ->orderBy('id')
             ->get();
 
-        return response()->json(['releases' => $releases], 200);
+        // Only money whose proof has arrived can be signed off. The rest is
+        // shown separately so nobody mistakes "not due yet" for "waiting".
+        [$due, $upcoming] = $releases->partition(fn (EscrowRelease $release) => $this->isDue($release));
+
+        $recent = EscrowRelease::with([
+            'order:id,buyer_id,farmer_id,status,payment_status,subtotal,total_price,delivery_fee',
+            'order.buyer:id,name',
+            'order.farmer:id,name',
+            'payee:id,name',
+            'payout:id,escrow_release_id,status,transfer_status,amount',
+        ])
+            ->where('status', 'released')
+            ->whereNotNull('released_at')
+            ->orderByDesc('released_at')
+            ->limit(8)
+            ->get();
+
+        return response()->json([
+            'releases' => $due->values(),
+            'upcoming' => $upcoming->values(),
+            'recent' => $recent,
+        ], 200);
+    }
+
+    /**
+     * A release is due when the evidence it waits for is already on the order.
+     */
+    private function isDue(EscrowRelease $release): bool
+    {
+        $order = $release->order;
+        $delivery = $order?->delivery;
+
+        if (!$order) {
+            return false;
+        }
+
+        return match ($release->milestone) {
+            'pickup' => in_array($order->status, ['shipped', 'delivered', 'completed'], true)
+                || ($delivery && in_array($delivery->status, ['picked_up', 'in_transit', 'delivered'], true)),
+            'quality', 'final' => $order->status === 'completed'
+                || (bool) $delivery?->buyer_confirmed_at,
+            'delivery' => $delivery
+                && $delivery->bothConfirmed()
+                && $delivery->payment_status === 'paid',
+            default => true,
+        };
     }
 
     public function release(Request $request, $id)

@@ -376,4 +376,92 @@ class EscrowTest extends TestCase
         Sanctum::actingAs($this->user('buyer'));
         $this->getJson("/api/v1/escrow/orders/{$order->id}")->assertStatus(403);
     }
+
+    public function test_the_payments_desk_lists_only_payments_whose_proof_has_arrived(): void
+    {
+        $admin = $this->user('admin');
+        $farmer = $this->user('farmer');
+        $buyer = $this->user('buyer');
+        $logistics = $this->user('logistics_provider');
+
+        $order = $this->paidOrder($farmer, $buyer);
+        $delivery = $this->deliveryFor($order, $logistics, ['payment_status' => 'paid']);
+        $service = app(EscrowService::class);
+        $service->fund($order->fresh('delivery'));
+        $service->fundDelivery($delivery->fresh());
+
+        Sanctum::actingAs($admin);
+
+        // Nothing is due while the goods have not left the farm.
+        $this->getJson('/api/v1/admin/escrow/pending')
+            ->assertOk()
+            ->assertJsonCount(0, 'releases')
+            ->assertJsonCount(4, 'upcoming')
+            ->assertJsonCount(0, 'recent');
+
+        // The driver's pickup note makes the first 10% due.
+        $delivery->update(['status' => 'picked_up']);
+
+        $this->getJson('/api/v1/admin/escrow/pending')
+            ->assertOk()
+            ->assertJsonCount(1, 'releases')
+            ->assertJsonPath('releases.0.milestone', 'pickup')
+            ->assertJsonCount(3, 'upcoming');
+
+        // The buyer confirming the goods makes the 60% and 30% due. The driver
+        // still waits for the farmer's handover signature.
+        $delivery->update(['status' => 'delivered', 'buyer_confirmed_at' => now()]);
+
+        $this->getJson('/api/v1/admin/escrow/pending')
+            ->assertOk()
+            ->assertJsonCount(3, 'releases')
+            ->assertJsonCount(1, 'upcoming')
+            ->assertJsonPath('upcoming.0.milestone', 'delivery');
+
+        // The farmer's signature completes the pair, so the delivery is due too.
+        $delivery->update(['farmer_confirmed_at' => now()]);
+
+        $this->getJson('/api/v1/admin/escrow/pending')
+            ->assertOk()
+            ->assertJsonCount(4, 'releases')
+            ->assertJsonCount(0, 'upcoming');
+    }
+
+    public function test_a_signed_off_payment_stays_visible_with_its_payout_state(): void
+    {
+        $admin = $this->user('admin');
+        $farmer = $this->user('farmer');
+        $order = $this->paidOrder($farmer, null, ['status' => 'shipped']);
+        $account = app(EscrowService::class)->fund($order->fresh('delivery'));
+        $pickup = $account->releases->firstWhere('milestone', 'pickup');
+
+        Sanctum::actingAs($admin);
+        $this->postJson("/api/v1/admin/escrow/releases/{$pickup->id}/release")->assertOk();
+
+        // Signing off one part does not change the order or the other parts.
+        $this->assertSame('shipped', $order->fresh()->status);
+        $this->assertSame(
+            ['pending', 'pending'],
+            EscrowRelease::where('order_id', $order->id)
+                ->whereIn('milestone', ['quality', 'final'])
+                ->orderBy('id')
+                ->pluck('status')
+                ->all()
+        );
+
+        // It leaves the approval list but stays on the page as released.
+        $this->getJson('/api/v1/admin/escrow/pending')
+            ->assertOk()
+            ->assertJsonCount(0, 'releases')
+            ->assertJsonCount(2, 'upcoming')
+            ->assertJsonPath('recent.0.id', $pickup->id)
+            ->assertJsonPath('recent.0.status', 'released')
+            ->assertJsonPath('recent.0.payout.status', 'pending');
+
+        // A refresh does not make it disappear or look unreleased again.
+        $this->getJson('/api/v1/admin/escrow/pending')
+            ->assertOk()
+            ->assertJsonPath('recent.0.id', $pickup->id)
+            ->assertJsonPath('recent.0.status', 'released');
+    }
 }

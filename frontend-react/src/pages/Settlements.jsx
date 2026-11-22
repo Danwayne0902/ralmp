@@ -1,18 +1,43 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Banknote, CheckCircle2, Clock3, Download, KeyRound, Landmark,
-  Lock, RefreshCw, Send, ShieldCheck, Snowflake, Wallet,
+  Banknote, BadgeCheck, CheckCircle2, CircleAlert, Clock3, Download, KeyRound,
+  Landmark, Lock, RefreshCw, Send, ShieldCheck, Snowflake, Wallet,
 } from 'lucide-react'
 import { PageHeader, Stat, Table, Th, Td, Tr, EmptyState, Skeleton, Progress } from '../components/ui/Data'
 import { Button } from '../components/ui/Button'
 import { Badge, StatusBadge } from '../components/ui/Badge'
+import { Modal } from '../components/ui/Overlay'
 import { adminService, escrowService, orderService, paymentService, payoutService } from '../lib/services'
 import { escrowSchedule, escrowReleasedAll, escrowHeldAll, TRANCHE_SPLIT } from '../lib/orders'
 import { fmtDate, fmtDateTime, money } from '../lib/format'
 import { downloadCsv, parseError } from '../lib/utils'
 import { useAuth } from '../store/auth'
 import { toast } from 'sonner'
+
+const MILESTONE_LABELS = {
+  pickup: 'Pickup payment',
+  quality: 'Main payment',
+  final: 'Final payment',
+  delivery: 'Delivery payment',
+}
+
+function milestoneLabel(release) {
+  return MILESTONE_LABELS[release.milestone] || release.label || 'Payment'
+}
+
+function waitingOn(release) {
+  if (release.milestone === 'delivery') return 'Waiting for the buyer and the farmer to confirm delivery'
+  if (release.milestone === 'pickup') return 'Waiting for the driver to send the pickup note'
+  return 'Waiting for the buyer to confirm the goods arrived'
+}
+
+function payoutState(payout) {
+  if (!payout) return { label: 'No payout yet', tone: 'neutral' }
+  if (payout.status === 'paid') return { label: 'Paid', tone: 'verified' }
+  if (['sending', 'pending', 'otp'].includes(payout.transfer_status)) return { label: 'Sending', tone: 'pending' }
+  return { label: 'Ready to send', tone: 'pending' }
+}
 
 export default function Settlements() {
   const { user } = useAuth()
@@ -22,8 +47,11 @@ export default function Settlements() {
   const [error, setError] = useState('')
   const [tab, setTab] = useState('orders')
   const [pendingReleases, setPendingReleases] = useState([])
+  const [upcomingReleases, setUpcomingReleases] = useState([])
+  const [recentReleases, setRecentReleases] = useState([])
   const [pendingPayouts, setPendingPayouts] = useState([])
   const [acting, setActing] = useState(null)
+  const [confirm, setConfirm] = useState(null)
   const [otpFor, setOtpFor] = useState(null)
   const [otp, setOtp] = useState('')
   const [fees, setFees] = useState(null)
@@ -36,8 +64,8 @@ export default function Settlements() {
         orderService.list({ per_page: 100 }),
         paymentService.history().catch(() => ({ data: { payments: [] } })),
         isAdmin
-          ? escrowService.pending().catch(() => ({ data: { releases: [] } }))
-          : Promise.resolve({ data: { releases: [] } }),
+          ? escrowService.pending().catch(() => ({ data: { releases: [], upcoming: [], recent: [] } }))
+          : Promise.resolve({ data: { releases: [], upcoming: [], recent: [] } }),
         isAdmin
           ? payoutService.list({ status: 'pending', per_page: 50 }).catch(() => ({ data: { data: [] } }))
           : Promise.resolve({ data: { data: [] } }),
@@ -48,6 +76,8 @@ export default function Settlements() {
       setOrders(orderRes.data?.data || [])
       setPayments(paymentRes.data?.payments || [])
       setPendingReleases(releasesRes.data?.releases || [])
+      setUpcomingReleases(releasesRes.data?.upcoming || [])
+      setRecentReleases(releasesRes.data?.recent || [])
       setPendingPayouts(payoutsRes.data?.data || [])
       setFees(feesRes.data || null)
       setError('')
@@ -58,14 +88,18 @@ export default function Settlements() {
     }
   }
 
-  async function releasePayment(id) {
-    setActing(id)
+  async function releasePayment(release) {
+    setActing(release.id)
     try {
-      await escrowService.release(id, 'Checked and approved in the payments desk.')
-      toast.success('Payment released from escrow')
+      await escrowService.release(release.id, 'Signed off in the payments desk.')
+      const who = release.payee?.name || release.order?.farmer?.name || 'the payee'
+      toast.success(`${money(release.net_amount ?? release.amount)} released to ${who}`, {
+        description: `Order #${release.order_id}. It is now ready for the bank transfer.`,
+      })
+      setConfirm(null)
       await load()
     } catch (err) {
-      toast.error(parseError(err))
+      toast.error('The payment was not released', { description: parseError(err) })
     } finally {
       setActing(null)
     }
@@ -80,11 +114,14 @@ export default function Settlements() {
         setOtp('')
         toast.info(res.data.message)
       } else {
-        toast.success(res.data?.message || 'Bank transfer started')
+        toast.success(`Bank transfer started for ${payout.user?.name || 'the payee'}`, {
+          description: `${money(payout.amount)} is on its way. It is marked paid when the bank confirms.`,
+        })
       }
+      setConfirm(null)
       await load()
     } catch (err) {
-      toast.error(parseError(err))
+      toast.error('The bank transfer was not started', { description: parseError(err) })
       await load()
     } finally {
       setActing(null)
@@ -110,18 +147,89 @@ export default function Settlements() {
     }
   }
 
-  async function markPayoutSent(id) {
-    setActing(id)
+  async function markPayoutSent(payout) {
+    setActing(payout.id)
     try {
-      await payoutService.markPaid(id, 'Paid outside Paystack and confirmed by the payments desk.')
-      toast.success('Payout marked as sent')
+      await payoutService.markPaid(payout.id, 'Paid outside Paystack and confirmed by the payments desk.')
+      toast.success(`${money(payout.amount)} marked as paid to ${payout.user?.name || 'the payee'}`, {
+        description: 'This was a manual confirmation. No Paystack transfer was started.',
+      })
+      setConfirm(null)
       await load()
     } catch (err) {
-      toast.error(parseError(err))
+      toast.error('The payout was not marked paid', { description: parseError(err) })
     } finally {
       setActing(null)
     }
   }
+
+  function runConfirm() {
+    if (!confirm) return
+    if (confirm.kind === 'release') return releasePayment(confirm.release)
+    if (confirm.kind === 'send') return sendPayout(confirm.payout)
+    if (confirm.kind === 'paid') return markPayoutSent(confirm.payout)
+  }
+
+  const confirmDetails = (() => {
+    if (!confirm) return null
+
+    if (confirm.kind === 'release') {
+      const release = confirm.release
+      const who = release.payee?.name || release.order?.farmer?.name || 'the payee'
+      const net = release.net_amount ?? release.amount
+      const fee = Math.max(0, Number(release.amount || 0) - Number(net || 0))
+      return {
+        title: 'Release this money?',
+        description: `You are about to sign off ${money(net)} to ${who} for order #${release.order_id}.`,
+        lines: [
+          ['Payment part', milestoneLabel(release)],
+          ['Released from escrow', money(release.amount)],
+          ...(fee > 0 ? [['Platform fee', `− ${money(fee)}`]] : []),
+          ['Payee receives', money(net)],
+        ],
+        warning: 'This moves the money out of escrow and creates a payout. It cannot be undone from this screen.',
+        confirmLabel: 'Yes, release the money',
+        danger: false,
+      }
+    }
+
+    const payout = confirm.payout
+    const name = payout.user?.name || 'this payee'
+    const bankName = payout.bank_name || payout.user?.bank_name
+    const account = payout.account_number || payout.user?.account_number
+    const masked = account ? `****${String(account).slice(-4)}` : null
+
+    if (confirm.kind === 'send') {
+      return {
+        title: 'Send this money?',
+        description: `A bank transfer of ${money(payout.amount)} will go to ${name}.`,
+        lines: [
+          ['Payee', name],
+          ['Bank', bankName || 'No bank on file'],
+          ['Account', masked || 'No account number on file'],
+          ['Amount', money(payout.amount)],
+        ],
+        warning: masked
+          ? 'Paystack starts the transfer. The payout is marked paid only when the bank confirms it.'
+          : 'This payee has no bank details on file, so the transfer will fail until they add them.',
+        confirmLabel: 'Yes, send the money',
+        danger: false,
+      }
+    }
+
+    return {
+      title: 'Mark this payout as paid?',
+      description: `This records ${money(payout.amount)} as sent to ${name} outside Paystack.`,
+      lines: [
+        ['Payee', name],
+        ['Amount', money(payout.amount)],
+        ['Method', 'Manual bank transfer'],
+      ],
+      warning: 'Only do this if you have proof the money reached the payee. Their screen will show it as paid.',
+      confirmLabel: 'Yes, mark it paid',
+      danger: true,
+    }
+  })()
 
   useEffect(() => {
     load()
@@ -409,7 +517,7 @@ export default function Settlements() {
                             <div className="mt-2 grid grid-cols-3 gap-2 text-[10.5px]">
                               <div><p className="text-muted">Total</p><p className="font-semibold text-ink tnum">{money(total)}</p></div>
                               <div><p className="text-muted">Paid out</p><p className="font-semibold text-forest-600 tnum">{money(released)}</p></div>
-                              <div><p className="text-muted">On hold</p><p className="font-semibold text-muted tnum">{money(held)}</p></div>
+                              <div><p className="text-muted">In escrow</p><p className="font-semibold text-muted tnum">{money(held)}</p></div>
                             </div>
                           </Link>
                         </li>
@@ -463,7 +571,7 @@ export default function Settlements() {
             <h2 className="flex items-center gap-2 font-display text-[15px] font-bold text-ink">
               <Lock size={15} className="text-forest-500" /> Payment parts
             </h2>
-            <p className="mt-0.5 text-[11px] text-muted">Money on hold is still in the escrow account.</p>
+            <p className="mt-0.5 text-[11px] text-muted">Money still in escrow is waiting for the step it belongs to.</p>
             <div className="mt-4 space-y-3">
               {trancheSummary.map((tranche) => {
                 const total = tranche.settled + tranche.held
@@ -496,33 +604,79 @@ export default function Settlements() {
                 <CheckCircle2 size={12} /> Waiting for your approval
               </p>
               {pendingReleases.length === 0 ? (
-                <p className="mt-2 text-[11.5px] leading-5 text-muted">Nothing is waiting. Every check has been handled.</p>
+                <p className="mt-2 text-[11.5px] leading-5 text-muted">
+                  Nothing is due. Money appears here when the step it waits for is done.
+                </p>
               ) : (
                 <ul className="mt-2 divide-y divide-harvest-200/70">
-                  {pendingReleases.slice(0, 5).map((release) => (
-                    <li key={release.id} className="py-2.5 first:pt-0">
-                      <div className="flex items-start justify-between gap-2">
+                  {pendingReleases.slice(0, 5).map((release) => {
+                    const net = release.net_amount ?? release.amount
+                    const fee = Number(release.amount || 0) - Number(net || 0)
+                    return (
+                      <li key={release.id} className="py-2.5 first:pt-0">
                         <div className="min-w-0">
                           <p className="break-words text-[11.5px] font-semibold text-ink">
-                            Order #{release.order_id} · {release.label}
+                            Order #{release.order_id} · {milestoneLabel(release)}
                           </p>
-                          <p className="text-[10.5px] text-muted">
-                            {release.order?.farmer?.name || 'Farmer'} · {money(release.amount)}
+                          <p className="break-words text-[10.5px] text-muted">
+                            {release.payee?.name || release.order?.farmer?.name || 'Payee'} · {money(net)}
+                            {fee > 0.004 && <> after {money(fee)} fee</>}
                           </p>
                         </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-1.5"
-                        loading={acting === release.id}
-                        onClick={() => releasePayment(release.id)}
-                      >
-                        Release payment
-                      </Button>
-                    </li>
-                  ))}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-1.5"
+                          loading={acting === release.id}
+                          onClick={() => setConfirm({ kind: 'release', release })}
+                        >
+                          Review and release
+                        </Button>
+                      </li>
+                    )
+                  })}
                 </ul>
+              )}
+              {upcomingReleases.length > 0 && (
+                <p className="mt-2 border-t border-harvest-200/70 pt-2 text-[10.5px] leading-4 text-muted">
+                  {upcomingReleases.length} more {upcomingReleases.length === 1 ? 'payment is' : 'payments are'} in
+                  escrow but not due yet. See “Not due yet” below.
+                </p>
+              )}
+            </div>
+          )}
+
+          {isAdmin && upcomingReleases.length > 0 && (
+            <div className="rounded-card border border-line bg-white p-5 shadow-card">
+              <p className="flex flex-wrap items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
+                <Clock3 size={12} /> Not due yet
+                <span className="rounded-full bg-canvas px-1.5 py-0.5 text-[9.5px] font-bold tracking-normal text-ink-soft tnum">
+                  {upcomingReleases.length}
+                </span>
+              </p>
+              <p className="mt-1 text-[10.5px] leading-4 text-muted">
+                These are still in escrow. They cannot be signed off until the step each one waits for is done.
+              </p>
+              <ul className="mt-2 divide-y divide-line">
+                {upcomingReleases.slice(0, 6).map((release) => (
+                  <li key={release.id} className="py-2.5 first:pt-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="break-words text-[11.5px] font-semibold text-ink">
+                          Order #{release.order_id} · {milestoneLabel(release)}
+                        </p>
+                        <p className="break-words text-[10.5px] text-muted">
+                          {release.payee?.name || release.order?.farmer?.name || 'Payee'} · {money(release.net_amount ?? release.amount)}
+                        </p>
+                        <p className="mt-0.5 text-[10px] leading-4 text-muted">{waitingOn(release)}</p>
+                      </div>
+                      <Badge tone="neutral" size="sm" className="shrink-0">Not due</Badge>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {upcomingReleases.length > 6 && (
+                <p className="mt-2 text-[10px] text-muted">and {upcomingReleases.length - 6} more.</p>
               )}
             </div>
           )}
@@ -580,7 +734,7 @@ export default function Settlements() {
                                 size="sm"
                                 loading={acting === payout.id}
                                 disabled={onTheWay}
-                                onClick={() => sendPayout(payout)}
+                                onClick={() => setConfirm({ kind: 'send', payout })}
                               >
                                 {!acting || acting !== payout.id ? <Send size={12} /> : null}
                                 {onTheWay ? 'Sending…' : 'Send money'}
@@ -589,7 +743,7 @@ export default function Settlements() {
                             <button
                               type="button"
                               className="text-[9.5px] font-semibold text-muted underline underline-offset-2 hover:text-ink"
-                              onClick={() => markPayoutSent(payout.id)}
+                              onClick={() => setConfirm({ kind: 'paid', payout })}
                               disabled={acting === payout.id}
                             >
                               Already paid outside Paystack
@@ -628,6 +782,45 @@ export default function Settlements() {
                   })}
                 </ul>
               )}
+            </div>
+          )}
+
+          {isAdmin && recentReleases.length > 0 && (
+            <div className="rounded-card border border-line bg-white p-5 shadow-card">
+              <p className="flex flex-wrap items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted">
+                <BadgeCheck size={12} /> Recently released
+                <span className="rounded-full bg-canvas px-1.5 py-0.5 text-[9.5px] font-bold tracking-normal text-ink-soft tnum">
+                  {recentReleases.length}
+                </span>
+              </p>
+              <p className="mt-1 text-[10.5px] leading-4 text-muted">
+                Signed-off payments stay here, including how their bank transfer is going.
+              </p>
+              <ul className="mt-2 divide-y divide-line">
+                {recentReleases.map((release) => {
+                  const state = payoutState(release.payout)
+                  return (
+                    <li key={release.id} className="py-2.5 first:pt-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="break-words text-[11.5px] font-semibold text-ink">
+                            Order #{release.order_id} · {milestoneLabel(release)}
+                          </p>
+                          <p className="break-words text-[10.5px] text-muted">
+                            {release.payee?.name || release.order?.farmer?.name || 'Payee'} ·{' '}
+                            {money(release.payout?.amount ?? release.net_amount ?? release.amount)}
+                          </p>
+                          <p className="text-[10px] text-muted">{fmtDateTime(release.released_at)}</p>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-end gap-1">
+                          <Badge tone="verified" size="sm">Released</Badge>
+                          <Badge tone={state.tone} size="sm">{state.label}</Badge>
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           )}
 
@@ -685,6 +878,50 @@ export default function Settlements() {
           </div>
         </aside>
       </div>
+
+      <Modal
+        open={Boolean(confirm)}
+        onOpenChange={(open) => {
+          if (!open && !acting) setConfirm(null)
+        }}
+        title={confirmDetails?.title}
+        description={confirmDetails?.description}
+        size="sm"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setConfirm(null)} disabled={Boolean(acting)}>
+              Cancel
+            </Button>
+            <Button
+              variant={confirmDetails?.danger ? 'danger' : 'primary'}
+              loading={Boolean(acting)}
+              onClick={runConfirm}
+            >
+              {confirmDetails?.confirmLabel || 'Continue'}
+            </Button>
+          </>
+        }
+      >
+        {confirmDetails && (
+          <div className="space-y-4">
+            <dl className="divide-y divide-line rounded-xl border border-line">
+              {confirmDetails.lines.map(([label, value]) => (
+                <div key={label} className="flex flex-wrap items-baseline justify-between gap-2 px-3.5 py-2.5">
+                  <dt className="text-[11.5px] text-muted">{label}</dt>
+                  <dd className="break-words text-right text-[12px] font-semibold text-ink tnum">{value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="flex gap-2 rounded-xl border border-harvest-200 bg-harvest-50/70 px-3.5 py-3">
+              <CircleAlert size={15} className="mt-0.5 shrink-0 text-harvest-700" />
+              <p className="text-[11.5px] leading-5 text-harvest-700">{confirmDetails.warning}</p>
+            </div>
+            <p className="text-[10.5px] leading-4 text-muted">
+              You can close this window without changing anything.
+            </p>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

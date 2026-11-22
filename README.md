@@ -183,6 +183,10 @@ Paystack Transfers.
    both confirmations, it is released straight away.
 6. **Payouts** go to the payee's saved bank account through Paystack Transfers and
    are marked paid only by a `transfer.success` webhook.
+7. **Payments desk.** The admin desk lists only releases whose proof has arrived.
+   Money that is still waiting is shown separately as not due, so it cannot be
+   signed off early. Every release and bank-transfer action asks for confirmation,
+   and a signed-off payment stays visible as released with its transfer state.
 
 The platform fee is `RAMLP_PLATFORM_FEE_PERCENT`, clamped to 4–6 and 5 by default.
 It is charged on goods and on delivery, and admins see the running total, the
