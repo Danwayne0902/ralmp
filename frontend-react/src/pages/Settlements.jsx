@@ -691,6 +691,10 @@ export default function Settlements() {
                   </span>
                 )}
               </p>
+              <p className="mt-1 text-[10.5px] leading-4 text-muted">
+                Paystack sends the money. If it cannot reach the bank, the reason is shown on the payout. Only use the
+                manual option after you have sent the money yourself.
+              </p>
               {pendingPayouts.length === 0 ? (
                 <p className="mt-2 text-[11.5px] leading-5 text-muted">No payout is waiting for a bank transfer.</p>
               ) : (

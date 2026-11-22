@@ -222,7 +222,7 @@ export default function Payouts() {
                           </Td>
                           <Td>
                             <PayoutState payout={event} />
-                            {event.failureReason && (
+                            {event.status !== 'paid' && event.failureReason && (
                               <p className="mt-0.5 max-w-[170px] text-[9.5px] leading-3 text-critical-600">
                                 {event.failureReason}
                               </p>
@@ -251,7 +251,7 @@ export default function Payouts() {
                             <p className="text-[9.5px] text-muted tnum">{money(event.base)} − {money(event.fee)} fee</p>
                           )}
                           <div className="mt-1 flex justify-end"><PayoutState payout={event} /></div>
-                          {event.failureReason && (
+                          {event.status !== 'paid' && event.failureReason && (
                             <p className="mt-1 max-w-[160px] text-[9.5px] leading-3 text-critical-600">{event.failureReason}</p>
                           )}
                         </div>
