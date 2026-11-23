@@ -93,4 +93,9 @@ class Order extends Model
     {
         return $this->hasMany(Payout::class);
     }
+
+    public function inspection()
+    {
+        return $this->hasOne(QualityInspection::class);
+    }
 }

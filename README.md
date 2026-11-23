@@ -195,14 +195,19 @@ month-to-date figure, the goods/delivery split and the recent fee rows under
 
 #### Presentation-only surfaces
 
-The API has no endpoints for arbitration rulings, e-waybills
-or laboratory assays. Those screens
-(`/admin/arbitration`, `/admin/quality/terminal`, `/dispatch/waybill`,
-`/buyer/procurement`) render the control framework and
-derive their content from real order, listing and payment records. Draft or
-unavailable data is labelled as such (for example "Draft only — not decided",
-or an empty state) and no assay values, awards or settlement references are
-invented.
+The API has no endpoints for arbitration rulings, e-waybills or laboratory
+assays. Those screens
+(`/admin/arbitration`, `/dispatch/waybill`, `/buyer/procurement`) render the
+control framework and derive their content from real order, listing and payment
+records. Draft or unavailable data is labelled as such (for example "Draft
+only — not decided", or an empty state) and no assay values, awards or
+settlement references are invented.
+
+The checker at `/admin/quality/terminal` is different: the readings and verdict
+you enter are saved against the order in `quality_inspections`, with your name
+and the time. It records a check; it does not release money, and it is not a
+laboratory result. Payment release stays in the payments desk and follows the
+buyer-confirmation rule above.
 
 ### Docker Setup
 

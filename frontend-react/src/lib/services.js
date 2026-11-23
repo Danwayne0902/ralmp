@@ -132,6 +132,9 @@ export const adminService = {
   removeCommodity: (id) => api.delete(`/admin/commodities/${id}`),
   logs: () => api.get('/admin/system-logs'),
   reviews: (params) => api.get('/admin/reviews', { params }),
+  inspections: () => api.get('/admin/quality/inspections'),
+  inspection: (orderId) => api.get(`/admin/quality/orders/${orderId}/inspection`),
+  saveInspection: (orderId, data) => api.post(`/admin/quality/orders/${orderId}/inspection`, data),
 }
 
 export const paymentService = {

@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\MessageController;
 use App\Http\Controllers\Api\V1\EscrowController;
 use App\Http\Controllers\Api\V1\PayoutController;
 use App\Http\Controllers\Api\V1\DeliveryOfferController;
+use App\Http\Controllers\Api\V1\QualityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -159,6 +160,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/payouts/{id}/send', [PayoutController::class, 'send']);
             Route::post('/payouts/{id}/transfer-otp', [PayoutController::class, 'finalize']);
             Route::post('/payouts/{id}/paid', [PayoutController::class, 'markPaid']);
+
+            // Checker sign-offs recorded against an order
+            Route::get('/quality/inspections', [QualityController::class, 'index']);
+            Route::get('/quality/orders/{order}/inspection', [QualityController::class, 'show']);
+            Route::post('/quality/orders/{order}/inspection', [QualityController::class, 'store']);
             
             Route::get('/dashboard', [AdminController::class, 'getDashboard']);
             Route::get('/analytics', [AdminController::class, 'getAnalytics']);

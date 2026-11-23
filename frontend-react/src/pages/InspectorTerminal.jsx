@@ -15,10 +15,10 @@ import { fmtDateTime, imgUrl, money, num, qtyUnit } from '../lib/format'
 import { cn, parseError } from '../lib/utils'
 
 const ASSAYS = [
-  { key: 'moisture', label: 'Moisture', unit: '%', limit: 12.5, compare: 'lte', spec: '≤ 12.50% max', bench: 'Standard limit' },
-  { key: 'aflatoxin', label: 'Aflatoxin B1', unit: 'ppb', limit: 10, compare: 'lt', spec: '< 10.0 ppb', bench: 'Food safety limit' },
-  { key: 'chaff', label: 'Dirt and other matter', unit: '%', limit: 2, compare: 'lte', spec: '≤ 2.00% max', bench: 'Max 2.0%' },
-  { key: 'broken', label: 'Broken grains', unit: '%', limit: 5, compare: 'lte', spec: '≤ 5.00% max', bench: 'Max 5.0%' },
+  { key: 'moisture', label: 'Moisture', unit: '%', limit: 12.5, compare: 'lte', spec: '≤ 12.50% max', bench: 'Check limit' },
+  { key: 'aflatoxin', label: 'Aflatoxin B1', unit: 'ppb', limit: 10, compare: 'lt', spec: '< 10.0 ppb', bench: 'Check limit' },
+  { key: 'chaff', label: 'Dirt and other matter', unit: '%', limit: 2, compare: 'lte', spec: '≤ 2.00% max', bench: 'Check limit' },
+  { key: 'broken', label: 'Broken grains', unit: '%', limit: 5, compare: 'lte', spec: '≤ 5.00% max', bench: 'Check limit' },
 ]
 
 function assayPass(key, raw) {
@@ -31,44 +31,57 @@ function assayPass(key, raw) {
 const VERDICTS = [
   {
     key: 'release',
-    label: 'All good — release the 60% payment',
+    label: 'All good — pass this check',
     icon: CheckCircle2,
     tone: 'forest',
-    copy: 'Releases the 60% payment to the farmer. Every reading is inside the agreed range.',
+    copy: 'Records a pass. The 60% payment is still released from the payments desk after the buyer confirms the goods arrived.',
   },
   {
     key: 'conditional',
     label: 'Pass with a small price cut',
     icon: Percent,
     tone: 'gold',
-    copy: 'Takes a small amount off the payment for drying, then releases the rest to the farmer.',
+    copy: 'Records a pass with a price cut to review. No money moves until someone approves the cut.',
   },
   {
     key: 'freeze',
-    label: 'Hold the money and open a complaint',
+    label: 'Hold the money',
     icon: Gavel,
     tone: 'critical',
-    copy: 'Stops the payment, asks for a new sample and sends the case to a review.',
+    copy: 'Records a hold. The 60% payment stays in escrow.',
   },
 ]
+
+const VERDICT_LABELS = {
+  release: 'Passed',
+  conditional: 'Pass with a cut to review',
+  freeze: 'Held',
+}
 
 export default function InspectorTerminal() {
   const [orders, setOrders] = useState([])
   const [activeId, setActiveId] = useState(null)
   const [produce, setProduce] = useState(null)
+  const [produceLoading, setProduceLoading] = useState(false)
+  const [inspections, setInspections] = useState({})
   const [reading, setReading] = useState({ moisture: '', aflatoxin: '', chaff: '', broken: '' })
   const [weighbridge, setWeighbridge] = useState({ origin: '', destination: '' })
   const [verdict, setVerdict] = useState('release')
-  const [signed, setSigned] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await adminService.orders({ per_page: 100 })
-      const rows = res.data?.data || []
+      const [ordersRes, inspectionsRes] = await Promise.all([
+        adminService.orders({ per_page: 100 }),
+        adminService.inspections(),
+      ])
+      const rows = ordersRes.data?.data || []
+      const saved = inspectionsRes.data?.inspections || []
       setOrders(rows)
+      setInspections(Object.fromEntries(saved.map((row) => [row.order_id, row])))
       setError('')
       setActiveId(
         (current) =>
@@ -87,14 +100,21 @@ export default function InspectorTerminal() {
   }, [load])
 
   const order = useMemo(() => orders.find((o) => o.id === activeId) || null, [orders, activeId])
+  const inspection = order ? inspections[order.id] || null : null
+  const signed = Boolean(inspection)
 
   useEffect(() => {
-    if (!order?.produce_id && !order?.produce?.id) {
+    const id = order?.produce_id || order?.produce?.id
+    if (!id) {
       setProduce(null)
+      setProduceLoading(false)
       return
     }
-    const id = order.produce_id || order.produce?.id
     let cancelled = false
+    // Clear the old load before fetching the new one so the screen never
+    // shows one order's photos while another order is selected.
+    setProduce(null)
+    setProduceLoading(true)
     produceService
       .get(id)
       .then((data) => {
@@ -103,13 +123,15 @@ export default function InspectorTerminal() {
       .catch(() => {
         if (!cancelled) setProduce(null)
       })
+      .finally(() => {
+        if (!cancelled) setProduceLoading(false)
+      })
     return () => {
       cancelled = true
     }
   }, [order])
 
   useEffect(() => {
-    setSigned(false)
     setVerdict('release')
     setReading({ moisture: '', aflatoxin: '', chaff: '', broken: '' })
     setWeighbridge({ origin: '', destination: '' })
@@ -126,10 +148,52 @@ export default function InspectorTerminal() {
 
   const images = Array.isArray(produce?.images) ? produce.images.slice(0, 4) : []
 
+  function numberOrNull(value) {
+    if (value === '' || value === null || value === undefined) return null
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  async function saveSignOff(nextVerdict, successTitle, successDescription) {
+    if (!order || saving) return
+    setSaving(true)
+    try {
+      const res = await adminService.saveInspection(order.id, {
+        verdict: nextVerdict,
+        readings: {
+          moisture: numberOrNull(reading.moisture),
+          aflatoxin: numberOrNull(reading.aflatoxin),
+          chaff: numberOrNull(reading.chaff),
+          broken: numberOrNull(reading.broken),
+        },
+        origin_weight: numberOrNull(weighbridge.origin),
+        destination_weight: numberOrNull(weighbridge.destination),
+      })
+      const saved = res.data?.inspection
+      if (saved) setInspections((prev) => ({ ...prev, [order.id]: saved }))
+      toast.success(successTitle, { description: successDescription })
+    } catch (err) {
+      toast.error('Your sign-off was not saved', { description: parseError(err) })
+    } finally {
+      setSaving(false)
+    }
+  }
+
   function signOff() {
-    if (!order) return
-    setSigned(true)
-    toast.success('Your result has been saved on the order')
+    return saveSignOff(
+      verdict,
+      `Check signed for order #${order?.id ?? ''}`,
+      'Your name and time are saved on the order. The money stays in escrow until its step is done.',
+    )
+  }
+
+  function recordHold() {
+    setVerdict('freeze')
+    return saveSignOff(
+      'freeze',
+      `Order #${order?.id ?? ''} saved as held`,
+      'The result is recorded on the order and the money stays in escrow.',
+    )
   }
 
   if (loading) {
@@ -176,19 +240,28 @@ export default function InspectorTerminal() {
         description="Test readings, the two weights and the final result for this load."
         actions={
           <>
-            <select
-              aria-label="Select load"
-              value={activeId ?? ''}
-              onChange={(e) => setActiveId(Number(e.target.value) || null)}
-              className="select"
-            >
-              {orders.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.produce?.commodity_name || `Order #${o.id}`} · #{o.id}
-                </option>
-              ))}
-            </select>
-            <Button variant="outline" size="md" onClick={load}>
+            <div className="relative min-w-0">
+              <select
+                aria-label="Select load"
+                aria-busy={produceLoading}
+                disabled={produceLoading}
+                value={activeId ?? ''}
+                onChange={(e) => setActiveId(Number(e.target.value) || null)}
+                className={cn('select', produceLoading && 'cursor-wait pr-16 text-muted')}
+              >
+                {orders.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.produce?.commodity_name || `Order #${o.id}`} · #{o.id}
+                  </option>
+                ))}
+              </select>
+              {produceLoading && (
+                <span className="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2">
+                  <RefreshCw size={14} className="animate-spin text-muted" />
+                </span>
+              )}
+            </div>
+            <Button variant="outline" size="md" onClick={load} disabled={produceLoading}>
               <RefreshCw size={15} /> Refresh
             </Button>
           </>
@@ -216,8 +289,12 @@ export default function InspectorTerminal() {
           icon={Fingerprint}
           label="Sign-off status"
           value={signed ? 'Signed' : 'Open'}
-          hint={signed ? 'Saved with your name and time' : 'Waiting for your sign-off'}
-          tone={signed ? 'forest' : 'neutral'}
+          hint={
+            signed
+              ? `Signed ${fmtDateTime(inspection.signed_at)}`
+              : 'Waiting for your sign-off'
+          }
+          tone={signed ? 'sprout' : 'neutral'}
         />
       </div>
 
@@ -228,7 +305,7 @@ export default function InspectorTerminal() {
               icon={FlaskConical}
               title="Test readings"
               description="Enter the readings. Pass or fail is checked against the agreed limit."
-              action={<Badge tone="outline" size="sm">NIRS probe calibrated</Badge>}
+              action={<Badge tone="outline" size="sm">Manual entry</Badge>}
             />
             <CardBody className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-[200px_minmax(0,1fr)]">
@@ -468,16 +545,26 @@ export default function InspectorTerminal() {
           </Card>
 
           <Card>
-            <CardHeader icon={Fingerprint} title="Your sign-off" description="Saved with your name and time" />
+            <CardHeader
+              icon={Fingerprint}
+              title="Your sign-off"
+              description={signed ? 'Recorded on this order' : 'Saved with your name and time'}
+            />
             <CardBody className="space-y-3">
-              <div className="relative grid h-28 place-items-center rounded-xl border border-dashed border-sage-400 bg-canvas">
+              <div className="relative grid min-h-28 place-items-center rounded-xl border border-dashed border-sage-400 bg-canvas px-4 py-4">
                 {signed ? (
                   <div className="text-center">
                     <CheckCircle2 size={26} className="mx-auto text-forest-600" />
-                    <p className="mt-1.5 text-[12px] font-semibold text-forest-600">Signed · {fmtDateTime(new Date())}</p>
+                    <p className="mt-1.5 text-[12px] font-semibold text-forest-600">
+                      Signed · {fmtDateTime(inspection.signed_at)}
+                    </p>
+                    <p className="mt-1 text-[11px] leading-4 text-muted">
+                      {inspection.inspector?.name || 'Checker'} ·{' '}
+                      {VERDICT_LABELS[inspection.verdict] || inspection.verdict}
+                    </p>
                   </div>
                 ) : (
-                  <p className="px-4 text-center text-[11.5px] text-muted">Your signature will appear here</p>
+                  <p className="text-center text-[11.5px] text-muted">Your signature will appear here</p>
                 )}
               </div>
               <div className="space-y-2 text-[11.5px]">
@@ -498,15 +585,20 @@ export default function InspectorTerminal() {
               </div>
             </CardBody>
             <CardFooter className="flex-col items-stretch gap-2">
-              <Button className="w-full" onClick={signOff} disabled={signed}>
-                <Fingerprint size={15} /> {signed ? 'Signed' : `Sign and release ${money(milestone)}`}
+              <Button className="w-full" onClick={signOff} loading={saving} disabled={saving}>
+                <Fingerprint size={15} /> {signed ? 'Sign this check again' : 'Sign off this check'}
               </Button>
+              <p className="text-center text-[10.5px] leading-4 text-muted">
+                This records your result. It does not move money.
+              </p>
               <Button
                 variant="outline"
                 className="w-full border-critical-200 text-critical-600 hover:bg-critical-50"
-                onClick={() => { setVerdict('freeze'); toast.info('The order has been sent for review') }}
+                onClick={recordHold}
+                loading={saving}
+                disabled={saving}
               >
-                <Snowflake size={15} /> Hold and report
+                <Snowflake size={15} /> Record a hold
               </Button>
             </CardFooter>
           </Card>
