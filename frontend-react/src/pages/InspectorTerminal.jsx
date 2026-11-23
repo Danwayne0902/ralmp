@@ -110,11 +110,25 @@ export default function InspectorTerminal() {
       setProduceLoading(false)
       return
     }
+
     let cancelled = false
+    let hideTimer = null
+    const startedAt = Date.now()
+
     // Clear the old load before fetching the new one so the screen never
     // shows one order's photos while another order is selected.
     setProduce(null)
     setProduceLoading(true)
+
+    // Keep the indicator visible long enough to be noticed. On a fast local
+    // API the request can finish before the browser paints the spinner.
+    const finish = () => {
+      const remaining = Math.max(0, 350 - (Date.now() - startedAt))
+      hideTimer = window.setTimeout(() => {
+        if (!cancelled) setProduceLoading(false)
+      }, remaining)
+    }
+
     produceService
       .get(id)
       .then((data) => {
@@ -123,11 +137,11 @@ export default function InspectorTerminal() {
       .catch(() => {
         if (!cancelled) setProduce(null)
       })
-      .finally(() => {
-        if (!cancelled) setProduceLoading(false)
-      })
+      .finally(finish)
+
     return () => {
       cancelled = true
+      if (hideTimer) window.clearTimeout(hideTimer)
     }
   }, [order])
 
@@ -273,6 +287,19 @@ export default function InspectorTerminal() {
           <Callout tone="critical" icon={CircleAlert} title="We cannot load the check list">
             {error}
           </Callout>
+        </div>
+      )}
+
+      {produceLoading && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-5 flex items-center gap-2.5 rounded-xl border border-line bg-white px-3.5 py-2.5 text-[12px] text-muted shadow-card"
+        >
+          <RefreshCw size={15} className="shrink-0 animate-spin text-forest-500" />
+          <span>
+            Loading {order?.produce?.commodity_name || `order #${order?.id ?? ''}`}…
+          </span>
         </div>
       )}
 
