@@ -12,78 +12,140 @@ use Illuminate\Support\Str;
 class MessageController extends Controller
 {
     /**
-     * Get all conversations for current user
+     * Get one row per conversation, using the latest message in each thread.
+     * The old version loaded every message the user had ever exchanged and
+     * grouped them in PHP, which grew with chat history.
      */
     public function getConversations(Request $request)
     {
         $userId = $request->user()->id;
 
-        $conversations = Message::where('sender_id', $userId)
-            ->orWhere('recipient_id', $userId)
-            ->with([
-                'sender:id,name,profile_image',
-                'recipient:id,name,profile_image',
-            ])
-            ->orderByDesc('created_at')
-            ->get()
-            ->groupBy(function($message) use ($userId) {
-                return $message->sender_id == $userId ? $message->recipient_id : $message->sender_id;
-            })
-            ->map(function($messages, $otherUserId) use ($userId) {
-                $otherUser = $messages->first()->sender_id == $userId 
-                    ? $messages->first()->recipient 
-                    : $messages->first()->sender;
-                
-                $lastMessage = $messages->first();
-                $unreadCount = $messages->where('recipient_id', $userId)->where('is_read', false)->count();
+        $base = Message::query()->where(function ($query) use ($userId) {
+            $query->where('sender_id', $userId)->orWhere('recipient_id', $userId);
+        });
+
+        // One id per conversation: the newest message in that thread.
+        $latestIds = (clone $base)
+            ->whereNotNull('conversation_id')
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('conversation_id')
+            ->pluck('id');
+
+        $messages = Message::with([
+            'sender:id,name,profile_image',
+            'recipient:id,name,profile_image',
+        ])
+            ->whereIn('id', $latestIds)
+            ->orderByDesc('id')
+            ->limit(max(1, min((int) $request->get('per_page', 100), 200)))
+            ->get();
+
+        // One grouped query supplies every unread badge.
+        $unread = (clone $base)
+            ->where('recipient_id', $userId)
+            ->where('is_read', false)
+            ->selectRaw('conversation_id, COUNT(*) as total')
+            ->groupBy('conversation_id')
+            ->pluck('total', 'conversation_id');
+
+        $conversations = $messages
+            ->map(function (Message $lastMessage) use ($userId, $unread) {
+                $otherUser = $lastMessage->sender_id === $userId
+                    ? $lastMessage->recipient
+                    : $lastMessage->sender;
+
+                if (!$otherUser) {
+                    return null;
+                }
 
                 return [
                     'user' => $otherUser,
                     'last_message' => $lastMessage,
-                    'unread_count' => $unreadCount,
-                    'conversation_id' => $this->getConversationId($userId, $otherUserId)
+                    'unread_count' => (int) ($unread[$lastMessage->conversation_id] ?? 0),
+                    'conversation_id' => $lastMessage->conversation_id,
                 ];
             })
+            ->filter()
             ->values();
 
         return response()->json([
-            'conversations' => $conversations
+            'conversations' => $conversations,
         ], 200);
     }
 
     /**
-     * Get messages in a conversation
+     * Get a page of messages in a conversation. The newest page is returned
+     * by default; before_id loads older pages and after_id loads new messages
+     * for polling without re-downloading the whole thread.
      */
     public function getConversation(Request $request, $userId)
     {
         $currentUserId = $request->user()->id;
+        $perPage = max(1, min((int) $request->get('per_page', 50), 100));
 
-        $messages = Message::where(function($query) use ($currentUserId, $userId) {
-            $query->where('sender_id', $currentUserId)
-                  ->where('recipient_id', $userId);
-        })->orWhere(function($query) use ($currentUserId, $userId) {
-            $query->where('sender_id', $userId)
-                  ->where('recipient_id', $currentUserId);
-        })
-        ->with([
-            'sender:id,name,profile_image',
-            'recipient:id,name,profile_image',
-            'offer.driver:id,name,profile_image',
-        ])
-        ->orderBy('created_at', 'asc')
-        ->get();
+        $base = Message::where(function ($query) use ($currentUserId, $userId) {
+            // Both directions must stay inside one group, otherwise a later
+            // before_id/after_id filter is OR-ed out by the second branch.
+            $query->where(function ($q) use ($currentUserId, $userId) {
+                $q->where('sender_id', $currentUserId)
+                    ->where('recipient_id', $userId);
+            })->orWhere(function ($q) use ($currentUserId, $userId) {
+                $q->where('sender_id', $userId)
+                    ->where('recipient_id', $currentUserId);
+            });
+        });
 
-        // Mark messages as read
+        $afterId = (int) $request->get('after_id', 0);
+        $beforeId = (int) $request->get('before_id', 0);
+
+        if ($afterId > 0) {
+            $messages = (clone $base)
+                ->with([
+                    'sender:id,name,profile_image',
+                    'recipient:id,name,profile_image',
+                    'offer.driver:id,name,profile_image',
+                ])
+                ->where('id', '>', $afterId)
+                ->orderBy('id')
+                ->limit($perPage)
+                ->get();
+
+            $hasMore = $messages->count() === $perPage;
+        } else {
+            $query = (clone $base)
+                ->with([
+                    'sender:id,name,profile_image',
+                    'recipient:id,name,profile_image',
+                    'offer.driver:id,name,profile_image',
+                ])
+                ->orderByDesc('id')
+                ->limit($perPage + 1);
+
+            if ($beforeId > 0) {
+                $query->where('id', '<', $beforeId);
+            }
+
+            $rows = $query->get();
+            $hasMore = $rows->count() > $perPage;
+            $messages = $rows->take($perPage)->reverse()->values();
+        }
+
+        // Opening or polling an active thread clears its unread flags.
         Message::where('sender_id', $userId)
             ->where('recipient_id', $currentUserId)
             ->where('is_read', false)
             ->update([
                 'is_read' => true,
-                'read_at' => now()
+                'read_at' => now(),
             ]);
 
         return response()->json([
-            'messages' => $messages
+            'messages' => $messages,
+            'meta' => [
+                'has_more' => $hasMore,
+                'oldest_id' => $messages->first()?->id,
+                'newest_id' => $messages->last()?->id,
+            ],
         ], 200);
     }
 

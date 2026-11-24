@@ -43,6 +43,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# load-test output
+loadtest/results/*.json
+
 # local agent tooling
 .claude/
 .qoder/

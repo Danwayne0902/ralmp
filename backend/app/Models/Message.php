@@ -28,6 +28,23 @@ class Message extends Model
         'created_at' => 'datetime',
     ];
 
+    /**
+     * Always keep the pair key in sync, so no code path can create a message
+     * that the conversation list cannot group.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Message $message) {
+            if ($message->conversation_id) {
+                return;
+            }
+
+            $ids = [(int) $message->sender_id, (int) $message->recipient_id];
+            sort($ids);
+            $message->conversation_id = 'conv_' . $ids[0] . '_' . $ids[1];
+        });
+    }
+
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');

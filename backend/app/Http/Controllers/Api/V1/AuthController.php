@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifyEmail;
 use App\Mail\ResetPassword;
+use App\Support\ImageStore;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -67,8 +68,7 @@ class AuthController extends Controller
 
         // Handle profile image upload
         if ($request->hasFile('profile_image')) {
-            $path = $request->file('profile_image')->store('profiles', 'public');
-            $userData['profile_image'] = $path;
+            $userData['profile_image'] = ImageStore::put($request->file('profile_image'), 'profiles');
         }
 
         $user = User::create($userData);

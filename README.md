@@ -213,19 +213,32 @@ buyer-confirmation rule above.
 
 ```bash
 # Optionally copy .env.example to .env at the repo root and set DB_PASSWORD,
-# APP_KEY, PAYSTACK_*, and VITE_API_URL before starting.
+# APP_KEY, PAYSTACK_*, AWS_*, and VITE_API_URL before starting.
 docker compose up --build -d
 ```
 
 Services:
-- Backend API: http://localhost:8000
+- Backend API (nginx + PHP-FPM): http://localhost:8000
+- Queue worker (same image, runs `queue:work`)
 - Frontend (AgroLink Continental): http://localhost:8080
 - MySQL: localhost:3306
 - Redis: localhost:6379
 
-The backend image generates a `.env` and `APP_KEY` on first boot when they are
-not supplied, waits for MySQL, runs migrations, and links storage. Both frontend
-images compile to static assets and are served by nginx.
+The backend image no longer runs `php artisan serve`. It runs nginx and PHP-FPM
+under supervisor, and the queue worker uses the same image with a different
+command. Cache, sessions, carts and queued jobs all use Redis, so two backend
+replicas see the same cart and session instead of separate local files.
+
+The web container waits for MySQL and Redis, runs migrations once, links local
+storage, and builds the Laravel config/view caches. The worker waits for the
+web container to become healthy before starting. When `APP_KEY` is not set, the
+stack generates one on first boot in the shared `app_keys` volume so the web and
+queue containers agree; set `APP_KEY` yourself in production. Check logs with:
+
+```bash
+docker compose logs -f backend queue
+docker compose ps
+```
 
 `frontend-react/` is the default `frontend` service. The pre-redesign client is
 kept as an opt-in rollback service on port 8082:
@@ -235,10 +248,11 @@ docker compose --profile legacy up --build -d frontend-legacy
 # Legacy client: http://localhost:8082
 ```
 
-Vite inlines `VITE_*` variables at build time, so `VITE_API_URL` and
-`VITE_PAYSTACK_PUBLIC_KEY` must be set in the root `.env` before
-`docker compose build`. For a browser talking to the containerised API, the
-default `http://localhost:8000/api/v1` is correct.
+Vite inlines `VITE_*` variables at build time, so `VITE_API_URL`,
+`VITE_ASSET_URL`, and `VITE_PAYSTACK_PUBLIC_KEY` must be set in the root `.env`
+before `docker compose build`. For a browser talking to the containerised API,
+the default `http://localhost:8000/api/v1` is correct. Set `VITE_ASSET_URL` to
+the CDN origin when uploads live in S3.
 
 ## API Endpoints
 
@@ -402,8 +416,29 @@ DB_USERNAME=root
 DB_PASSWORD=secret
 
 CACHE_DRIVER=file
+SESSION_DRIVER=file
 QUEUE_CONNECTION=sync
 BROADCAST_DRIVER=log   # use "pusher" when a Pusher-compatible server runs
+
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=null
+
+# Images use the public disk locally; production points this at S3 and puts a
+# CDN in front of AWS_URL.
+FILESYSTEM_DISK=local
+UPLOADS_DISK=public
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_URL=
+AWS_ENDPOINT=
+
+# Requests per minute per user or IP. 0 disables throttling (load tests only).
+API_RATE_LIMIT=120
+METRICS_ENABLED=true
 
 MAIL_MAILER=smtp
 MAIL_HOST=127.0.0.1
@@ -427,8 +462,12 @@ RAMLP_DEFAULT_DELIVERY_DAYS=3
 Vite only exposes variables prefixed with `VITE_`:
 ```
 VITE_API_URL=http://localhost:8000/api/v1
+VITE_ASSET_URL=
 VITE_PAYSTACK_PUBLIC_KEY=pk_test_...
 ```
+
+`VITE_ASSET_URL` is the public origin for uploaded images. Leave it empty in
+local development; in production set it to the CDN domain.
 
 For the Docker frontend, pass the API URL as a build arg:
 ```bash
@@ -458,23 +497,31 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 
 ### Production Checklist
 - [ ] Set `APP_ENV=production` and `APP_DEBUG=false`
-- [ ] Generate a unique `APP_KEY` and keep it secret
-- [ ] Enable HTTPS/SSL
-- [ ] Configure MySQL with backups
-- [ ] Set up Redis for caching/queues
+- [ ] Generate one unique `APP_KEY` and give the same value to the web and queue containers
+- [ ] Enable HTTPS/SSL and set `SESSION_SECURE_COOKIE=true`
+- [ ] Use MySQL with backups; add a read replica when reporting queries get heavy
+- [ ] Run Redis for cache, sessions, carts and queues
+- [ ] Run at least one queue worker (the compose file includes one)
 - [ ] Configure a real mail transport
 - [ ] Set `PAYSTACK_SECRET_KEY`, enable Transfers and register the webhook URL
 - [ ] Fund the Paystack balance used for farmer and transporter payouts
+- [ ] Create an S3-compatible bucket, set `UPLOADS_DISK=s3` and `AWS_*`, and put a CDN in front of `AWS_URL`
+- [ ] Set `VITE_ASSET_URL` to the CDN origin before building the frontend
 - [ ] Configure Pusher/Soketi and set `BROADCAST_DRIVER=pusher`
-- [ ] Run `php artisan config:cache route:cache`
-- [ ] Configure Supervisor for queues
-- [ ] Set up Nginx reverse proxy
+- [ ] Run more than one backend replica behind a load balancer (remove the fixed `8000:8000` port mapping, or put nginx/ALB in front)
 - [ ] Restrict CORS to the real frontend origin
+- [ ] Keep the default API throttle (`API_RATE_LIMIT=120`) and scrape `/health` plus `/api/v1/admin/metrics?format=prometheus`
+- [ ] Ship container logs to a log store; `LOG_CHANNEL=stderr` is already set in the image
 
 ### Docker Production Build
 ```bash
-docker-compose -f docker-compose.yml up -d
+APP_KEY=base64:... docker compose up --build -d
 ```
+
+The image builds the Laravel config and view caches at boot, so no manual
+`php artisan config:cache` step is needed. Only the web container runs
+migrations (`RUN_MIGRATIONS=1`); additional replicas should set
+`RUN_MIGRATIONS=0` so they do not race.
 
 ## Testing
 
@@ -486,8 +533,11 @@ cd backend && php artisan test
 cd backend && php artisan test --testsuite=Feature
 
 # Frontend lint and production build
-cd frontend && npm run lint
-cd frontend && npm run build
+cd frontend-react && npm run lint
+cd frontend-react && npm run build
+
+# Load test (needs k6; see loadtest/README.md)
+k6 run loadtest/k6.js
 ```
 
 CI runs both jobs on every push and pull request (`.github/workflows/ci.yml`).
@@ -504,14 +554,70 @@ CI runs both jobs on every push and pull request (`.github/workflows/ci.yml`).
 - Clear cache: `rm -rf dist && npm run build`
 - Check API URL in `.env`
 
-## Performance Optimization
+## Scalability
 
-- Database query optimization with indexing
-- Redis caching for frequently accessed data
-- Lazy-loaded React routes (route-level code splitting)
-- Code splitting in frontend
-- Gzip compression enabled
-- CDN ready for static assets
+The stack is designed for a regional pilot that can grow to several backend
+replicas. This section records what is already handled and what still limits it,
+so capacity decisions can be checked against evidence rather than guessed.
+
+### Shared state and background work
+- Cache, sessions, carts and queued jobs use Redis (`CACHE_DRIVER=redis`,
+  `SESSION_DRIVER=redis`, `QUEUE_CONNECTION=redis`).
+- `docker-compose.yml` runs a dedicated `queue` container from the same image.
+  Mail and other `ShouldQueue` work no longer runs inside the request.
+- Redis uses append-only persistence, so sessions survive a cache restart.
+
+### Chat and indexes
+- The inbox returns one row per conversation, using `MAX(id)` per
+  `conversation_id`, plus one grouped unread query. It no longer loads every
+  message the user has ever exchanged.
+- Message history is paginated: `per_page`, `before_id` for older pages, and
+  `after_id` for polling only new messages. The frontend loads 30 at a time and
+  has a **Load earlier messages** control.
+- Migration `2026_11_23_000001` backfills `conversation_id` and adds indexes on
+  `messages(conversation_id, id)`, `messages(recipient_id, is_read)`,
+  `messages(sender_id, created_at)`, order status/payment dates, and marketplace
+  filters.
+
+### Search and admin analytics
+- MySQL gets a `FULLTEXT` index on
+  `produce_listings(commodity_name, description, category)`.
+  `App\Support\Search` uses `MATCH … AGAINST` on MySQL and falls back to `LIKE`
+  on SQLite, so tests keep working.
+- Admin analytics are cached for five minutes under `admin.analytics.v1`.
+  `GET /api/v1/admin/analytics?fresh=1` bypasses the cache when an admin needs
+  current numbers.
+
+### Pagination and uploads
+- `ClampPerPage` limits every `per_page` query parameter to 1–100.
+- Uploads go through `App\Support\ImageStore`, controlled by `UPLOADS_DISK`.
+  Local development keeps the public disk; production uses S3-compatible
+  storage. Replaced and deleted images are removed from storage.
+- The frontend resolves images through `VITE_ASSET_URL`, so a CDN origin can be
+  used without code changes.
+
+### Serving and observability
+- The backend image runs nginx + PHP-FPM under supervisor instead of
+  `php artisan serve`, with opcache and a tuned FPM pool.
+- `GET /health` checks the database and shared cache and is used by the
+  container healthcheck.
+- Every API request is counted by `RecordRequestMetrics`. Admins can read
+  `GET /api/v1/admin/metrics` (JSON) or
+  `GET /api/v1/admin/metrics?format=prometheus` (text). Counters are stored in
+  Redis so replicas share one view and the response includes per-route latency.
+  With the local file cache only the request and slow-request totals are kept.
+- `loadtest/k6.js` measures listing browsing and the signed-in inbox/orders/cart
+  against a running environment, with latency and failure thresholds.
+
+### What still limits scale
+- Only the web tier is stateless. MySQL is still a single primary; add a read
+  replica before reporting or analytics traffic grows.
+- Chat is polled every four seconds when a thread is open. A websocket service
+  (Pusher/Soketi) is the next step for large concurrent chat usage.
+- The API throttle is per user/IP (`API_RATE_LIMIT=120`). Raise it deliberately
+  or run a load test with it lifted.
+- There is no autoscaling or multi-region setup. Those are deployment choices,
+  not requirements for a pilot.
 
 ## Security Features
 
@@ -548,5 +654,5 @@ For issues and questions:
 
 ---
 
-**Last Updated**: May 10, 2026
+**Last Updated**: November 24, 2026
 **Version**: 1.0.0

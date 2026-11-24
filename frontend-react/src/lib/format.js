@@ -91,11 +91,18 @@ export function roleHome(role) {
   return '/buyer'
 }
 
+// Images live on the API host in development and on a CDN in production.
+// VITE_ASSET_URL is the public origin for uploads (for example
+// https://cdn.example.com); when it is empty we fall back to the API origin.
+const ASSET_BASE = (import.meta.env.VITE_ASSET_URL || '').replace(/\/+$/, '')
+
 export function imgUrl(path) {
   if (!path) return ''
   if (/^https?:\/\//i.test(path)) return path
-  const origin = API_BASE.replace(/\/api\/v1\/?$/, '')
   const clean = String(path).replace(/^\/+/, '')
+  if (ASSET_BASE) return `${ASSET_BASE}/${clean}`
+
+  const origin = API_BASE.replace(/\/api\/v1\/?$/, '')
   return clean.startsWith('storage/') ? `${origin}/${clean}` : `${origin}/storage/${clean}`
 }
 

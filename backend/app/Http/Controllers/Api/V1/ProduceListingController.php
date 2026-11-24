@@ -7,6 +7,8 @@ use App\Models\ProduceListing;
 use App\Models\Order;
 use App\Models\Payout;
 use App\Models\EscrowRelease;
+use App\Support\ImageStore;
+use App\Support\Search;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -27,12 +29,7 @@ class ProduceListingController extends Controller
         // present. `has()` is true for empty strings, which would otherwise
         // match nothing (e.g. availability_status=).
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('commodity_name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
-            });
+            Search::apply($query, (string) $request->search, ['commodity_name', 'description', 'category']);
         }
 
         // Filter by commodity name
@@ -148,8 +145,7 @@ class ProduceListingController extends Controller
         if ($request->hasFile('images')) {
             $images = [];
             foreach ($request->file('images') as $image) {
-                $path = $image->store('produce', 'public');
-                $images[] = $path;
+                $images[] = ImageStore::put($image, 'produce');
             }
             $listing->images = $images;
         }
@@ -196,13 +192,19 @@ class ProduceListingController extends Controller
         $listing->update($validated);
 
         if ($request->hasFile('images')) {
+            $previous = $listing->images ?: [];
             $images = [];
             foreach ($request->file('images') as $image) {
-                $path = $image->store('produce', 'public');
-                $images[] = $path;
+                $images[] = ImageStore::put($image, 'produce');
             }
             $listing->images = $images;
             $listing->save();
+
+            // Remove the photos this upload replaced so storage does not grow
+            // with every edit.
+            foreach ($previous as $oldPath) {
+                ImageStore::delete($oldPath);
+            }
         }
 
         return response()->json([
@@ -225,6 +227,11 @@ class ProduceListingController extends Controller
         // Check authorization
         if ($listing->user_id !== $request->user()->id && !$request->user()->hasRole('admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Delete the listing's photos from storage before removing the row.
+        foreach ($listing->images ?: [] as $path) {
+            ImageStore::delete($path);
         }
 
         $listing->delete();

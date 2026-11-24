@@ -17,6 +17,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Upload Disk
+    |--------------------------------------------------------------------------
+    |
+    | Produce photos and profile images use this disk. Point it at an S3
+    | bucket in production and set AWS_URL to the CDN domain.
+    |
+    */
+
+    'uploads_disk' => env('UPLOADS_DISK', 'public'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |

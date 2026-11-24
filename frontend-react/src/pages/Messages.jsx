@@ -13,12 +13,13 @@ import { fmtDateTime, money, relativeDate } from '../lib/format'
 import { parseError, cn } from '../lib/utils'
 import { useAuth } from '../store/auth'
 
-function sameThread(prev, next) {
-  if (prev.length !== next.length) return false
-  for (let i = 0; i < prev.length; i += 1) {
-    if (prev[i].id !== next[i].id) return false
-  }
-  return true
+// Merge messages by id and keep them oldest-first. Older pages are prepended,
+// polled messages appended, and offer updates replace the previous copy.
+function mergeThread(prev, incoming) {
+  if (!incoming?.length) return prev
+  const byId = new Map(prev.map((message) => [message.id, message]))
+  incoming.forEach((message) => byId.set(message.id, message))
+  return [...byId.values()].sort((a, b) => a.id - b.id)
 }
 
 function OfferMessage({ offer, user, busy, onAccept, onDecline, onCounter }) {
@@ -135,12 +136,17 @@ export default function Messages() {
   const [messages, setMessages] = useState([])
   const [loadingList, setLoadingList] = useState(true)
   const [loadingThread, setLoadingThread] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
   const [sending, setSending] = useState(false)
   const [text, setText] = useState('')
   const [q, setQ] = useState('')
   const [error, setError] = useState('')
   const [offerBusy, setOfferBusy] = useState(false)
   const scrollRef = useRef(null)
+  const stickRef = useRef(true)
+  const restoreScrollRef = useRef(null)
+  const newestIdRef = useRef(0)
 
   const activeId = searchParams.get('to') ? Number(searchParams.get('to')) : null
   const activeConversation = conversations.find((item) => item.user?.id === activeId)
@@ -163,20 +169,31 @@ export default function Messages() {
   }, [])
 
   // The API has no websocket transport in this deployment (broadcasting is
-  // log-only), so the inbox polls. Threads refresh every 4s while visible;
-  // failures are ignored so a blip never clears the conversation.
+  // log-only), so the inbox polls. Only messages newer than the last one we
+  // already have are requested, so a long thread is not re-downloaded every
+  // few seconds. Failures are ignored so a blip never clears the conversation.
   useEffect(() => {
     const tick = async () => {
       if (document.visibilityState !== 'visible') return
       try {
-        // Read the thread first: opening it clears unread flags, so the
-        // conversation list fetched afterwards shows the correct badge.
-        const threadRes = activeId ? await messageService.conversation(activeId) : null
+        let incoming = []
+        if (activeId) {
+          const afterId = newestIdRef.current
+          const threadRes = await messageService.conversation(activeId, {
+            after_id: afterId || undefined,
+            per_page: afterId ? 100 : 30,
+          })
+          incoming = threadRes.data?.messages || []
+          if (!afterId) setHasMore(Boolean(threadRes.data?.meta?.has_more))
+        }
+
+        // Read the thread first because opening it clears unread flags; the
+        // list fetched afterwards then shows the correct badge.
         const listRes = await messageService.conversations()
         setChats(listRes.data?.conversations || [])
-        if (threadRes) {
-          const next = threadRes.data?.messages || []
-          setMessages((prev) => (sameThread(prev, next) ? prev : next))
+
+        if (incoming.length) {
+          setMessages((prev) => mergeThread(prev, incoming))
         }
       } catch {
         // Transient poll failure — keep showing the last known thread.
@@ -187,16 +204,29 @@ export default function Messages() {
   }, [activeId])
 
   useEffect(() => {
+    newestIdRef.current = messages.length ? messages[messages.length - 1].id : 0
+  }, [messages])
+
+  // Opening a thread loads only its newest page. Older pages arrive on demand
+  // through loadOlder(), and polling fills in anything newer.
+  useEffect(() => {
     if (!activeId) {
       setMessages([])
+      setHasMore(false)
       return
     }
     let active = true
+    setMessages([])
+    setHasMore(false)
     setLoadingThread(true)
+    stickRef.current = true
+    restoreScrollRef.current = null
     messageService
-      .conversation(activeId)
+      .conversation(activeId, { per_page: 30 })
       .then((res) => {
-        if (active) setMessages(res.data?.messages || [])
+        if (!active) return
+        setMessages(res.data?.messages || [])
+        setHasMore(Boolean(res.data?.meta?.has_more))
       })
       .catch((err) => {
         if (active) toast.error(parseError(err))
@@ -210,10 +240,55 @@ export default function Messages() {
   }, [activeId])
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    const el = scrollRef.current
+    if (!el) return
+
+    // Prepending older messages must keep the reader at the same spot.
+    if (restoreScrollRef.current) {
+      const { height, top } = restoreScrollRef.current
+      restoreScrollRef.current = null
+      el.scrollTop = el.scrollHeight - height + top
+      return
+    }
+
+    if (stickRef.current) {
+      el.scrollTop = el.scrollHeight
     }
   }, [messages, loadingThread])
+
+  function handleScroll() {
+    const el = scrollRef.current
+    if (!el) return
+    stickRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80
+  }
+
+  async function loadOlder() {
+    if (!activeId || loadingMore || !hasMore || !messages.length) return
+
+    const el = scrollRef.current
+    if (el) restoreScrollRef.current = { height: el.scrollHeight, top: el.scrollTop }
+
+    setLoadingMore(true)
+    try {
+      const res = await messageService.conversation(activeId, {
+        before_id: messages[0].id,
+        per_page: 30,
+      })
+      const older = res.data?.messages || []
+      if (older.length) {
+        setMessages((prev) => mergeThread(prev, older))
+      } else {
+        // Nothing to prepend, so the saved scroll position is no longer needed.
+        restoreScrollRef.current = null
+      }
+      setHasMore(Boolean(res.data?.meta?.has_more))
+    } catch (err) {
+      restoreScrollRef.current = null
+      toast.error(parseError(err))
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   function openThread(id) {
     const next = new URLSearchParams(searchParams)
@@ -235,7 +310,11 @@ export default function Messages() {
     try {
       const res = await messageService.send({ recipient_id: activeId, message: body })
       const created = res.data?.data
-      if (created) setMessages((prev) => [...prev, created])
+      if (created) {
+        // Your own message should bring the thread back to the bottom.
+        stickRef.current = true
+        setMessages((prev) => mergeThread(prev, [created]))
+      }
       setText('')
       await loadChats({ silent: true })
     } catch (err) {
@@ -249,8 +328,9 @@ export default function Messages() {
   // assigns the driver, a counter-offer replaces the open one, so both refresh.
   async function refreshThread() {
     if (!activeId) return
-    const res = await messageService.conversation(activeId)
-    setMessages(res.data?.messages || [])
+    const res = await messageService.conversation(activeId, { per_page: 100 })
+    // Merge rather than replace, so any older pages already loaded stay put.
+    setMessages((prev) => mergeThread(prev, res.data?.messages || []))
   }
 
   async function acceptOffer(offer) {
@@ -449,7 +529,24 @@ export default function Messages() {
                 <Badge tone="verified" size="sm"><ShieldCheck size={10} /> Logged</Badge>
               </div>
 
-              <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto bg-canvas px-4 py-4 scroll-thin">
+              <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="flex-1 space-y-3 overflow-y-auto bg-canvas px-4 py-4 scroll-thin"
+              >
+                {hasMore && !loadingThread && (
+                  <div className="flex justify-center pb-1">
+                    <button
+                      type="button"
+                      onClick={loadOlder}
+                      disabled={loadingMore}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-[11px] font-semibold text-muted transition hover:text-ink disabled:opacity-60"
+                    >
+                      {loadingMore && <RefreshCw size={12} className="animate-spin" />}
+                      {loadingMore ? 'Loading earlier messages…' : 'Load earlier messages'}
+                    </button>
+                  </div>
+                )}
                 {loadingThread ? (
                   <div className="space-y-2">
                     {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-2/3 rounded-xl" />)}

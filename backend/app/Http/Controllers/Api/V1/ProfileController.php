@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\ImageStore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -70,9 +71,11 @@ class ProfileController extends Controller
             ], 422);
         }
 
+        $previousImage = null;
+
         if ($request->hasFile('profile_image')) {
-            $path = $request->file('profile_image')->store('profiles', 'public');
-            $validated['profile_image'] = $path;
+            $previousImage = $user->profile_image;
+            $validated['profile_image'] = ImageStore::put($request->file('profile_image'), 'profiles');
         }
 
         // A new account needs a new Paystack recipient before the next payout.
@@ -88,6 +91,11 @@ class ProfileController extends Controller
         }
 
         $user->update($validated);
+
+        // Drop the replaced file only after the profile update succeeded.
+        if ($previousImage && $previousImage !== $user->profile_image) {
+            ImageStore::delete($previousImage);
+        }
 
         return response()->json([
             'message' => $bankChanged

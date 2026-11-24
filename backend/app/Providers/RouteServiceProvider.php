@@ -25,7 +25,13 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            $perMinute = (int) config('rate_limits.api_per_minute', 120);
+
+            if ($perMinute <= 0) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute($perMinute)->by($request->user()?->id ?: $request->ip());
         });
 
         $this->routes(function () {
@@ -35,6 +41,9 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
+
+            // No middleware: the probe must not create a session.
+            Route::group([], base_path('routes/health.php'));
         });
     }
 }

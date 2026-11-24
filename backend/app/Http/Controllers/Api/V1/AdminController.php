@@ -9,7 +9,9 @@ use App\Models\Order;
 use App\Models\Delivery;
 use App\Models\PlatformFee;
 use App\Services\EscrowService;
+use App\Support\Metrics;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -177,6 +179,45 @@ class AdminController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        $cacheKey = 'admin.analytics.v1';
+
+        if ($request->boolean('fresh')) {
+            Cache::forget($cacheKey);
+        }
+
+        // Dashboard numbers can be a few minutes old. This keeps the heavy
+        // aggregate queries off the request path when the page is opened often.
+        $payload = Cache::remember($cacheKey, now()->addMinutes(5), fn () => $this->buildAnalyticsPayload());
+
+        return response()->json($payload, 200);
+    }
+
+    /**
+     * Request counters collected by the metrics middleware. `?format=prometheus`
+     * returns the same data as text for a Prometheus scrape.
+     */
+    public function getMetrics(Request $request)
+    {
+        if (!$request->user()->hasRole('admin')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $snapshot = Metrics::snapshot();
+
+        if ($request->query('format') === 'prometheus') {
+            return response(Metrics::prometheus($snapshot), 200, [
+                'Content-Type' => 'text/plain; version=0.0.4; charset=utf-8',
+            ]);
+        }
+
+        return response()->json($snapshot, 200);
+    }
+
+    /**
+     * Build the admin analytics payload used by getAnalytics().
+     */
+    private function buildAnalyticsPayload(): array
+    {
         // User statistics
         $totalUsers = User::count();
         $usersByRole = User::selectRaw('role, COUNT(*) as count')
@@ -273,9 +314,13 @@ class AdminController extends Controller
         }
         
         // Sort by created_at and take top 10
-        collect($recentActivity)->sortByDesc('created_at')->take(10)->values();
+        $recentActivity = collect($recentActivity)
+            ->sortByDesc('created_at')
+            ->take(10)
+            ->values()
+            ->all();
 
-        return response()->json([
+        return [
             'total_users' => $totalUsers,
             'total_farmers' => $usersByRole['farmer'] ?? 0,
             'total_buyers' => $usersByRole['buyer'] ?? 0,
@@ -288,7 +333,7 @@ class AdminController extends Controller
             'top_commodities' => $topCommodities,
             'top_locations' => $topLocations,
             'recent_activity' => $recentActivity,
-        ], 200);
+        ];
     }
 
     /**

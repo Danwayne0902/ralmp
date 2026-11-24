@@ -17,11 +17,16 @@ services:
     networks:
       - ramlp-network
 
+  # Cache, sessions and carts live here, so two backend replicas see the same
+  # state. Append-only persistence keeps sessions across a Redis restart.
   redis:
     image: redis:7-alpine
     container_name: ramlp_redis
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -34,12 +39,15 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: ramlp-backend:local
     container_name: ramlp_backend
-    environment:
+    environment: &backend-env
       APP_NAME: RAMLP
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-true}
       APP_URL: http://localhost:8000
+      # Leave empty to generate one on first boot in the shared app_keys volume.
+      # Production should set a unique value and use it for web and queue.
       APP_KEY: ${APP_KEY:-}
       DB_CONNECTION: mysql
       DB_HOST: mysql
@@ -47,21 +55,70 @@ services:
       DB_DATABASE: ramlp
       DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD:-password}
-      CACHE_DRIVER: ${CACHE_DRIVER:-file}
+      CACHE_DRIVER: ${CACHE_DRIVER:-redis}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+      REDIS_CLIENT: phpredis
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      # Uploads default to the local public disk. Point these at an S3 bucket
+      # and CDN in production.
+      FILESYSTEM_DISK: ${FILESYSTEM_DISK:-local}
+      UPLOADS_DISK: ${UPLOADS_DISK:-public}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-}
+      AWS_BUCKET: ${AWS_BUCKET:-}
+      AWS_URL: ${AWS_URL:-}
+      AWS_ENDPOINT: ${AWS_ENDPOINT:-}
+      AWS_USE_PATH_STYLE_ENDPOINT: ${AWS_USE_PATH_STYLE_ENDPOINT:-false}
       # No Pusher/Soketi container is included in this stack, so broadcasting
       # to the log driver keeps realtime events from failing the request.
       BROADCAST_DRIVER: ${BROADCAST_DRIVER:-log}
       MAIL_MAILER: ${MAIL_MAILER:-log}
+      LOG_CHANNEL: stderr
       PAYSTACK_PUBLIC_KEY: ${PAYSTACK_PUBLIC_KEY:-}
       PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY:-}
       RAMLP_DELIVERY_FEE: ${RAMLP_DELIVERY_FEE:-2500}
       RAMLP_DEFAULT_DELIVERY_DAYS: ${RAMLP_DEFAULT_DELIVERY_DAYS:-3}
+      # 0 disables the per-user API throttle. Use only in load-test environments.
+      API_RATE_LIMIT: ${API_RATE_LIMIT:-120}
+      RUN_MIGRATIONS: "1"
     ports:
       - "8000:8000"
+    volumes:
+      - app_keys:/app/.keys
     depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8000/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 6
+    networks:
+      - ramlp-network
+    restart: unless-stopped
+
+  # Same image as the web container, but runs the queue worker instead of
+  # nginx/php-fpm. Only the web container runs migrations.
+  queue:
+    image: ramlp-backend:local
+    container_name: ramlp_queue
+    environment:
+      <<: *backend-env
+      RUN_MIGRATIONS: "0"
+      RESET_QUEUES: "1"
+    command: ["php", "artisan", "queue:work", "--sleep=1", "--tries=3", "--timeout=90"]
+    volumes:
+      - app_keys:/app/.keys
+    depends_on:
+      backend:
+        condition: service_healthy
       mysql:
         condition: service_healthy
       redis:
@@ -78,6 +135,7 @@ services:
       args:
         # Baked into the static bundle at build time (Vite requires VITE_*).
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
+        VITE_ASSET_URL: ${VITE_ASSET_URL:-}
         VITE_PAYSTACK_PUBLIC_KEY: ${VITE_PAYSTACK_PUBLIC_KEY:-}
     container_name: ramlp_frontend
     ports:
@@ -109,6 +167,8 @@ services:
 
 volumes:
   mysql_data:
+  redis_data:
+  app_keys:
 
 networks:
   ramlp-network:

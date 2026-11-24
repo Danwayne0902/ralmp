@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ProduceListing;
 use App\Models\Order;
+use App\Support\Search;
 use Illuminate\Http\Request;
 
 class BuyerController extends Controller
@@ -18,11 +19,7 @@ class BuyerController extends Controller
 
         // Search by commodity name or description
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('commodity_name', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
-            });
+            Search::apply($query, (string) $request->search, ['commodity_name', 'description', 'category']);
         }
 
         // Filter by category

@@ -168,6 +168,7 @@ Route::prefix('v1')->group(function () {
             
             Route::get('/dashboard', [AdminController::class, 'getDashboard']);
             Route::get('/analytics', [AdminController::class, 'getAnalytics']);
+            Route::get('/metrics', [AdminController::class, 'getMetrics']);
             Route::get('/chart-data', [AdminController::class, 'chartData']);
             Route::get('/market-insights', [AdminController::class, 'getMarketInsights']);
             Route::get('/system-logs', [AdminController::class, 'getSystemLogs']);

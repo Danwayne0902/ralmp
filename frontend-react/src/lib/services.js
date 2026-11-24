@@ -144,8 +144,8 @@ export const paymentService = {
 }
 
 export const messageService = {
-  conversations: () => api.get('/messages/conversations'),
-  conversation: (userId) => api.get(`/messages/${userId}`),
+  conversations: (params) => api.get('/messages/conversations', { params }),
+  conversation: (userId, params) => api.get(`/messages/${userId}`, { params }),
   send: (data) => api.post('/messages', data),
   markRead: (userId) => api.put(`/messages/${userId}/read`),
   unread: () => api.get('/messages/unread-count'),
