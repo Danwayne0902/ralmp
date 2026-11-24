@@ -72,6 +72,7 @@ services:
       AWS_BUCKET: ${AWS_BUCKET:-}
       AWS_URL: ${AWS_URL:-}
       AWS_ENDPOINT: ${AWS_ENDPOINT:-}
+      AWS_VISIBILITY: ${AWS_VISIBILITY:-private}
       AWS_USE_PATH_STYLE_ENDPOINT: ${AWS_USE_PATH_STYLE_ENDPOINT:-false}
       # No Pusher/Soketi container is included in this stack, so broadcasting
       # to the log driver keeps realtime events from failing the request.

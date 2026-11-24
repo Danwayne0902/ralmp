@@ -435,6 +435,8 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_URL=
 AWS_ENDPOINT=
+AWS_VISIBILITY=private
+AWS_USE_PATH_STYLE_ENDPOINT=false
 
 # Requests per minute per user or IP. 0 disables throttling (load tests only).
 API_RATE_LIMIT=120
@@ -506,6 +508,7 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 - [ ] Set `PAYSTACK_SECRET_KEY`, enable Transfers and register the webhook URL
 - [ ] Fund the Paystack balance used for farmer and transporter payouts
 - [ ] Create an S3-compatible bucket, set `UPLOADS_DISK=s3` and `AWS_*`, and put a CDN in front of `AWS_URL`
+- [ ] Keep the bucket private and grant the CDN read access (OAI/OAC), or set `AWS_VISIBILITY=public` deliberately
 - [ ] Set `VITE_ASSET_URL` to the CDN origin before building the frontend
 - [ ] Configure Pusher/Soketi and set `BROADCAST_DRIVER=pusher`
 - [ ] Run more than one backend replica behind a load balancer (remove the fixed `8000:8000` port mapping, or put nginx/ALB in front)
@@ -592,7 +595,9 @@ so capacity decisions can be checked against evidence rather than guessed.
 - `ClampPerPage` limits every `per_page` query parameter to 1–100.
 - Uploads go through `App\Support\ImageStore`, controlled by `UPLOADS_DISK`.
   Local development keeps the public disk; production uses S3-compatible
-  storage. Replaced and deleted images are removed from storage.
+  storage. Replaced and deleted images are removed from storage. S3 objects are
+  private by default, ready for a CDN with origin access; set
+  `AWS_VISIBILITY=public` only for a deliberately public bucket.
 - The frontend resolves images through `VITE_ASSET_URL`, so a CDN origin can be
   used without code changes.
 
