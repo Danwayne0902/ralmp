@@ -21,7 +21,7 @@ RUN apk add --no-cache \
         pdo \
         pdo_mysql \
         zip \
-    && pecl install redis \
+    && yes '' | pecl install redis-6.3.0 \
     && docker-php-ext-enable redis \
     && apk del $PHPIZE_DEPS \
     && rm -rf /var/cache/apk/* /tmp/pear

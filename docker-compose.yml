@@ -83,6 +83,9 @@ services:
       PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY:-}
       RAMLP_DELIVERY_FEE: ${RAMLP_DELIVERY_FEE:-2500}
       RAMLP_DEFAULT_DELIVERY_DAYS: ${RAMLP_DEFAULT_DELIVERY_DAYS:-3}
+      # New accounts need a verification email when this is true. The mail is
+      # queued, so the worker delivers it.
+      AUTH_EMAIL_VERIFICATION: ${AUTH_EMAIL_VERIFICATION:-false}
       # 0 disables the per-user API throttle. Use only in load-test environments.
       API_RATE_LIMIT: ${API_RATE_LIMIT:-120}
       RUN_MIGRATIONS: "1"

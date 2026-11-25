@@ -229,11 +229,12 @@ under supervisor, and the queue worker uses the same image with a different
 command. Cache, sessions, carts and queued jobs all use Redis, so two backend
 replicas see the same cart and session instead of separate local files.
 
-The web container waits for MySQL and Redis, runs migrations once, links local
-storage, and builds the Laravel config/view caches. The worker waits for the
-web container to become healthy before starting. When `APP_KEY` is not set, the
-stack generates one on first boot in the shared `app_keys` volume so the web and
-queue containers agree; set `APP_KEY` yourself in production. Check logs with:
+The web container waits for MySQL and Redis, runs migrations once, seeds the
+roles and permissions needed for registration, links local storage, and builds
+the Laravel config/view caches. The worker waits for the web container to become
+healthy before starting. When `APP_KEY` is not set, the stack generates one on
+first boot in the shared `app_keys` volume so the web and queue containers
+agree; set `APP_KEY` yourself in production. Check logs with:
 
 ```bash
 docker compose logs -f backend queue
@@ -442,6 +443,10 @@ AWS_USE_PATH_STYLE_ENDPOINT=false
 API_RATE_LIMIT=120
 METRICS_ENABLED=true
 
+# Require new accounts to confirm their email. The message is queued, so the
+# worker must be running.
+AUTH_EMAIL_VERIFICATION=false
+
 MAIL_MAILER=smtp
 MAIL_HOST=127.0.0.1
 MAIL_PORT=1025
@@ -505,6 +510,7 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 - [ ] Run Redis for cache, sessions, carts and queues
 - [ ] Run at least one queue worker (the compose file includes one)
 - [ ] Configure a real mail transport
+- [ ] Decide whether new accounts must verify email (`AUTH_EMAIL_VERIFICATION`); queued mail needs the worker
 - [ ] Set `PAYSTACK_SECRET_KEY`, enable Transfers and register the webhook URL
 - [ ] Fund the Paystack balance used for farmer and transporter payouts
 - [ ] Create an S3-compatible bucket, set `UPLOADS_DISK=s3` and `AWS_*`, and put a CDN in front of `AWS_URL`
@@ -515,6 +521,7 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 - [ ] Restrict CORS to the real frontend origin
 - [ ] Keep the default API throttle (`API_RATE_LIMIT=120`) and scrape `/health` plus `/api/v1/admin/metrics?format=prometheus`
 - [ ] Ship container logs to a log store; `LOG_CHANNEL=stderr` is already set in the image
+- [ ] Do not run the demo `DatabaseSeeder` in production; the entrypoint runs the idempotent `PermissionsSeeder` (roles + permissions) on boot
 
 ### Docker Production Build
 ```bash
@@ -523,8 +530,8 @@ APP_KEY=base64:... docker compose up --build -d
 
 The image builds the Laravel config and view caches at boot, so no manual
 `php artisan config:cache` step is needed. Only the web container runs
-migrations (`RUN_MIGRATIONS=1`); additional replicas should set
-`RUN_MIGRATIONS=0` so they do not race.
+migrations and seeds access rows (`RUN_MIGRATIONS=1`); additional replicas
+should set `RUN_MIGRATIONS=0` so they do not race.
 
 ## Testing
 
@@ -543,7 +550,13 @@ cd frontend-react && npm run build
 k6 run loadtest/k6.js
 ```
 
-CI runs both jobs on every push and pull request (`.github/workflows/ci.yml`).
+CI runs three jobs on every push and pull request
+(`.github/workflows/ci.yml`): backend tests, both frontend builds, and a Docker
+stack smoke test. The stack job builds the production image, boots MySQL +
+Redis + nginx/PHP-FPM + the queue worker, checks `/health`, confirms nginx is
+serving the API, and registers a user whose verification email must be
+delivered by the worker. That catches image, compose, migration and queue
+regressions that the SQLite test suite cannot see.
 
 ## Troubleshooting
 

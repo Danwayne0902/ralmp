@@ -98,6 +98,9 @@ chmod -R ug+rwX storage bootstrap/cache
 if [ "${RUN_MIGRATIONS:-0}" = "1" ]; then
     php artisan storage:link || true
     php artisan migrate --force
+    # Registration assigns a role, so a fresh database needs these rows before
+    # it can accept users. The seeder is idempotent and contains no demo users.
+    php artisan db:seed --class=PermissionsSeeder --force
 fi
 
 if [ "${APP_ENV:-production}" = "production" ]; then

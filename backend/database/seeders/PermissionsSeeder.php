@@ -25,7 +25,15 @@ class PermissionsSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
-        $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        // Registration assigns one of these roles, so they must exist on a
+        // fresh database. DatabaseSeeder calls this seeder too.
+        $roles = ['farmer', 'buyer', 'logistics_provider', 'admin'];
+
+        foreach ($roles as $role) {
+            Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
+        }
+
+        $admin = Role::findByName('admin', 'web');
         $admin->syncPermissions($permissions);
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
