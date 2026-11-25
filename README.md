@@ -567,8 +567,12 @@ so capacity decisions can be checked against evidence rather than guessed.
 - Cache, sessions, carts and queued jobs use Redis (`CACHE_DRIVER=redis`,
   `SESSION_DRIVER=redis`, `QUEUE_CONNECTION=redis`).
 - `docker-compose.yml` runs a dedicated `queue` container from the same image.
-  Mail and other `ShouldQueue` work no longer runs inside the request.
-- Redis uses append-only persistence, so sessions survive a cache restart.
+  Verification, password-reset, order-status and payout mail implement
+  `ShouldQueue`, so delivery runs in the worker instead of the request. With
+  `QUEUE_CONNECTION=sync` in local development they still send immediately.
+- Redis uses append-only persistence. A local restart test confirmed the cache
+  entry and the session value were still readable after `SHUTDOWN` and a fresh
+  `redis-server` start on the same data directory.
 
 ### Chat and indexes
 - The inbox returns one row per conversation, using `MAX(id)` per
@@ -613,6 +617,20 @@ so capacity decisions can be checked against evidence rather than guessed.
   With the local file cache only the request and slow-request totals are kept.
 - `loadtest/k6.js` measures listing browsing and the signed-in inbox/orders/cart
   against a running environment, with latency and failure thresholds.
+
+### Measured baseline
+
+A 30-second run with 6 public and 3 signed-in virtual users, Redis for
+cache/cart/metrics, MySQL 8.1 and PHP's built-in server with four workers
+(PHP 8.2, 8-core i5, 16 GB) produced:
+
+- 598 requests, 0 HTTP failures
+- p95 140 ms, p99 205 ms, max 566 ms
+
+Cart writes were disabled for that run (`WRITE_RATIO=0`) to keep the sample
+stable. This proves the script and the normal request path end to end; it is not
+a benchmark of the nginx + PHP-FPM image, and the built-in server is slower than
+FPM. Run `loadtest/k6.js` against the deployed stack for capacity numbers.
 
 ### What still limits scale
 - Only the web tier is stateless. MySQL is still a single primary; add a read

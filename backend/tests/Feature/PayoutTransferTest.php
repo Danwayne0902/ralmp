@@ -164,7 +164,7 @@ class PayoutTransferTest extends TestCase
         $this->assertSame('paid', $payout->status);
         $this->assertSame('success', $payout->transfer_status);
         $this->assertNotNull($payout->paid_at);
-        Mail::assertSent(PayoutSent::class, fn ($mail) => $mail->hasTo($farmer->email));
+        Mail::assertQueued(PayoutSent::class, fn ($mail) => $mail->hasTo($farmer->email));
     }
 
     public function test_a_failed_transfer_stays_pending_and_can_be_tried_again(): void
@@ -254,7 +254,7 @@ class PayoutTransferTest extends TestCase
 
         app(EscrowService::class)->release($pickup, $admin, 'Picked up.');
 
-        Mail::assertSent(PayoutReleased::class, function ($mail) use ($farmer) {
+        Mail::assertQueued(PayoutReleased::class, function ($mail) use ($farmer) {
             return $mail->hasTo($farmer->email)
                 && (float) $mail->payout->amount === 1900.0;
         });

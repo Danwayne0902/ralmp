@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 
-class OrderStatusNotification extends Mailable
+class OrderStatusNotification extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

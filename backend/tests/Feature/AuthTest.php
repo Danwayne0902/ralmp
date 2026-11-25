@@ -110,7 +110,7 @@ class AuthTest extends TestCase
         $user = User::where('email', 'new-buyer@example.test')->firstOrFail();
         $rawToken = null;
 
-        Mail::assertSent(VerifyEmail::class, function (VerifyEmail $mail) use ($user, &$rawToken) {
+        Mail::assertQueued(VerifyEmail::class, function (VerifyEmail $mail) use ($user, &$rawToken) {
             $rawToken = $mail->token;
 
             return $mail->hasTo($user->email);
@@ -136,7 +136,7 @@ class AuthTest extends TestCase
         $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
             ->assertOk();
 
-        Mail::assertSent(ResetPassword::class, function (ResetPassword $mail) use (&$rawToken) {
+        Mail::assertQueued(ResetPassword::class, function (ResetPassword $mail) use (&$rawToken) {
             $rawToken = $mail->token;
 
             return true;

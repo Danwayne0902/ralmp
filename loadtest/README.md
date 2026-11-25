@@ -58,6 +58,25 @@ Useful environment variables:
 | `BUYER_VUS` | `5` | Virtual users signed in |
 | `WRITE_RATIO` | `0.1` | Share of buyer iterations that add then remove a cart item |
 
+## Recorded baseline
+
+One local run (November 2026) for reference, not a capacity claim:
+
+```
+BASE_URL=http://127.0.0.1:8000/api/v1 \
+K6_EMAIL=buyer@ramlp.com K6_PASSWORD=... \
+DURATION=30s READ_VUS=6 BUYER_VUS=3 WRITE_RATIO=0 \
+k6 run loadtest/k6.js
+```
+
+- Host: 8-core i5, 16 GB RAM, macOS, MySQL 8.1, PHP 8.2 built-in server (4
+  workers), Redis 7.4 on the same machine.
+- Result: 598 requests, 0 failures, p95 140 ms, p99 205 ms, max 566 ms.
+- Thresholds passed.
+
+The built-in server is slower than nginx + PHP-FPM, so treat these numbers as a
+floor for the request path, not a production estimate.
+
 ## Reading the result
 
 The thresholds answer the scalability question directly:
