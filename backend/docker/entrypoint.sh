@@ -105,7 +105,8 @@ fi
 
 if [ "${APP_ENV:-production}" = "production" ]; then
     php artisan config:cache
-    # The web routes file contains a closure, so route caching is optional.
+    # Laravel 12 can cache closure routes, so this succeeds; it cuts route
+    # matching per request. Fall back to a clear if a route cannot be cached.
     php artisan route:cache || php artisan route:clear || true
     php artisan view:cache || true
 else

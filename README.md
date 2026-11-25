@@ -5,7 +5,7 @@ A production-grade full-stack web application connecting farmers, buyers, logist
 ## Tech Stack
 
 ### Backend
-- **Framework**: Laravel 10 (PHP 8.1+)
+- **Framework**: Laravel 12 (PHP 8.2+)
 - **Authentication**: Laravel Sanctum
 - **Authorization**: Spatie Laravel Permission (RBAC)
 - **Database**: MySQL 8.0+
@@ -26,7 +26,7 @@ A production-grade full-stack web application connecting farmers, buyers, logist
 
 ```
 RAMLP/
-├── backend/                # Laravel 10 API
+├── backend/                # Laravel 12 API
 │   ├── app/
 │   │   ├── Http/Controllers/Api/V1/
 │   │   │   ├── AuthController.php
@@ -69,7 +69,7 @@ RAMLP/
 ## Quick Start
 
 ### Prerequisites
-- PHP 8.1+
+- PHP 8.2+
 - Node.js 20+
 - MySQL 8.0+
 - Composer
@@ -658,6 +658,8 @@ FPM. Run `loadtest/k6.js` against the deployed stack for capacity numbers.
 ## Security Features
 
 - Bcrypt password hashing
+- Framework and packages on supported releases (Laravel 12); `composer audit`
+  reports no known advisories
 - Sanctum API token protection
 - Role-based authorization on orders, deliveries, payments, and admin routes
 - Hashed email-verification and password-reset tokens with expiry
