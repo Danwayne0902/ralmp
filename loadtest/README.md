@@ -77,6 +77,33 @@ k6 run loadtest/k6.js
 The built-in server is slower than nginx + PHP-FPM, so treat these numbers as a
 floor for the request path, not a production estimate.
 
+### nginx + PHP-FPM on the same machine
+
+`loadtest/fpm.sh` starts the app behind nginx and PHP-FPM without Docker, using
+the same pool size as `backend/docker/php-fpm.conf` and Redis for cache and
+sessions. That measures the serving path the container actually uses.
+
+```sh
+loadtest/fpm.sh start
+
+BASE_URL=http://127.0.0.1:8088/api/v1 \
+K6_EMAIL=buyer@ramlp.com K6_PASSWORD=... \
+DURATION=30s READ_VUS=6 BUYER_VUS=3 WRITE_RATIO=0 \
+k6 run loadtest/k6.js
+
+loadtest/fpm.sh stop
+```
+
+Same host and profile as the built-in-server run:
+
+- 638 requests, 0 failures, 100% of checks passed
+- p95 58 ms, p99 108 ms, max 382 ms
+
+That is less than half the p95 of `artisan serve` on the same machine, which is
+why the earlier run is a floor rather than an estimate. It is still one laptop
+node with MySQL on the same disk, so it says nothing about staging capacity,
+network latency or multiple app replicas.
+
 ## Reading the result
 
 The thresholds answer the scalability question directly:

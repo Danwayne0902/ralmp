@@ -664,6 +664,15 @@ docker compose exec -T queue php artisan queue:monitor redis:default --max=1000
 Scrape `/api/v1/admin/metrics?format=prometheus` for request rate, error statuses
 and slow requests.
 
+If you would rather not open a monitoring account, `.github/workflows/uptime.yml`
+probes the deployed API and site from GitHub every 15 minutes. Set the repository
+variables `UPTIME_API_URL` (required) and `UPTIME_SITE_URL` (optional) under
+**Settings → Secrets and variables → Actions → Variables**; until `UPTIME_API_URL`
+exists the job exits without failing. GitHub notifies the user who last edited
+the workflow when a scheduled run fails, and disables schedules after 60 days
+without repository activity, so treat it as a stopgap rather than a paging
+system.
+
 ## Testing
 
 ```bash
@@ -679,6 +688,11 @@ cd frontend-react && npm run build
 
 # Load test (needs k6; see loadtest/README.md)
 k6 run loadtest/k6.js
+
+# Same test through nginx + PHP-FPM (the serving path the container uses)
+loadtest/fpm.sh start
+BASE_URL=http://127.0.0.1:8088/api/v1 k6 run loadtest/k6.js
+loadtest/fpm.sh stop
 ```
 
 CI runs four jobs on every push and pull request

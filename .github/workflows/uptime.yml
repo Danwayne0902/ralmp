@@ -1,0 +1,71 @@
+name: Uptime
+
+# External health check from GitHub's runners, so no monitoring account is
+# needed. Set the repository variables UPTIME_API_URL (required) and
+# UPTIME_SITE_URL (optional) under Settings -> Secrets and variables -> Actions
+# -> Variables. Until UPTIME_API_URL exists the job exits without failing.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  health:
+    name: Health check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Probe the deployed API and site
+        env:
+          API_URL: ${{ vars.UPTIME_API_URL }}
+          SITE_URL: ${{ vars.UPTIME_SITE_URL }}
+        run: |
+          if [ -z "$API_URL" ]; then
+            echo "::notice::Set the UPTIME_API_URL repository variable to enable this check."
+            exit 0
+          fi
+
+          probe_api() {
+            local attempt code
+            for attempt in 1 2 3; do
+              code=$(curl -sS --max-time 15 -o /tmp/health.json -w '%{http_code}' "$API_URL" 2>/dev/null) || code=000
+              [ -n "$code" ] || code=000
+              if [ "$code" = "200" ] && grep -q '"status":"ok"' /tmp/health.json; then
+                echo "API is healthy: $API_URL"
+                return 0
+              fi
+              echo "API attempt $attempt returned $code"
+              sleep 20
+            done
+            echo "::error::API health check failed: $API_URL"
+            return 1
+          }
+
+          probe_site() {
+            local attempt code
+            for attempt in 1 2 3; do
+              code=$(curl -sS --max-time 15 -o /dev/null -w '%{http_code}' "$SITE_URL" 2>/dev/null) || code=000
+              [ -n "$code" ] || code=000
+              if [ "$code" = "200" ]; then
+                echo "Site is up: $SITE_URL"
+                return 0
+              fi
+              echo "Site attempt $attempt returned $code"
+              sleep 20
+            done
+            echo "::error::Site check failed: $SITE_URL"
+            return 1
+          }
+
+          status=0
+          probe_api || status=1
+
+          if [ -n "$SITE_URL" ]; then
+            probe_site || status=1
+          fi
+
+          exit "$status"
