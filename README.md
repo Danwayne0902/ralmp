@@ -507,6 +507,7 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 - [ ] Generate one unique `APP_KEY` and give the same value to the web and queue containers (or mount it as a secret file)
 - [ ] Move `APP_KEY`, `DB_PASSWORD` and payment/AWS keys out of plain environment variables (`scripts/secrets-init.sh` + `docker-compose.secrets.yml`, or your secret manager)
 - [ ] Enable HTTPS/SSL and set `SESSION_SECURE_COOKIE=true`
+- [ ] Set `TRUSTED_PROXIES` to the proxy/load-balancer addresses (or `*` only when the app is unreachable except through that proxy) so generated URLs use `https`
 - [ ] Use MySQL with backups; add a read replica when reporting queries get heavy
 - [ ] Schedule `scripts/db-backup.sh` and prove a restore with `scripts/db-restore.sh`; keep a copy off the database host
 - [ ] Run Redis for cache, sessions, carts and queues
@@ -535,6 +536,29 @@ The image builds the Laravel config and view caches at boot, so no manual
 `php artisan config:cache` step is needed. Only the web container runs
 migrations and seeds access rows (`RUN_MIGRATIONS=1`); additional replicas
 should set `RUN_MIGRATIONS=0` so they do not race.
+
+### Temporary public demo (no server, no account)
+
+To let people try the app before a real host exists, `scripts/demo-tunnel.sh`
+builds the React app, serves it and proxies the API through one local nginx
+port, then exposes that port with a Cloudflare quick tunnel:
+
+```bash
+# API already running on 127.0.0.1:8000
+scripts/demo-tunnel.sh start   # prints the public URL and sets APP_URL
+scripts/demo-tunnel.sh url
+scripts/demo-tunnel.sh stop
+```
+
+The frontend is built with `VITE_API_URL=/api/v1`, so the browser calls the
+same origin and no CORS setup is needed. The tunnel URL is random and changes
+on every start; the script updates `APP_URL` in `backend/.env` for you.
+
+Before exposing anything, set `APP_DEBUG=false`, rotate the seeded passwords
+(the `DatabaseSeeder` accounts use `password`), and remember that this is a
+demo: the URL dies with the process, the machine must stay awake, and it has no
+uptime or rate-limit protection beyond the app's own throttle. Use it for
+feedback, not for real user data.
 
 ### Object storage and CDN
 
