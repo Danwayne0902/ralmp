@@ -18,7 +18,18 @@ class ImageStore
 
     public static function put(UploadedFile $file, string $folder): string
     {
-        return $file->store($folder, self::disk());
+        $path = $file->store($folder, [
+            'disk' => self::disk(),
+            // Stored names are random, so a cached object never goes stale.
+            // This lets a CDN and the browser keep uploads for a year.
+            'CacheControl' => 'public, max-age=31536000, immutable',
+        ]);
+
+        if ($path === false) {
+            throw new \RuntimeException('The upload could not be stored on the '.self::disk().' disk.');
+        }
+
+        return $path;
     }
 
     public static function delete(?string $path): void

@@ -50,3 +50,6 @@ loadtest/results/*.json
 .claude/
 .qoder/
 .sixth/
+
+# local database dumps
+backups/

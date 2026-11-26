@@ -507,6 +507,7 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 - [ ] Generate one unique `APP_KEY` and give the same value to the web and queue containers
 - [ ] Enable HTTPS/SSL and set `SESSION_SECURE_COOKIE=true`
 - [ ] Use MySQL with backups; add a read replica when reporting queries get heavy
+- [ ] Schedule `scripts/db-backup.sh` and prove a restore with `scripts/db-restore.sh`; keep a copy off the database host
 - [ ] Run Redis for cache, sessions, carts and queues
 - [ ] Run at least one queue worker (the compose file includes one)
 - [ ] Configure a real mail transport
@@ -516,6 +517,7 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 - [ ] Create an S3-compatible bucket, set `UPLOADS_DISK=s3` and `AWS_*`, and put a CDN in front of `AWS_URL`
 - [ ] Keep the bucket private and grant the CDN read access (OAI/OAC), or set `AWS_VISIBILITY=public` deliberately
 - [ ] Set `VITE_ASSET_URL` to the CDN origin before building the frontend
+- [ ] Run `docker compose exec backend php artisan uploads:check` after pointing uploads at S3
 - [ ] Configure Pusher/Soketi and set `BROADCAST_DRIVER=pusher`
 - [ ] Run more than one backend replica behind a load balancer (remove the fixed `8000:8000` port mapping, or put nginx/ALB in front)
 - [ ] Restrict CORS to the real frontend origin
@@ -532,6 +534,78 @@ The image builds the Laravel config and view caches at boot, so no manual
 `php artisan config:cache` step is needed. Only the web container runs
 migrations and seeds access rows (`RUN_MIGRATIONS=1`); additional replicas
 should set `RUN_MIGRATIONS=0` so they do not race.
+
+### Object storage and CDN
+
+With `UPLOADS_DISK=s3`, produce photos and profile images go straight to the
+bucket and the database stores only the object key. The frontend turns that key
+into a URL with `VITE_ASSET_URL`, so browsers load images from the CDN instead
+of the API.
+
+1. Create a bucket in the region you serve from.
+2. Point the backend at it:
+   ```bash
+   UPLOADS_DISK=s3
+   AWS_ACCESS_KEY_ID=...
+   AWS_SECRET_ACCESS_KEY=...
+   AWS_DEFAULT_REGION=eu-west-1
+   AWS_BUCKET=ramlp-uploads
+   AWS_VISIBILITY=private
+   AWS_URL=https://cdn.example.com
+   ```
+3. Put a CDN in front of the bucket. On CloudFront, use an origin access
+   control (OAC) so CloudFront can read the private bucket while the bucket
+   stays closed to the public. `AWS_URL` is the CDN origin. Without a CDN,
+   either make the bucket public (`AWS_VISIBILITY=public`) or images will not
+   load.
+4. Set `VITE_ASSET_URL=https://cdn.example.com` and rebuild the frontend; Vite
+   bakes it in at build time.
+5. Verify from inside the app container:
+   ```bash
+   docker compose exec backend php artisan uploads:check
+   ```
+   It writes, reads back and deletes a small object, prints the object URL, and
+   fails with a clear message when the bucket, credentials or region are wrong.
+
+The API receives uploads itself, so the bucket needs no browser CORS rules.
+Object keys are random and uploads carry a one-year immutable `Cache-Control`
+header, so the CDN can cache them indefinitely without serving stale images.
+
+### Database backups
+
+`scripts/db-backup.sh` dumps the database with `mysqldump --single-transaction`
+(no table locks), compresses it, and checks both gzip integrity and the
+`Dump completed` marker before it keeps the file. It uses a local `mysqldump`
+when one is installed and otherwise runs the dump inside the compose `mysql`
+container.
+
+```bash
+# Local copy in ./backups, kept for 14 days
+scripts/db-backup.sh
+
+# Also copy each backup off the host (needs the aws CLI)
+BACKUP_S3_URI=s3://ramlp-backups/mysql scripts/db-backup.sh
+
+# Nightly at 02:15 with cron
+15 2 * * * cd /srv/ramlp && BACKUP_S3_URI=s3://ramlp-backups/mysql scripts/db-backup.sh >> /var/log/ramlp-backup.log 2>&1
+```
+
+Settings come from the environment or `backend/.env`: `DB_HOST`, `DB_PORT`,
+`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, plus `BACKUP_RETENTION_DAYS`
+(default 14) and `BACKUP_S3_URI`.
+
+A backup nobody restored is not a backup. `scripts/db-restore.sh` restores into
+`<database>_restore` by default, compares every table's row count with the live
+database and reports the result:
+
+```bash
+scripts/db-restore.sh backups/ramlp-20261125T020000Z.sql.gz
+scripts/db-restore.sh backups/ramlp-20261125T020000Z.sql.gz ramlp_restore --strict
+```
+
+Restoring over the live database needs `--force`. Run a restore drill after
+changing MySQL versions or backup destinations, and keep a copy off the
+database host: a disk failure takes the local dumps with it.
 
 ## Testing
 
@@ -550,12 +624,13 @@ cd frontend-react && npm run build
 k6 run loadtest/k6.js
 ```
 
-CI runs three jobs on every push and pull request
+CI runs four jobs on every push and pull request
 (`.github/workflows/ci.yml`): backend tests, both frontend builds, and a Docker
 stack smoke test. The stack job builds the production image, boots MySQL +
 Redis + nginx/PHP-FPM + the queue worker, checks `/health`, confirms nginx is
-serving the API, and registers a user whose verification email must be
-delivered by the worker. That catches image, compose, migration and queue
+serving the API, registers a user whose verification email must be delivered by
+the worker, then dumps the database and restores it into a second database with
+matching row counts. That catches image, compose, migration, queue and backup
 regressions that the SQLite test suite cannot see.
 
 ## Troubleshooting
