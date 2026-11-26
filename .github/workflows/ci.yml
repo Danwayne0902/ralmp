@@ -195,6 +195,12 @@ jobs:
           dump=$(ls /tmp/ramlp-backups/*.sql.gz | head -n 1)
           scripts/db-restore.sh "$dump" ramlp_restore_check --strict
 
+      - name: Check the health watcher
+        env:
+          HEALTH_STATE_FILE: /tmp/ramlp-health.state
+          HEALTH_RETRIES: '1'
+        run: scripts/health-watch.sh http://127.0.0.1:8000/health
+
       - name: Show container logs on failure
         if: failure()
         run: docker compose logs --no-color

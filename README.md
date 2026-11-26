@@ -504,7 +504,8 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 
 ### Production Checklist
 - [ ] Set `APP_ENV=production` and `APP_DEBUG=false`
-- [ ] Generate one unique `APP_KEY` and give the same value to the web and queue containers
+- [ ] Generate one unique `APP_KEY` and give the same value to the web and queue containers (or mount it as a secret file)
+- [ ] Move `APP_KEY`, `DB_PASSWORD` and payment/AWS keys out of plain environment variables (`scripts/secrets-init.sh` + `docker-compose.secrets.yml`, or your secret manager)
 - [ ] Enable HTTPS/SSL and set `SESSION_SECURE_COOKIE=true`
 - [ ] Use MySQL with backups; add a read replica when reporting queries get heavy
 - [ ] Schedule `scripts/db-backup.sh` and prove a restore with `scripts/db-restore.sh`; keep a copy off the database host
@@ -521,7 +522,7 @@ comes from Paystack, so the bank codes always match the ones used for transfers.
 - [ ] Configure Pusher/Soketi and set `BROADCAST_DRIVER=pusher`
 - [ ] Run more than one backend replica behind a load balancer (remove the fixed `8000:8000` port mapping, or put nginx/ALB in front)
 - [ ] Restrict CORS to the real frontend origin
-- [ ] Keep the default API throttle (`API_RATE_LIMIT=120`) and scrape `/health` plus `/api/v1/admin/metrics?format=prometheus`
+- [ ] Keep the default API throttle (`API_RATE_LIMIT=120`); monitor `/health` from outside the host and scrape `/api/v1/admin/metrics?format=prometheus`
 - [ ] Ship container logs to a log store; `LOG_CHANNEL=stderr` is already set in the image
 - [ ] Do not run the demo `DatabaseSeeder` in production; the entrypoint runs the idempotent `PermissionsSeeder` (roles + permissions) on boot
 
@@ -606,6 +607,62 @@ scripts/db-restore.sh backups/ramlp-20261125T020000Z.sql.gz ramlp_restore --stri
 Restoring over the live database needs `--force`. Run a restore drill after
 changing MySQL versions or backup destinations, and keep a copy off the
 database host: a disk failure takes the local dumps with it.
+
+### Secrets
+
+Compose passes configuration as environment variables, which anyone with Docker
+access can read with `docker inspect`. For production, move at least `APP_KEY`
+and `DB_PASSWORD` into files:
+
+```bash
+# Writes ./secrets/app_key and ./secrets/db_password (owner-only)
+scripts/secrets-init.sh
+
+docker compose -f docker-compose.yml -f docker-compose.secrets.yml up -d
+```
+
+The entrypoint accepts `<VAR>_FILE` for `APP_KEY`, `DB_PASSWORD`,
+`REDIS_PASSWORD`, `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_SECRET_KEY`, `MAIL_PASSWORD`,
+`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `PUSHER_APP_SECRET`, so the same
+pattern works with a Kubernetes secret volume or a systemd `LoadCredential=`
+mount. Add entries to `docker-compose.secrets.yml` as you move more values.
+
+`backend/.env` remains the local source for `scripts/secrets-init.sh`; keep it
+at mode 600 and never commit it. If a cloud secret manager is available, inject
+the variables at boot instead of keeping a file on disk.
+
+Rotate `APP_KEY` deliberately: changing it logs everyone out and makes
+previously encrypted values unreadable.
+
+### Monitoring
+
+`GET /health` checks the database and the shared cache and returns `503` with
+`"status":"degraded"` when either fails, so it is the right endpoint for an
+external monitor. Point the monitor at both the API and the frontend, at
+one-minute intervals, and alert to email and chat.
+
+For a self-hosted check, `scripts/health-watch.sh` probes `/health`, retries,
+and posts to a Slack-compatible webhook only when the state changes:
+
+```bash
+# Cron every minute
+* * * * * cd /srv/ramlp && ALERT_WEBHOOK=https://hooks.slack.com/services/... scripts/health-watch.sh >> /var/log/ramlp-health.log 2>&1
+```
+
+`HEALTH_URL`, `HEALTH_RETRIES`, `HEALTH_DELAY`, `HEALTH_TIMEOUT` and
+`HEALTH_STATE_FILE` tune it. It exits 0 when healthy and 1 when not, so a
+systemd timer or another monitor can consume the result too.
+
+`/health` cannot see queue depth, disk space or the S3 bucket. Check those from
+the host (disk) and from the queue:
+
+```bash
+# Exits non-zero when more than 1000 jobs are waiting.
+docker compose exec -T queue php artisan queue:monitor redis:default --max=1000
+```
+
+Scrape `/api/v1/admin/metrics?format=prometheus` for request rate, error statuses
+and slow requests.
 
 ## Testing
 

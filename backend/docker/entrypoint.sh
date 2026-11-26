@@ -3,6 +3,11 @@ set -e
 
 cd /app
 
+# Load any secrets mounted as files (APP_KEY_FILE, DB_PASSWORD_FILE, ...)
+# before Laravel reads its environment.
+. ./docker/secrets.sh
+load_secret_files
+
 # The image ships without a .env (it is dockerignored). Build one from the
 # example on first boot; real configuration arrives as container env vars.
 if [ ! -f .env ]; then

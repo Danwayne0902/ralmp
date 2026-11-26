@@ -53,3 +53,6 @@ loadtest/results/*.json
 
 # local database dumps
 backups/
+
+# mounted secret files
+secrets/
